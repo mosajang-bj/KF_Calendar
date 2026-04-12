@@ -1343,11 +1343,34 @@ function renderBottom(){
   renderGoods(bot, evtsOnDay);
 }
 
+// ── 이벤트 이름에서 매칭용 키워드 추출 ──
+function extractKeywords(eventName) {
+  // 괄호/특수문자 제거 후 2자 이상 토큰만
+  const cleaned = eventName
+    .replace(/[()[\]{}「」『』【】〔〕·•,\-–—_/\\|!?~@#$%^&*+=<>:;"']/g, ' ')
+    .toLowerCase();
+  const tokens = cleaned.split(/\s+/).filter(t => t.length >= 2);
+  // 너무 일반적인 단어 제외
+  const STOP = new Set(['concert','tour','the','and','for','with','feat','live','night','day',
+    'bts','enhypen','seventeen','세븐틴','방탄','엔하이픈','소년단']);
+  return tokens.filter(t => !STOP.has(t));
+}
+
+// 상품명이 키워드와 얼마나 매칭되는지 점수 반환
+function keywordScore(itemName, keywords) {
+  if(!keywords.length) return 0;
+  const name = itemName.toLowerCase();
+  let score = 0;
+  keywords.forEach(kw => { if(name.includes(kw)) score++; });
+  return score;
+}
+
 function renderGoods(bot, evtsOnDay){
   // ── 어떤 그룹·이벤트 기준으로 보여줄지 결정 ──
   let featuredGroups=[];
   let goodsTitle='', goodsSub='';
-  let priorityCats=[];   // 이벤트 타입별 추천 카테고리 순서
+  let priorityCats=[];
+  let matchKeywords=[];  // 키워드 매칭용
 
   if(selectedEventId){
     const evt=EVENTS.find(e=>e.id===selectedEventId);
@@ -1355,12 +1378,12 @@ function renderGoods(bot, evtsOnDay){
       featuredGroups=[evt.group];
       const g=groupOf(evt.group);
       priorityCats=TYPE_CAT_PRIORITY[evt.type]||[];
+      matchKeywords=extractKeywords(evt.name);
       goodsTitle=`${g.label} · ${TYPE_LABEL[evt.type]||evt.type} Picks`;
       goodsSub=evt.name;
     }
   } else if(evtsOnDay.length){
     featuredGroups=[activeGroup];
-    // 오늘 이벤트 타입들을 합산해 우선순위 계산
     const types=[...new Set(evtsOnDay.map(e=>e.type))];
     const catScores={};
     types.forEach(t=>{
@@ -1369,6 +1392,8 @@ function renderGoods(bot, evtsOnDay){
       });
     });
     priorityCats=Object.entries(catScores).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+    // 당일 모든 이벤트 키워드 합산
+    matchKeywords=[...new Set(evtsOnDay.flatMap(e=>extractKeywords(e.name)))];
     goodsTitle='Today\'s Picks';
     goodsSub=`Based on ${evtsOnDay.length} event${evtsOnDay.length>1?'s':''} · Tap an event to filter`;
   } else {
@@ -1383,16 +1408,16 @@ function renderGoods(bot, evtsOnDay){
     (GOODS[gid]||[]).forEach(item=>goodsList.push({...item,groupId:gid}));
   });
 
-  // ── 이벤트 타입 기반 정렬 (우선순위 카테고리 순서대로) ──
-  if(priorityCats.length){
-    goodsList.sort((a,b)=>{
-      const ai=priorityCats.indexOf(a.cat);
-      const bi=priorityCats.indexOf(b.cat);
+  // ── 정렬: 키워드 매칭 점수 → 카테고리 우선순위 → 나머지 ──
+  goodsList.sort((a,b)=>{
+    const ks = keywordScore(b.name, matchKeywords) - keywordScore(a.name, matchKeywords);
+    if(ks !== 0) return ks;
+    if(priorityCats.length){
+      const ai=priorityCats.indexOf(a.cat), bi=priorityCats.indexOf(b.cat);
       return (ai===-1?999:ai)-(bi===-1?999:bi);
-    });
-  } else {
-    goodsList=shuffle(goodsList);
-  }
+    }
+    return 0;
+  });
 
   // ── 카테고리 필터 적용 ──
   const filtered = activeGoodsCat==='all'
@@ -1400,12 +1425,16 @@ function renderGoods(bot, evtsOnDay){
     : goodsList.filter(item=>item.cat===activeGoodsCat);
 
   // ── 헤더 ──
+  const topMatched = goodsList.filter(i=>keywordScore(i.name,matchKeywords)>0).length;
+  const subText = matchKeywords.length && topMatched > 0
+    ? `${goodsSub} · ${topMatched} keyword matches`
+    : goodsSub;
   const ghdr=document.createElement('div');
   ghdr.className='goods-hdr';
   ghdr.innerHTML=`
     <div class="goods-hdr-l">
       <div class="goods-hdr-title">${goodsTitle}</div>
-      <div class="goods-hdr-sub">${goodsSub}</div>
+      <div class="goods-hdr-sub">${subText}</div>
     </div>
     <button class="see-all" onclick="window.open('https://globalbunjang.com','_blank')">See all →</button>
   `;
