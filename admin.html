@@ -41,6 +41,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .fchip.manual.on{background:#306050;color:#fff}
 .fchip.fan{border-color:#805020;color:#f0a040}
 .fchip.fan.on{background:#805020;color:#fff}
+.fchip.pending{border-color:#8040a0;color:#d080f0;border-style:dashed}
+.fchip.pending.on{background:#5a2080;border-style:solid;color:#fff}
 /* cal grid */
 .cal-grid-wrap{overflow-x:auto}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:90px;gap:1px;background:#22223a;border-radius:10px;overflow:hidden;min-width:560px}
@@ -59,6 +61,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .src-crawl{background:#1a3050;color:#70a0d0}
 .src-manual{background:#1a3028;color:#60d090}
 .src-fan{background:#3a2810;color:#f0a040}
+.src-pending{background:#3a1a40;color:#d080f0;border:1px dashed #8040a0}
 /* event detail panel */
 .detail-panel{background:#1a1a28;border:1px solid #2a2a40;border-radius:10px;padding:18px;margin-bottom:16px;display:none}
 .detail-panel.open{display:block}
@@ -153,6 +156,7 @@ select option{background:#0d0d14}
         <div class="fchip crawl on"    onclick="toggleFilter('src','crawl')">Crawled</div>
         <div class="fchip manual on"   onclick="toggleFilter('src','manual')">Manual</div>
         <div class="fchip fan on"      onclick="toggleFilter('src','fan')">Fan-approved</div>
+        <div class="fchip pending on"  onclick="toggleFilter('src','pending')">⏳ Pending</div>
       </div>
     </div>
 
@@ -268,13 +272,14 @@ const TABS = ['calendar','submissions','history','feedback','add'];
 let allEvents = [];
 let calYear, calMonth;
 let filterGroup = 'all';
-let filterSrc = new Set(['crawl','manual','fan']);
+let filterSrc = new Set(['crawl','manual','fan','pending']);
 let detailEvent = null;
 let editingId = null;
+let allSubmissions = [];
 
 const GC = {bts:'badge-bts',enhypen:'badge-enhypen',seventeen:'badge-seventeen'};
 const SC = {crawl:'badge-crawl',manual:'badge-manual',fan:'badge-fan'};
-const PC = {crawl:'src-crawl',manual:'src-manual',fan:'src-fan'};
+const PC = {crawl:'src-crawl',manual:'src-manual',fan:'src-fan',pending:'src-pending'};
 const TYPE_EMOJI = {comeback:'🎵',concert:'🎤',tour:'🌏',fansign:'✍️',fancon:'🎉',release:'💿',special:'⭐'};
 
 // ── TABS ──
@@ -293,7 +298,7 @@ function showTab(name) {
 (async function init() {
   const now = new Date();
   calYear = now.getFullYear(); calMonth = now.getMonth();
-  await loadAllEvents();
+  await Promise.all([loadAllEvents(), loadAllSubmissions()]);
   renderCal();
   updateTopbar();
   loadSubmissions(); // pre-load badge count
@@ -302,6 +307,17 @@ function showTab(name) {
 async function loadAllEvents() {
   const res = await api('events?select=*&order=date_start.asc', {prefer:''});
   allEvents = await res.json();
+}
+
+async function loadAllSubmissions() {
+  const res = await api('event_submissions?select=*&status=eq.pending&order=date_start.asc', {prefer:''});
+  const rows = await res.json();
+  // normalize to same shape as events, mark source='pending'
+  allSubmissions = Array.isArray(rows) ? rows.map(r => ({
+    ...r,
+    source: 'pending',
+    _isPending: true,
+  })) : [];
 }
 
 function updateTopbar() {
@@ -330,10 +346,16 @@ function toggleFilter(type, val) {
 }
 
 function visibleEvents() {
-  return allEvents.filter(e =>
+  const approved = allEvents.filter(e =>
     (filterGroup==='all' || e.group_id===filterGroup) &&
     filterSrc.has(e.source||'manual')
   );
+  const pending = filterSrc.has('pending')
+    ? allSubmissions.filter(e =>
+        filterGroup==='all' || e.group_id===filterGroup
+      )
+    : [];
+  return [...approved, ...pending];
 }
 
 function renderCal() {
@@ -404,25 +426,41 @@ function openDetail(e) {
   panel.classList.add('open');
   document.getElementById('dp-edit').style.display='none';
   document.getElementById('dp-name').textContent = e.name;
+  const srcLabel = e._isPending ? '⏳ Pending Fan Submission' : (e.source||'manual');
+  const srcBadge = e._isPending ? 'badge-pending' : (SC[e.source]||'badge-type');
   document.getElementById('dp-meta').innerHTML = `
     <span class="badge ${GC[e.group_id]||'badge-type'}">${(e.group_id||'').toUpperCase()}</span>
-    <span class="badge ${SC[e.source]||'badge-type'}">${e.source||'manual'}</span>
+    <span class="badge ${srcBadge}">${srcLabel}</span>
     <span class="badge badge-type">${e.type}</span><br>
     📅 ${e.date_start}${e.date_end?' → '+e.date_end:''} &nbsp; 📍 ${e.venue||'—'}
-    ${e.source_url?`<br>🔗 <a href="${e.source_url}" target="_blank">${e.source_url.slice(0,60)}</a>`:''}
+    ${e.evidence_url?`<br>🔗 <a href="${e.evidence_url}" target="_blank">${e.evidence_url.slice(0,60)}</a>`:
+      e.source_url?`<br>🔗 <a href="${e.source_url}" target="_blank">${e.source_url.slice(0,60)}</a>`:''}
+    ${e.submitted_by?`<br>👤 Submitted by: ${e.submitted_by}`:''}
   `;
   const actions = document.getElementById('dp-actions');
   actions.innerHTML='';
-  const btnEdit = document.createElement('button');
-  btnEdit.className='btn-edit'; btnEdit.textContent='Edit';
-  btnEdit.onclick = () => toggleEditForm(e);
-  const btnDel = document.createElement('button');
-  btnDel.className='btn-delete'; btnDel.textContent='Delete';
-  btnDel.onclick = () => deleteEvent(e.id);
   const btnClose = document.createElement('button');
   btnClose.className='btn-sm'; btnClose.style.background='#222'; btnClose.style.color='#888';
   btnClose.textContent='Close'; btnClose.onclick = () => panel.classList.remove('open');
-  actions.append(btnEdit, btnDel, btnClose);
+
+  if(e._isPending) {
+    // Pending submission: show Approve / Reject
+    const btnApp = document.createElement('button');
+    btnApp.className='btn-approve'; btnApp.textContent='✓ Approve';
+    btnApp.onclick = () => reviewSubmission(e.id, 'approved');
+    const btnRej = document.createElement('button');
+    btnRej.className='btn-reject'; btnRej.textContent='✗ Reject';
+    btnRej.onclick = () => reviewSubmission(e.id, 'rejected');
+    actions.append(btnApp, btnRej, btnClose);
+  } else {
+    const btnEdit = document.createElement('button');
+    btnEdit.className='btn-edit'; btnEdit.textContent='Edit';
+    btnEdit.onclick = () => toggleEditForm(e);
+    const btnDel = document.createElement('button');
+    btnDel.className='btn-delete'; btnDel.textContent='Delete';
+    btnDel.onclick = () => deleteEvent(e.id);
+    actions.append(btnEdit, btnDel, btnClose);
+  }
 }
 
 function toggleEditForm(e) {
@@ -514,6 +552,29 @@ function makeSubCard(r, showActions) {
     </div>
   `;
   return card;
+}
+
+// Called from calendar detail panel for pending submissions
+async function reviewSubmission(id, action) {
+  const panel = document.getElementById('detail-panel');
+  if(action === 'approved') {
+    const row = allSubmissions.find(s => s.id === id);
+    if(!row) return;
+    await api('events', {method:'POST', prefer:'return=minimal', body:JSON.stringify({
+      group_id:row.group_id, type:row.type, name:row.name, venue:row.venue||'',
+      date_start:row.date_start, date_end:row.date_end||null, source:'fan', source_url:row.evidence_url||'',
+    })});
+    await api(`event_submissions?id=eq.${id}`, {method:'PATCH', prefer:'return=minimal',
+      body:JSON.stringify({status:'approved', reviewed_at:new Date().toISOString()})});
+  } else {
+    const reason = prompt('Rejection reason (optional):') ?? '';
+    await api(`event_submissions?id=eq.${id}`, {method:'PATCH', prefer:'return=minimal',
+      body:JSON.stringify({status:'rejected', reject_reason:reason, reviewed_at:new Date().toISOString()})});
+  }
+  panel.classList.remove('open');
+  await Promise.all([loadAllEvents(), loadAllSubmissions()]);
+  renderCal();
+  updateTopbar();
 }
 
 async function approveSubmission(id, btn) {
