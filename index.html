@@ -79,8 +79,8 @@ body{
   display:flex;flex-direction:column;
   min-height:100%;
   -webkit-font-smoothing:antialiased;
-  /* 기본 = ENHYPEN */
-  background: linear-gradient(to top right, #FFD4A8 0%, #FFE8C8 35%, #D8EAFF 65%, #BACED8 100%);
+  /* 기본 = BTS */
+  background: linear-gradient(to top right, #D4AAFF 0%, #E8CCFF 35%, #FFD0F0 65%, #FFB8E4 100%);
   transition: background 0.5s ease;
 }
 /* BTS: 보라(좌하) ↔ 핑크(우상) */
@@ -551,9 +551,9 @@ const _kst = new Date(new Date().toLocaleString('en-US', {timeZone:'Asia/Seoul'}
 const TODAY = new Date(_kst.getFullYear(), _kst.getMonth(), _kst.getDate());
 
 const GROUPS = [
-  {id:'enhypen',   label:'ENHYPEN',    color:'#E8823A', theme:'theme-enhypen'},
   {id:'bts',       label:'BTS',        color:'#A855C8', theme:'theme-bts'},
   {id:'seventeen', label:'SEVENTEEN',  color:'#D060A0', theme:'theme-seventeen'},
+  {id:'enhypen',   label:'ENHYPEN',    color:'#E8823A', theme:'theme-enhypen'},
 ];
 
 const TYPE_COLORS = {comeback:'#7C5CFC',concert:'#FF4757',fansign:'#FF80AB',release:'#00C4B4',tour:'#FFA500',fancon:'#6B94D6',special:'#FFD700'};
@@ -1034,7 +1034,7 @@ async function fetchGoods() {
 //  STATE
 // ─────────────────────────────────────────
 let view = 'week';               // 'week' | 'month'
-let activeGroup = 'enhypen';    // 첫 번째 그룹으로 시작
+let activeGroup = 'bts';        // 첫 번째 그룹으로 시작
 let selectedDate = dKey(TODAY);  // 'YYYY-MM-DD'
 let weekStart = getWeekStart(TODAY);
 let monthPivot = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
