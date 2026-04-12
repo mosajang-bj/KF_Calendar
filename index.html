@@ -1186,13 +1186,15 @@ function renderGoods_grid(container, list){
     card.style.animationDelay=`${i*25}ms`;
     card.style.animation='fadeUp .22s ease both';
 
-    const imgHtml=item.imageUrl
-      ? `<img src="${item.imageUrl}" alt="${item.name}" loading="lazy" onerror="this.classList.add('err')">`
+    const imgHtml=imgSrc
+      ? `<img src="${imgSrc}" alt="${item.name}" loading="lazy" onerror="this.classList.add('err')">`
       : '';
     const fallbackEmoji=catInfo.emoji||'📦';
     const brandLabel=item.brand||g.label;
     // 번장 상품 페이지 URL (id 있으면 연결)
-    const productUrl=item.id?`https://m.bunjang.co.kr/products/${item.id}`:'';
+    const productUrl=item.id?`https://global.bunjang.com/products/${item.id}`:'';
+    const imgSrc=item.imageUrl?(location.protocol==='file:'?item.imageUrl:`/api/image?url=${encodeURIComponent(item.imageUrl)}`):'';
+
 
     card.innerHTML=`
       <div class="gcard-img">
@@ -1215,7 +1217,7 @@ function renderGoods_grid(container, list){
         </div>
       </div>
     `;
-    card.onclick=()=>{ if(productUrl) window.open(productUrl,'_blank'); else toast(`🛍️ ${item.name}`); };
+    card.onclick=()=>{ if(productUrl) window.open(productUrl,'_blank'); else toast('번장글로벌에서 검색해보세요!'); };
     grid.appendChild(card);
   });
 
