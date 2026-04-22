@@ -767,9 +767,8 @@ function filtered() {
       return tags.includes(activeTag);
     });
   }
-  // 정렬
-  if (sortMode === 'price_asc') list = [...list].sort((a, b) => a.price - b.price);
-  else list = [...list].sort((a, b) => b.price - a.price); // 기본: 높은 가격순
+  // 정렬 — 항상 새 배열로 정렬
+  list = [...list].sort((a, b) => sortMode === 'price_asc' ? a.price - b.price : b.price - a.price);
   return list;
 }
 
