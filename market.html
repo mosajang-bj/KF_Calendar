@@ -453,48 +453,43 @@ body {
   border: 1.5px solid var(--border);
   overflow: hidden; position: relative;
   box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  display: flex; flex-direction: column;
 }
 .cmp-card-img {
   width: 100%; aspect-ratio: 1/1; object-fit: cover;
-  background: rgba(240,235,255,0.5); display: block;
+  background: rgba(240,235,255,0.5); display: block; flex-shrink: 0;
 }
 .cmp-card-img-ph {
-  width: 100%; aspect-ratio: 1/1;
+  width: 100%; aspect-ratio: 1/1; flex-shrink: 0;
   background: linear-gradient(135deg,rgba(196,160,240,0.2),rgba(255,184,228,0.2));
   display: flex; align-items: center; justify-content: center; font-size: 28px;
 }
-.cmp-card-body { padding: 8px 9px 10px; }
+.cmp-card-body { padding: 8px 9px 10px; flex: 1; min-width: 0; }
 .cmp-card-name {
   font-size: 10.5px; font-weight: 600; color: var(--txt1);
   line-height: 1.35; overflow: hidden; display: -webkit-box;
   -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-  line-clamp: 2;
+  line-clamp: 2; word-break: break-all;
   margin-bottom: 5px;
 }
-.cmp-card-price { font-size: 13px; font-weight: 800; color: var(--txt1); }
+.cmp-card-price {
+  font-size: 12px; font-weight: 800; color: var(--txt1);
+  word-break: break-all;
+}
 .cmp-card-group {
   font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 5px;
   background: rgba(155,111,216,0.08); color: var(--accent);
   border: 1px solid rgba(155,111,216,0.15);
-  display: inline-block; margin-top: 3px;
+  display: inline-block; margin-top: 4px;
 }
 .cmp-remove {
   position: absolute; top: 6px; right: 6px;
-  width: 22px; height: 22px; border-radius: 50%;
-  background: rgba(0,0,0,0.5); border: none;
-  color: #fff; font-size: 13px; cursor: pointer;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(0,0,0,0.55); border: none;
+  color: #fff; font-size: 14px; font-weight: 700; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  line-height: 1;
+  line-height: 1; padding: 0;
 }
-.cmp-empty-slot {
-  aspect-ratio: 1/1; border-radius: 14px;
-  border: 2px dashed var(--border2);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 6px; color: var(--txt3); font-size: 11px; font-weight: 600;
-  background: rgba(255,255,255,0.4);
-}
-.cmp-empty-slot-icon { font-size: 24px; opacity: .4; }
 .cmp-actions {
   display: flex; gap: 10px; margin-top: 16px;
 }
@@ -1110,12 +1105,6 @@ function renderCompareGrid() {
             <div class="cmp-card-price">₩${item.price?.toLocaleString()}</div>
             <div class="cmp-card-group">${groupLabel}</div>
           </div>
-        </div>`);
-    } else {
-      slots.push(`
-        <div class="cmp-empty-slot">
-          <div class="cmp-empty-slot-icon">＋</div>
-          <div>카드를 담아봐</div>
         </div>`);
     }
   }
