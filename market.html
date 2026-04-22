@@ -128,35 +128,6 @@ body {
 .chip:hover { background: rgba(255,255,255,0.9); color: var(--txt1); }
 .chip.on { background: rgba(255,255,255,0.95); color: var(--txt1); border-color: var(--accent); box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
 
-/* ══════════════════════════════════════
-   EVENT TYPE FILTER (태그)
-══════════════════════════════════════ */
-.tag-bar {
-  position: sticky; top: 98px; z-index: 39;
-  padding: 8px 14px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(255,255,255,0.55);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  overflow-x: auto; scrollbar-width: none;
-}
-.tag-bar::-webkit-scrollbar { display: none; }
-.tag-row { display: flex; gap: 6px; width: max-content; }
-.tag-chip {
-  display: flex; align-items: center; gap: 4px;
-  padding: 4px 11px; border-radius: 16px;
-  font-size: 11px; font-weight: 600;
-  border: 1.5px solid var(--border);
-  background: rgba(255,255,255,0.55); color: var(--txt2);
-  cursor: pointer; white-space: nowrap;
-  transition: all .15s; user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-.tag-chip .ticon { font-size: 12px; }
-.tag-chip:hover { background: rgba(255,255,255,0.85); color: var(--txt1); }
-.tag-chip.on {
-  background: rgba(255,255,255,0.95); color: var(--accent);
-  border-color: var(--accent); box-shadow: 0 2px 8px rgba(155,111,216,0.15);
-}
 
 /* ══════════════════════════════════════
    MAIN CONTENT
@@ -403,29 +374,6 @@ body {
   </div>
 </div>
 
-<!-- ═══ EVENT TYPE TAG FILTER ═══ -->
-<div class="tag-bar">
-  <div class="tag-row" id="tagRow">
-    <div class="tag-chip on" data-tag="all">
-      <span class="ticon">✨</span> 전체
-    </div>
-    <div class="tag-chip" data-tag="concert">
-      <span class="ticon">🎤</span> 콘서트 포카
-    </div>
-    <div class="tag-chip" data-tag="fansign">
-      <span class="ticon">✍️</span> 팬싸 포카
-    </div>
-    <div class="tag-chip" data-tag="workshop">
-      <span class="ticon">🎬</span> 공방 포카
-    </div>
-    <div class="tag-chip" data-tag="album">
-      <span class="ticon">💿</span> 앨범 버전 포카
-    </div>
-    <div class="tag-chip" data-tag="broadcast">
-      <span class="ticon">📺</span> 방송 포카
-    </div>
-  </div>
-</div>
 
 <!-- ═══ MAIN ═══ -->
 <main class="main" id="main">
@@ -802,11 +750,6 @@ function setTag(tag) {
   render();
 }
 
-document.getElementById('tagRow').addEventListener('click', e => {
-  const chip = e.target.closest('[data-tag]');
-  if (!chip) return;
-  setTag(chip.dataset.tag);
-});
 document.getElementById('themeRow').addEventListener('click', e => {
   const card = e.target.closest('[data-tag]');
   if (!card) return;
