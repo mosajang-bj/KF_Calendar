@@ -102,29 +102,55 @@ body {
 }
 
 /* ══════════════════════════════════════
-   GROUP FILTER
+   TAG TYPE BAR (헤더 sticky)
 ══════════════════════════════════════ */
-.group-bar {
+.tag-bar {
   position: sticky; top: 54px; z-index: 40;
-  padding: 9px 14px;
+  padding: 0 14px;
   border-bottom: 1px solid var(--border);
   background: rgba(255,255,255,0.6);
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   overflow-x: auto; scrollbar-width: none;
 }
-.group-bar::-webkit-scrollbar { display: none; }
-.group-row { display: flex; gap: 7px; width: max-content; }
+.tag-bar::-webkit-scrollbar { display: none; }
+.tag-row { display: flex; gap: 0; width: max-content; }
+.tag-tab {
+  display: flex; align-items: center; gap: 5px;
+  padding: 12px 14px;
+  font-size: 12px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; user-select: none;
+  color: var(--txt2); border-bottom: 2.5px solid transparent;
+  transition: all .18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.tag-tab .ticon { font-size: 13px; }
+.tag-tab:hover { color: var(--txt1); }
+.tag-tab.on { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ══════════════════════════════════════
+   GROUP GRID (바디)
+══════════════════════════════════════ */
+.group-section {
+  padding: 16px 16px 4px;
+}
+.group-section-title {
+  font-size: 11px; font-weight: 700; color: var(--txt3);
+  letter-spacing: .5px; text-transform: uppercase; margin-bottom: 10px;
+}
+.group-grid {
+  display: flex; flex-wrap: wrap; gap: 7px;
+}
 .chip {
   display: flex; align-items: center; gap: 5px;
-  padding: 5px 14px; border-radius: 20px;
+  padding: 5px 12px; border-radius: 20px;
   font-size: 11.5px; font-weight: 700; letter-spacing: .2px;
   cursor: pointer; border: 1.5px solid var(--border);
   background: rgba(255,255,255,0.6); color: var(--txt2);
-  transition: all .2s; white-space: nowrap; user-select: none;
+  transition: all .18s; white-space: nowrap; user-select: none;
   -webkit-tap-highlight-color: transparent;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 5px rgba(0,0,0,0.04);
 }
-.chip .cdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.chip .cdot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 .chip:hover { background: rgba(255,255,255,0.9); color: var(--txt1); }
 .chip.on { background: rgba(255,255,255,0.95); color: var(--txt1); border-color: var(--accent); box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
 
@@ -356,27 +382,49 @@ body {
   </div>
 </header>
 
-<!-- ═══ GROUP FILTER ═══ -->
-<div class="group-bar">
-  <div class="group-row" id="groupRow">
-    <div class="chip on" data-group="all">
-      <span class="cdot" style="background:#9B6FD8"></span> 전체
-    </div>
-    <div class="chip" data-group="bts">
-      <span class="cdot" style="background:#A855C8"></span> BTS
-    </div>
-    <div class="chip" data-group="seventeen">
-      <span class="cdot" style="background:#D060A0"></span> SEVENTEEN
-    </div>
-    <div class="chip" data-group="enhypen">
-      <span class="cdot" style="background:#E8823A"></span> ENHYPEN
-    </div>
+<!-- ═══ TAG TYPE BAR (sticky 헤더) ═══ -->
+<div class="tag-bar">
+  <div class="tag-row" id="tagRow">
+    <div class="tag-tab on" data-tag="all"><span class="ticon">✨</span> 전체</div>
+    <div class="tag-tab" data-tag="concert"><span class="ticon">🎤</span> 콘서트</div>
+    <div class="tag-tab" data-tag="fansign"><span class="ticon">✍️</span> 팬싸</div>
+    <div class="tag-tab" data-tag="workshop"><span class="ticon">🎬</span> 공방</div>
+    <div class="tag-tab" data-tag="album"><span class="ticon">💿</span> 앨범버전</div>
+    <div class="tag-tab" data-tag="broadcast"><span class="ticon">📺</span> 방송</div>
   </div>
 </div>
 
-
 <!-- ═══ MAIN ═══ -->
 <main class="main" id="main">
+
+  <!-- 그룹 선택 -->
+  <div class="group-section">
+    <div class="group-section-title">그룹 선택</div>
+    <div class="group-grid" id="groupRow">
+      <div class="chip on" data-group="all"><span class="cdot" style="background:#9B6FD8"></span>전체</div>
+      <div class="chip" data-group="bts"><span class="cdot" style="background:#A855C8"></span>BTS</div>
+      <div class="chip" data-group="seventeen"><span class="cdot" style="background:#D060A0"></span>SEVENTEEN</div>
+      <div class="chip" data-group="enhypen"><span class="cdot" style="background:#E8823A"></span>ENHYPEN</div>
+      <div class="chip" data-group="stray-kids"><span class="cdot" style="background:#FF5A5A"></span>Stray Kids</div>
+      <div class="chip" data-group="txt"><span class="cdot" style="background:#5B9BD5"></span>TXT</div>
+      <div class="chip" data-group="ateez"><span class="cdot" style="background:#FF8C00"></span>ATEEZ</div>
+      <div class="chip" data-group="nct127"><span class="cdot" style="background:#00B4D8"></span>NCT 127</div>
+      <div class="chip" data-group="nct-dream"><span class="cdot" style="background:#06D6A0"></span>NCT DREAM</div>
+      <div class="chip" data-group="shinee"><span class="cdot" style="background:#4CC9F0"></span>SHINee</div>
+      <div class="chip" data-group="exo"><span class="cdot" style="background:#C77DFF"></span>EXO</div>
+      <div class="chip" data-group="got7"><span class="cdot" style="background:#2DC653"></span>GOT7</div>
+      <div class="chip" data-group="monsta-x"><span class="cdot" style="background:#7B2D8B"></span>MONSTA X</div>
+      <div class="chip" data-group="bigbang"><span class="cdot" style="background:#FFD600"></span>BIGBANG</div>
+      <div class="chip" data-group="2pm"><span class="cdot" style="background:#E63946"></span>2PM</div>
+      <div class="chip" data-group="infinite"><span class="cdot" style="background:#4361EE"></span>INFINITE</div>
+      <div class="chip" data-group="highlight"><span class="cdot" style="background:#F77F00"></span>Highlight</div>
+      <div class="chip" data-group="day6"><span class="cdot" style="background:#3A86FF"></span>DAY6</div>
+      <div class="chip" data-group="astro"><span class="cdot" style="background:#FF006E"></span>ASTRO</div>
+      <div class="chip" data-group="victon"><span class="cdot" style="background:#8338EC"></span>VICTON</div>
+      <div class="chip" data-group="cravity"><span class="cdot" style="background:#FB5607"></span>CRAVITY</div>
+      <div class="chip" data-group="xikers"><span class="cdot" style="background:#FF4D6D"></span>xikers</div>
+    </div>
+  </div>
 
   <!-- 테마 배너 섹션 -->
   <div class="section" id="themeSection">
@@ -736,19 +784,25 @@ document.getElementById('groupRow').addEventListener('click', e => {
   render();
 });
 
-// 태그 필터 (태그바 + 테마카드 둘 다)
+// 태그 필터 (헤더 탭 + 테마카드 둘 다 동기화)
 function setTag(tag) {
   activeTag = tag;
   visibleCount = PAGE_SIZE;
-  document.querySelectorAll('[data-tag]').forEach(el => {
+  document.querySelectorAll('.tag-tab').forEach(el => {
     el.classList.toggle('on', el.dataset.tag === tag);
-    if (el.classList.contains('theme-card')) {
-      el.classList.toggle('active', el.dataset.tag === tag);
-    }
+  });
+  document.querySelectorAll('.theme-card').forEach(el => {
+    el.classList.toggle('active', el.dataset.tag === tag);
   });
   gaEvent('filter_tag', { tag, group: activeGroup });
   render();
 }
+
+document.getElementById('tagRow').addEventListener('click', e => {
+  const tab = e.target.closest('[data-tag]');
+  if (!tab) return;
+  setTag(tab.dataset.tag);
+});
 
 document.getElementById('themeRow').addEventListener('click', e => {
   const card = e.target.closest('[data-tag]');
