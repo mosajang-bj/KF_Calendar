@@ -1996,7 +1996,7 @@ function openFeedbackModal() {
   if(document.getElementById('fb-modal')) return;
   const overlay = document.createElement('div');
   overlay.id = 'fb-modal';
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9998;display:flex;align-items:flex-end;justify-content:center;padding:0 0 80px';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9998;display:flex;align-items:flex-end;justify-content:center;padding:0';
   overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
   overlay.innerHTML = `
     <div style="background:var(--bg4);border-radius:var(--r) var(--r) 0 0;padding:24px;width:100%;max-width:480px;
