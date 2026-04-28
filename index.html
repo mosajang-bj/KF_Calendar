@@ -610,8 +610,8 @@ body.theme-seventeen::before{
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </button>
     <div class="toggle-wrap">
-      <button class="toggle-btn on" id="btnWeek" onclick="setView('week')">Week</button>
-      <button class="toggle-btn"   id="btnMonth" onclick="setView('month')">Month</button>
+      <button class="toggle-btn" id="btnWeek" onclick="setView('week')">Week</button>
+      <button class="toggle-btn on" id="btnMonth" onclick="setView('month')">Month</button>
     </div>
   </div>
 </div>
@@ -1248,7 +1248,7 @@ async function fetchGoods() {
 // ─────────────────────────────────────────
 //  STATE
 // ─────────────────────────────────────────
-let view = 'week';               // 'week' | 'month'
+let view = 'month';              // 'week' | 'month'
 let activeGroup = 'bts';        // 첫 번째 그룹으로 시작
 let selectedDate = dKey(TODAY);  // 'YYYY-MM-DD'
 let weekStart = getWeekStart(TODAY);
@@ -1415,7 +1415,7 @@ function buildWeek(area){
       cell.appendChild(dc);
     }
 
-    cell.onclick=()=>{ selectedDate=ds;selectedEventId=null;activeGoodsCat='all';buildCal();renderBottom() };
+    cell.onclick=()=>{ selectedDate=ds;selectedEventId=null;activeGoodsCat='all';buildCal();renderBottom();scrollToBottom() };
     grid.appendChild(cell);
   }
   area.appendChild(grid);
@@ -1499,10 +1499,119 @@ function buildMonth(area){
       cell.appendChild(pillsEl);
     }
 
-    cell.onclick=()=>{ selectedDate=ds;selectedEventId=null;activeGoodsCat='all';buildCal();renderBottom() };
+    cell.onclick=()=>{ selectedDate=ds;selectedEventId=null;activeGoodsCat='all';buildCal();renderBottom();scrollToBottom() };
     grid.appendChild(cell);
   });
   area.appendChild(grid);
+}
+
+// ─────────────────────────────────────────
+//  SCROLL TO BOTTOM
+// ─────────────────────────────────────────
+function scrollToBottom(){
+  const bot=document.getElementById('bottom');
+  if(bot) bot.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ─────────────────────────────────────────
+//  PROMO BANNER — 가장 가까운 이벤트 기준
+// ─────────────────────────────────────────
+function getNextEvent(){
+  const today = dKey(TODAY);
+  const upcoming = filteredEvents()
+    .filter(e => e.date >= today)
+    .sort((a,b) => a.date.localeCompare(b.date));
+  // D+1 ~ D+7 지난 것도 포함 (이벤트 직후 매물)
+  const recent = filteredEvents()
+    .filter(e => {
+      const diff = Math.round((TODAY - new Date(e.date)) / 86400000);
+      return diff > 0 && diff <= 7;
+    })
+    .sort((a,b) => b.date.localeCompare(a.date));
+  return { upcoming: upcoming[0] || null, recent: recent[0] || null };
+}
+
+function renderPromoBanner(bot){
+  const { upcoming, recent } = getNextEvent();
+
+  // 우선순위: 이벤트 직후(D+1~7) > 이벤트 임박(D-3이내) > 일반 예정
+  let target = null, mode = null;
+
+  if(recent){
+    target = recent; mode = 'post';
+  } else if(upcoming){
+    const diff = Math.round((new Date(upcoming.date) - TODAY) / 86400000);
+    if(diff === 0){ target = upcoming; mode = 'today'; }
+    else if(diff <= 3){ target = upcoming; mode = 'soon'; }
+    else { target = upcoming; mode = 'pre'; }
+  }
+
+  if(!target) return;
+
+  const g = groupOf(target.group);
+  const [ey,em,ed] = target.date.split('-').map(Number);
+  const evtDate = new Date(ey, em-1, ed);
+  const diffDays = Math.round((evtDate - TODAY) / 86400000);
+
+  let icon, headline, sub, btnLabel, accentColor;
+  const LIVE_TYPES = ['fansign','fancon','comeback','popup'];
+  const isLive = LIVE_TYPES.includes(target.type);
+
+  if(mode === 'post'){
+    icon = '🔴';
+    headline = `${target.name}`;
+    sub = `이벤트 종료 후 ${Math.abs(diffDays)}일 · 지금 한정판 매물이 올라오고 있어요`;
+    btnLabel = '매물 바로 보기 →';
+    accentColor = '#FF4757';
+  } else if(mode === 'today'){
+    icon = isLive ? '🔴' : '🎤';
+    headline = `오늘! ${target.name}`;
+    sub = isLive ? '현장 한정 매물이 곧 올라옵니다 · 빠르게 확인하세요' : '오늘 공연 챙길 굿즈가 있나요?';
+    btnLabel = isLive ? '실시간 매물 보기 →' : '관련 굿즈 보기 →';
+    accentColor = '#FF4757';
+  } else if(mode === 'soon'){
+    icon = '⏰';
+    headline = `D-${diffDays} · ${target.name}`;
+    sub = isLive ? `이 이벤트 이후 한정 매물을 빠르게 만나보세요` : `공연 전에 챙겨갈 굿즈 둘러보세요`;
+    btnLabel = isLive ? '한정 매물 미리보기 →' : '준비할 굿즈 보기 →';
+    accentColor = g.color;
+  } else {
+    icon = TYPE_EMOJI[target.type] || '📅';
+    headline = `D-${diffDays} · ${target.name}`;
+    sub = isLive ? `이 이벤트 이후 올라올 한정 매물을 기억해두세요` : `이 일정을 위해 미리 준비해요`;
+    btnLabel = '관련 굿즈 보기 →';
+    accentColor = g.color;
+  }
+
+  const banner = document.createElement('div');
+  banner.className = 'promo-banner';
+  banner.style.cssText = `
+    margin:12px 16px 0;border-radius:14px;
+    background:rgba(255,255,255,0.72);
+    border:1.5px solid ${accentColor}33;
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    padding:13px 14px;display:flex;align-items:flex-start;gap:10px;
+    box-shadow:0 2px 12px ${accentColor}18;
+    cursor:pointer;
+  `;
+  banner.innerHTML = `
+    <div style="font-size:22px;line-height:1;flex-shrink:0;margin-top:1px">${icon}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:11px;font-weight:800;color:${accentColor};letter-spacing:.3px;margin-bottom:2px;text-transform:uppercase">${TYPE_LABEL[target.type]||target.type} · ${g.label}</div>
+      <div style="font-size:13px;font-weight:700;color:var(--txt1);line-height:1.3;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${headline}</div>
+      <div style="font-size:11px;color:var(--txt2);line-height:1.4;margin-bottom:8px">${sub}</div>
+      <div style="font-size:11.5px;font-weight:700;color:${accentColor}">${btnLabel}</div>
+    </div>
+  `;
+  banner.onclick = () => {
+    selectedDate = target.date;
+    selectedEventId = target.id;
+    activeGoodsCat = 'all';
+    buildCal();
+    renderBottom();
+    scrollToBottom();
+  };
+  bot.appendChild(banner);
 }
 
 // ─────────────────────────────────────────
@@ -1511,6 +1620,14 @@ function buildMonth(area){
 function renderBottom(){
   const bot=document.getElementById('bottom');
   bot.innerHTML='';
+
+  // 프로모 배너: 항상 상단에 표시
+  renderPromoBanner(bot);
+
+  // 배너-헤더 간격
+  const bannerGap = document.createElement('div');
+  bannerGap.style.cssText = 'height:12px';
+  bot.appendChild(bannerGap);
 
   const [y,mo,d]=selectedDate.split('-').map(Number);
   const dateObj=new Date(y,mo-1,d);
