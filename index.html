@@ -7,12 +7,11 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-N34TZXCRPY');
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Bunjang Global — K-pop Calendar</title>
+<title>Bunjang Global — K-pop 공방 캘린더</title>
 <style>
 /* ════════════════════════════════════════
    TOKENS
@@ -24,61 +23,14 @@
   --bg4:       rgba(255,255,255,0.85);
   --border:    rgba(160,130,210,0.15);
   --border2:   rgba(160,130,210,0.28);
-
   --txt1:      #2A1F3D;
   --txt2:      #8B7BAB;
   --txt3:      #C0B0D8;
-
   --accent:    #9B6FD8;
   --accent-l:  #C4A0F0;
   --r:         14px;
   --r-sm:      10px;
   --r-xs:      7px;
-}
-
-/* ── BTS 테마: 보라-핑크 ── */
-body.theme-bts {
-  --bg:        rgba(255,255,255,0.55);
-  --bg2:       rgba(255,255,255,0.55);
-  --bg3:       rgba(255,240,255,0.5);
-  --bg4:       rgba(255,255,255,0.8);
-  --border:    rgba(180,100,200,0.18);
-  --border2:   rgba(180,100,200,0.32);
-  --txt1:      #2A1240;
-  --txt2:      #9B6BAA;
-  --txt3:      #D0B0E0;
-  --accent:    #A855C8;
-  --accent-l:  #D49CE8;
-}
-
-/* ── ENHYPEN 테마: 오렌지-블루 ── */
-body.theme-enhypen {
-  --bg:        rgba(255,255,255,0.55);
-  --bg2:       rgba(255,255,255,0.55);
-  --bg3:       rgba(255,248,240,0.5);
-  --bg4:       rgba(255,255,255,0.8);
-  --border:    rgba(200,130,60,0.15);
-  --border2:   rgba(80,140,220,0.25);
-  --txt1:      #1E2A3A;
-  --txt2:      #8A7060;
-  --txt3:      #D0C0B0;
-  --accent:    #E8823A;
-  --accent-l:  #5B9FE0;
-}
-
-/* ── SEVENTEEN 테마: 연핑크-연블루 ── */
-body.theme-seventeen {
-  --bg:        rgba(255,255,255,0.55);
-  --bg2:       rgba(255,255,255,0.55);
-  --bg3:       rgba(255,240,248,0.5);
-  --bg4:       rgba(255,255,255,0.8);
-  --border:    rgba(200,130,160,0.15);
-  --border2:   rgba(120,160,220,0.25);
-  --txt1:      #1E1A2E;
-  --txt2:      #A080A0;
-  --txt3:      #D8C0D8;
-  --accent:    #D060A0;
-  --accent-l:  #80A8E0;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{height:100%}
@@ -91,25 +43,10 @@ body{
   background:transparent;
   position:relative;
 }
-/* 배경 그라데이션 — position:fixed로 스크롤과 분리해 GPU 렌더링 */
 body::before{
   content:'';
   position:fixed;inset:0;z-index:-1;
   background: linear-gradient(to top right, #D4AAFF 0%, #E8CCFF 35%, #FFD0F0 65%, #FFB8E4 100%);
-  transition: background 0.5s ease;
-  will-change: background;
-}
-/* BTS: 보라(좌하) ↔ 핑크(우상) */
-body.theme-bts::before{
-  background: linear-gradient(to top right, #D4AAFF 0%, #E8CCFF 35%, #FFD0F0 65%, #FFB8E4 100%);
-}
-/* ENHYPEN: 오렌지(좌하) ↔ 블루(우상) */
-body.theme-enhypen::before{
-  background: linear-gradient(to top right, #FFD4A8 0%, #FFE8C8 35%, #D8EAFF 65%, #BACED8 100%);
-}
-/* SEVENTEEN: 핑크(좌하) ↔ 블루(우상) */
-body.theme-seventeen::before{
-  background: linear-gradient(to top right, #FFB8D0 0%, #FFD4E4 35%, #C8D8FF 65%, #AABCF0 100%);
 }
 
 /* ════════════════════════════════════════
@@ -129,43 +66,12 @@ body.theme-seventeen::before{
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
 .hdr-r{display:flex;align-items:center;gap:14px}
-.hdr-r svg{width:20px;height:20px;stroke:var(--txt2);cursor:pointer;transition:stroke .2s}
-.hdr-r svg:hover{stroke:var(--txt1)}
-.notif{position:relative}
-.notif-dot{position:absolute;top:-1px;right:-1px;width:6px;height:6px;border-radius:50%;background:#FF4757;border:1.5px solid rgba(255,255,255,0.8)}
-
-/* ════════════════════════════════════════
-   GROUP FILTER
-════════════════════════════════════════ */
-.filter{
-  position:sticky;top:54px;z-index:40;
-  overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
-  padding:9px 14px;
-  border-bottom:1px solid var(--border);
-  background:rgba(255,255,255,0.55);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-}
-.filter::-webkit-scrollbar{display:none}
-.filter-row{display:flex;gap:7px;width:max-content}
-.chip{
-  display:flex;align-items:center;gap:5px;
-  padding:5px 14px;border-radius:20px;
-  font-size:11.5px;font-weight:700;letter-spacing:.2px;
-  cursor:pointer;border:1.5px solid var(--border);
-  background:rgba(255,255,255,0.6);color:var(--txt2);
-  transition:all .2s;white-space:nowrap;user-select:none;
-  -webkit-tap-highlight-color:transparent;
-  box-shadow:0 1px 6px rgba(0,0,0,0.05);
-}
-.chip .cdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.chip:hover{background:rgba(255,255,255,0.9);color:var(--txt1)}
-.chip.on{background:rgba(255,255,255,0.95);color:var(--txt1);border-color:var(--accent);box-shadow:0 2px 10px rgba(0,0,0,0.08)}
 
 /* ════════════════════════════════════════
    VIEW TOGGLE (week / month)
 ════════════════════════════════════════ */
 .view-bar{
-  position:sticky;top:98px;z-index:39;
+  position:sticky;top:54px;z-index:39;
   display:flex;align-items:center;justify-content:space-between;
   padding:0 16px;height:46px;
   background:rgba(255,255,255,0.6);
@@ -204,7 +110,7 @@ body.theme-seventeen::before{
 .today-btn:hover{background:rgba(255,255,255,0.9);color:var(--txt1)}
 
 /* ════════════════════════════════════════
-   CALENDAR AREA (scrollable top section)
+   CALENDAR AREA
 ════════════════════════════════════════ */
 .cal-area{
   flex-shrink:0;
@@ -234,6 +140,8 @@ body.theme-seventeen::before{
 .wday:last-child{border-right:none}
 .wday:hover{background:rgba(255,255,255,0.5)}
 .wday.on{background:rgba(255,255,255,0.7)}
+/* future dates slightly dimmed */
+.wday.future{opacity:.55}
 
 .wday-num{
   width:28px;height:28px;border-radius:50%;
@@ -268,6 +176,7 @@ body.theme-seventeen::before{
 .mday:hover{background:rgba(255,255,255,0.65)}
 .mday.on{background:rgba(255,255,255,0.85)}
 .mday.other{opacity:.4}
+.mday.future{opacity:.5}
 .mday-num{
   font-size:11.5px;font-weight:600;
   width:22px;height:22px;border-radius:50%;
@@ -287,10 +196,9 @@ body.theme-seventeen::before{
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   opacity:.9;line-height:1.3;
 }
-.mevt-more{font-size:8.5px;color:var(--txt3);padding:0 3px;font-weight:600;line-height:1.4}
 
 /* ════════════════════════════════════════
-   EVENTS + GOODS (bottom scrollable)
+   BOTTOM (scrollable)
 ════════════════════════════════════════ */
 .bottom{
   flex:1;min-height:0;
@@ -317,76 +225,13 @@ body.theme-seventeen::before{
   box-shadow:0 2px 8px rgba(0,0,0,0.12);
 }
 
-/* events strip */
-.events-strip{
-  display:flex;gap:10px;
-  padding:12px 16px;
-  overflow-x:auto;scrollbar-width:none;
-}
-.events-strip::-webkit-scrollbar{display:none}
-.no-evt{padding:14px 16px 6px;font-size:12.5px;color:var(--txt2)}
-
-.evt-chip{
-  flex-shrink:0;
-  display:flex;align-items:center;gap:8px;
-  padding:9px 13px;border-radius:12px;
-  background:rgba(255,255,255,0.75);
-  border:1.5px solid var(--border);
-  box-shadow:0 2px 8px rgba(0,0,0,0.05);
-  cursor:pointer;transition:all .18s;max-width:220px;
-  -webkit-tap-highlight-color:transparent;
-}
-.evt-chip:hover{background:rgba(255,255,255,0.95);border-color:var(--border2)}
-.evt-chip.on{border-color:var(--accent);background:rgba(255,255,255,0.95);box-shadow:0 2px 12px rgba(0,0,0,0.1)}
-.evt-chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.evt-chip-body{min-width:0}
-.evt-chip-group{font-size:9.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:1px}
-.evt-chip-name{font-size:11.5px;font-weight:600;color:var(--txt1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
-.evt-chip-type{font-size:9px;color:var(--txt2);margin-top:1px}
-
-/* goods section */
-.goods-hdr{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:4px 16px 10px;
-}
-.goods-hdr-l{display:flex;flex-direction:column;gap:2px}
-.goods-hdr-title{font-size:13px;font-weight:700}
-.goods-hdr-sub{font-size:11px;color:var(--txt2)}
-.see-all{
-  font-size:11px;font-weight:600;color:var(--accent-l);
-  background:none;border:none;cursor:pointer;padding:0;
-  -webkit-tap-highlight-color:transparent;
-}
-.see-all:hover{color:#fff}
-
-/* goods category filter */
-.goods-filter{
-  display:flex;gap:6px;
-  padding:0 16px 10px;
-  overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
-}
-.goods-filter::-webkit-scrollbar{display:none}
-.gf-chip{
-  flex-shrink:0;
-  display:flex;align-items:center;gap:4px;
-  padding:5px 12px;border-radius:16px;
-  font-size:11px;font-weight:600;
-  border:1.5px solid var(--border);
-  background:rgba(255,255,255,0.6);color:var(--txt2);
-  cursor:pointer;transition:all .15s;white-space:nowrap;
-  -webkit-tap-highlight-color:transparent;
-  box-shadow:0 1px 4px rgba(0,0,0,0.05);
-}
-.gf-chip:hover{background:rgba(255,255,255,0.9);color:var(--txt1)}
-.gf-chip.on{background:rgba(255,255,255,0.95);border-color:var(--accent);color:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,0.08)}
-
+/* goods grid */
 .goods-grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(145px,1fr));
   gap:10px;
   padding:0 16px 24px;
 }
-
 @media(max-width:400px){
   .goods-grid{grid-template-columns:repeat(2,1fr);gap:8px}
 }
@@ -416,25 +261,7 @@ body.theme-seventeen::before{
 }
 .gcard-img img.err{display:none}
 
-/* category tag on image */
-.gcard-cat{
-  position:absolute;bottom:6px;left:6px;z-index:3;
-  font-size:9px;font-weight:700;letter-spacing:.3px;
-  padding:2px 7px;border-radius:10px;
-  background:rgba(0,0,0,.65);color:#fff;
-  backdrop-filter:blur(4px);
-}
-
-.badge{
-  position:absolute;top:6px;right:6px;z-index:4;
-  font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;
-  background:rgba(0,0,0,.55);color:#fff;
-}
-.badge.hot{background:#FF4757}
-.badge.new{background:var(--accent)}
-
 .gcard-body{padding:8px 10px 10px}
-.gcard-group{font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:3px}
 .gcard-name{
   font-size:11.5px;font-weight:600;color:var(--txt1);
   line-height:1.35;
@@ -457,78 +284,7 @@ body.theme-seventeen::before{
   padding:20px 16px;font-size:12.5px;color:var(--txt2);text-align:center;
 }
 
-/* ── LIVE 섹션 ── */
-.live-section{
-  margin:0 16px 12px;
-  border-radius:var(--r);
-  border:1.5px solid rgba(255,60,60,0.25);
-  background:rgba(255,245,245,0.7);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  overflow:hidden;
-}
-.live-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 12px 8px;
-  border-bottom:1px solid rgba(255,60,60,0.12);
-}
-.live-badge{
-  display:inline-flex;align-items:center;gap:5px;
-  font-size:10px;font-weight:800;letter-spacing:.5px;
-  color:#CC2222;
-  padding:3px 8px 3px 6px;border-radius:6px;
-  background:rgba(255,60,60,0.1);border:1px solid rgba(255,60,60,0.2);
-}
-.live-badge-dot{
-  width:7px;height:7px;border-radius:50%;background:#FF3333;
-  animation:livePulse 1.4s ease-in-out infinite;
-}
-@keyframes livePulse{
-  0%,100%{opacity:1;transform:scale(1)}
-  50%{opacity:.5;transform:scale(.7)}
-}
-.live-label{
-  font-size:11.5px;font-weight:700;color:#991111;
-}
-.live-sub{
-  font-size:10px;color:rgba(150,50,50,.7);margin-top:1px;
-}
-.live-scroll{overflow-x:auto;scrollbar-width:none;padding:10px 12px 12px}
-.live-scroll::-webkit-scrollbar{display:none}
-.live-row{display:flex;gap:8px;width:max-content}
-.live-card{
-  width:105px;border-radius:var(--r-sm);
-  background:rgba(255,255,255,0.9);
-  border:1px solid rgba(255,100,100,0.2);
-  overflow:hidden;cursor:pointer;flex-shrink:0;
-  transition:all .18s;
-  text-decoration:none;display:block;color:inherit;
-  box-shadow:0 2px 8px rgba(255,80,80,0.08);
-  -webkit-tap-highlight-color:transparent;
-}
-.live-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(255,80,80,0.15)}
-.live-card-img-wrap{
-  width:100%;aspect-ratio:1/1;position:relative;
-  background:rgba(255,240,240,0.6);overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
-}
-.live-card-img{
-  position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;display:block;
-  transition:opacity .2s;
-}
-.live-card-img-fallback{
-  font-size:28px;line-height:1;z-index:0;
-}
-.live-card-body{padding:6px 8px 8px}
-.live-card-name{
-  font-size:10px;font-weight:600;color:#441111;
-  line-height:1.3;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-  margin-bottom:4px;min-height:26px;
-}
-.live-card-price{font-size:12px;font-weight:800;color:#CC2222}
-
-/* ── 추천 섹션 헤더 ── */
+/* rec-header reuse */
 .rec-header{
   display:flex;align-items:center;justify-content:space-between;
   padding:4px 16px 10px;
@@ -541,22 +297,6 @@ body.theme-seventeen::before{
 }
 .rec-title{font-size:13px;font-weight:700;color:var(--txt1);margin-top:3px}
 .rec-sub{font-size:11px;color:var(--txt2);margin-top:1px}
-
-/* type legend */
-.type-legend{
-  position:sticky;top:144px;z-index:38;
-  display:flex;flex-wrap:wrap;gap:6px 10px;
-  padding:7px 16px;
-  border-bottom:1px solid var(--border);
-  background:rgba(255,255,255,0.5);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-}
-.tleg-item{
-  display:flex;align-items:center;gap:4px;
-  font-size:9.5px;font-weight:600;color:var(--txt2);
-  letter-spacing:.2px;
-}
-.tleg-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 
 /* divider */
 .divider{height:1px;background:var(--border);margin:4px 16px 12px}
@@ -575,6 +315,7 @@ body.theme-seventeen::before{
 }
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* feedback btn */
 .fb-btn{
@@ -595,17 +336,12 @@ body.theme-seventeen::before{
 <header class="hdr">
   <div class="logo">BunjangGlobal</div>
   <div class="hdr-r">
-<button onclick="openSubmitModal()" style="
+    <button onclick="openSubmitModal()" style="
       background:var(--accent);color:#fff;border:none;border-radius:20px;
       padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;
     ">+ Submit Event</button>
   </div>
 </header>
-
-<!-- GROUP FILTER -->
-<div class="filter">
-  <div class="filter-row" id="filterRow"></div>
-</div>
 
 <!-- VIEW BAR -->
 <div class="view-bar">
@@ -625,9 +361,6 @@ body.theme-seventeen::before{
   </div>
 </div>
 
-<!-- TYPE LEGEND -->
-<div class="type-legend" id="typeLegend"></div>
-
 <!-- CALENDAR AREA -->
 <div class="cal-area" id="calArea"></div>
 
@@ -641,31 +374,8 @@ body.theme-seventeen::before{
 // ─────────────────────────────────────────
 //  CONSTANTS
 // ─────────────────────────────────────────
-// 유저 로컬 시각 기준 오늘 날짜
 const _now = new Date();
 const TODAY = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate());
-
-const GROUPS = [
-  {id:'bts',       label:'BTS',        color:'#A855C8', theme:'theme-bts'},
-  {id:'seventeen', label:'SEVENTEEN',  color:'#D060A0', theme:'theme-seventeen'},
-  {id:'enhypen',   label:'ENHYPEN',    color:'#E8823A', theme:'theme-enhypen'},
-];
-
-const TYPE_COLORS = {comeback:'#7C5CFC',concert:'#FF4757',fansign:'#FF80AB',release:'#00C4B4',tour:'#FFA500',fancon:'#6B94D6',special:'#FFD700'};
-const TYPE_EMOJI  = {comeback:'🎵',concert:'🎤',fansign:'✍️',release:'💿',tour:'🌍',fancon:'🎉',special:'⭐'};
-const TYPE_LABEL  = {comeback:'COMEBACK',concert:'CONCERT',fansign:'FAN SIGN',release:'RELEASE',tour:'TOUR',fancon:'FAN CON',special:'SPECIAL'};
-
-// 이벤트 타입별 추천 상품 카테고리 우선순위
-// 앞에 올수록 먼저 노출
-const TYPE_CAT_PRIORITY = {
-  comeback: ['album','photobook','photocard','poster','md'],
-  release:  ['album','photobook','photocard','poster','md'],
-  fansign:  ['photocard','album','lightstick','figure','md'],
-  fancon:   ['photocard','lightstick','album','plush','figure','md'],
-  concert:  ['lightstick','photocard','md','apparel','figure'],
-  tour:     ['lightstick','photocard','md','apparel','figure'],
-  special:  ['photocard','album','md','figure','plush'],
-};
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DOW_SHORT   = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
@@ -673,8 +383,8 @@ const DOW_SHORT   = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 // ─────────────────────────────────────────
 //  SUPABASE
 // ─────────────────────────────────────────
-const SUPA_URL = 'https://zbnronyslswwbwdiuzjg.supabase.co';
-const SUPA_KEY = 'sb_publishable_Io-m0ZUsJTNky1ANkXpQ-g_JoWZrzWO';
+const SUPA_URL = 'https://kzffotlfdtubkbxsjqiv.supabase.co';
+const SUPA_KEY = 'sb_publishable__Qi94MjMjmOJRuotulyOZA_ftnVkHxL';
 
 async function supaFetch(path, opts={}) {
   const {prefer, headers: extraHeaders, ...fetchOpts} = opts;
@@ -693,576 +403,110 @@ async function supaFetch(path, opts={}) {
 }
 
 // ─────────────────────────────────────────
-//  EVENTS DATA (fallback — overwritten by Supabase)
-// ─────────────────────────────────────────
-let EVENTS = [
-  // ENHYPEN
-  {id:'en-1',group:'enhypen',date:'2026-04-08',name:'FATE World Tour — Los Angeles',type:'tour',venue:'Crypto.com Arena, LA'},
-  {id:'en-2',group:'enhypen',date:'2026-04-14',name:'New EP Fan Con — Seoul',type:'fancon',venue:'KSPO Dome, Seoul'},
-  {id:'en-3',group:'enhypen',date:'2026-04-21',name:'New EP Release',type:'comeback',venue:'Physical + Digital'},
-  {id:'en-4',group:'enhypen',date:'2026-04-28',name:'Fan Sign — Hongdae',type:'fansign',venue:'Yes24 Live Hall, Seoul'},
-  // BTS
-  {id:'bts-1',group:'bts',date:'2026-04-09',name:'"ARIRANG" World Tour — Goyang Night 1',type:'concert',venue:'Goyang Stadium'},
-  {id:'bts-2',group:'bts',date:'2026-04-10',name:'"ARIRANG" World Tour — Goyang Night 2',type:'concert',venue:'Goyang Stadium'},
-  {id:'bts-3',group:'bts',date:'2026-04-11',name:'"ARIRANG" World Tour — Goyang Night 3',type:'concert',venue:'Goyang Stadium'},
-  {id:'bts-4',group:'bts',date:'2026-04-09',name:'"ARIRANG" Album Official Release',type:'comeback',venue:'Physical + Digital'},
-  // SEVENTEEN
-  {id:'svt-1',group:'seventeen',date:'2026-04-10',name:'SPILL THE FEELS — Osaka Day 1',type:'tour',venue:'Kyocera Dome, Osaka'},
-  {id:'svt-2',group:'seventeen',date:'2026-04-11',name:'SPILL THE FEELS — Osaka Day 2',type:'tour',venue:'Kyocera Dome, Osaka'},
-  {id:'svt-3',group:'seventeen',date:'2026-04-18',name:'New Single Digital Release',type:'release',venue:'All Platforms'},
-  {id:'svt-4',group:'seventeen',date:'2026-04-25',name:'Carat Fan Meeting — Seoul',type:'fancon',venue:'Olympic Hall, Seoul'},
-];
-
-// ─────────────────────────────────────────
-//  GOODS POOL — 폴백용 샘플 (API 연동 전 표시)
-//  cat: classifyGoods()와 동일한 값 사용
-// ─────────────────────────────────────────
-const GOODS = {
-  bts:[
-    {id:'400986762',name:`BTS 방탄소년단 푸마 엽서`,imageUrl:'https://media.bunjang.co.kr/product/400986762_1_w360.jpg',brand:'BTS',price:5000,cat:'photobook'},
-    {id:'400986617',name:`개별 판매) 방탄 아리랑 콘서트 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400986617_1_w360.jpg',brand:'BTS',price:10000,cat:'photocard'},
-    {id:'400986521',name:`bts 아리랑콘서트 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400986521_1_w360.jpg',brand:'BTS',price:65000,cat:'photocard'},
-    {id:'400986336',name:`방탄 고양 중콘 아미존 포카 (석진)`,imageUrl:'https://media.bunjang.co.kr/product/400986336_1_w360.jpg',brand:'BTS',price:15000,cat:'photocard'},
-    {id:'400986000',name:`방탄 bts 고양 포토카드 포카 새상품`,imageUrl:'https://media.bunjang.co.kr/product/400986000_1_w360.jpg',brand:'BTS',price:340000,cat:'photocard'},
-    {id:'400985995',name:`BTS 방탄소년단 VT 포토카드`,imageUrl:'https://media.bunjang.co.kr/product/400985995_1_w360.jpg',brand:'BTS',price:10000,cat:'photocard'},
-    {id:'400985846',name:`남준 알엠 RM 방탄 BTS 아리랑 아미존 포토카드 특전 고양콘`,imageUrl:'https://media.bunjang.co.kr/product/400985846_1_w360.jpg',brand:'BTS',price:11000,cat:'photocard'},
-    {id:'400985693',name:`호석 제이홉 jhope 방탄 BTS 아리랑 아미존 포토카드 특전 고양콘`,imageUrl:'https://media.bunjang.co.kr/product/400985693_1_w360.jpg',brand:'BTS',price:13000,cat:'photocard'},
-    {id:'400985508',name:`윤기 슈가 suga 방탄 BTS 아리랑 아미존 포토카드 특전 고양콘서트`,imageUrl:'https://media.bunjang.co.kr/product/400985508_1_w360.jpg',brand:'BTS',price:22000,cat:'photocard'},
-    {id:'400985036',name:`석진 진 방탄 BTS 아리랑 아미존 포토카드 특전 고양콘서트 첫콘`,imageUrl:'https://media.bunjang.co.kr/product/400985036_1_w360.jpg',brand:'BTS',price:25000,cat:'photocard'},
-    {id:'400984916',name:`방탄 아리랑 콘서트 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400984916_1_w360.jpg',brand:'BTS',price:15000,cat:'photocard'},
-    {id:'400984908',name:`(1회사용) 아미밤 ver4 버전4 사미밤 BTS 응원봉 라이트스틱`,imageUrl:'https://media.bunjang.co.kr/product/400984908_1_w360.jpg',brand:'BTS',price:59000,cat:'lightstick'},
-    {id:'400984870',name:`태형 V 뷔 방탄 BTS 아리랑 아미존 포토카드 특전 고양콘서트 첫콘`,imageUrl:'https://media.bunjang.co.kr/product/400984870_1_w360.jpg',brand:'BTS',price:27000,cat:'photocard'},
-    {id:'400984747',name:`bts 작은시 공방포카 일괄(미개봉)`,imageUrl:'https://media.bunjang.co.kr/product/400984747_1_w360.jpg',brand:'BTS',price:150000,cat:'photocard'},
-    {id:'400984738',name:`방탄소년단 아리랑 고양콘 아미존 특전 포토카드 BTS 남준 윤기 석진`,imageUrl:'https://media.bunjang.co.kr/product/400984738_1_w360.jpg',brand:'BTS',price:22000,cat:'photocard'},
-    {id:'400984675',name:`방탄 아리랑 콘서트 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400984675_1_w360.jpg',brand:'BTS',price:15000,cat:'photocard'},
-    {id:'400984416',name:`방탄 고양 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400984416_1_w360.jpg',brand:'BTS',price:55000,cat:'md'},
-    {id:'400984362',name:`방탄 bts 단체 포카 일본위버스 특전 클리어파일 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400984362_1_w360.jpg',brand:'BTS',price:260000,cat:'photocard'},
-    {id:'400984164',name:`방탄소년단 태형포카 양도 탈덕처분`,imageUrl:'https://media.bunjang.co.kr/product/400984164_1_w360.jpg',brand:'BTS',price:613,cat:'photocard'},
-    {id:'400984083',name:`방탄 아리랑 콘서트 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400984083_1_w360.jpg',brand:'BTS',price:22000,cat:'photocard'},
-    {id:'400983790',name:`방탄 아리랑 콘서트 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400983790_1_w360.jpg',brand:'BTS',price:22000,cat:'photocard'},
-    {id:'400982984',name:`BTS LIGHT STICK`,imageUrl:'https://media.bunjang.co.kr/product/400982984_1_w360.jpg',brand:'BTS',price:400000,cat:'lightstick'},
-    {id:'400982920',name:`방탄소년단 아리랑 콘서트 아미존 특전 포카 bts army 미개봉`,imageUrl:'https://media.bunjang.co.kr/product/400982920_1_w360.jpg',brand:'BTS',price:50000,cat:'photocard'},
-    {id:'400982786',name:`BTS 방탄 아미밤 응원봉 ver4 새상품`,imageUrl:'https://media.bunjang.co.kr/product/400982786_1_w360.jpg',brand:'BTS',price:85000,cat:'lightstick'},
-    {id:'400982678',name:`방탄소년단 원형 포토카드 13개`,imageUrl:'https://media.bunjang.co.kr/product/400982678_1_w360.jpg',brand:'BTS',price:1000,cat:'photocard'},
-    {id:'400982639',name:`BTS 방탄소년단 정국 골든 앨범 포카, 인더섬 정국 포카`,imageUrl:'https://media.bunjang.co.kr/product/400982639_1_w360.jpg',brand:'BTS',price:10000,cat:'md'},
-    {id:'400982449',name:`방탄소년단 아리랑 고양콘 아미존 포카 2세트 일괄`,imageUrl:'https://media.bunjang.co.kr/product/400982449_1_w360.jpg',brand:'BTS',price:110000,cat:'photocard'},
-    {id:'400982436',name:`방탄 아리랑 콘서트 아미존 포카 풀세트`,imageUrl:'https://media.bunjang.co.kr/product/400982436_1_w360.jpg',brand:'BTS',price:50000,cat:'photocard'},
-    {id:'400982203',name:`BTS 아미밤 응원봉 ver4 버전4`,imageUrl:'https://media.bunjang.co.kr/product/400982203_1_w360.jpg',brand:'BTS',price:120000,cat:'lightstick'},
-    {id:'400981710',name:`방탄소년단 포토카드`,imageUrl:'https://media.bunjang.co.kr/product/400981710_1_w360.jpg',brand:'BTS',price:2000,cat:'photocard'},
-    {id:'400981699',name:`BTS 방탄 아리랑 고양콘 아미존 픽업 앨범 위버스 럭드 제이홉 호석`,imageUrl:'https://media.bunjang.co.kr/product/400981699_1_w360.jpg',brand:'BTS',price:15000,cat:'photocard'},
-    {id:'400981643',name:`bts 방탄소년단 지민 Face Muse 앨범 포카`,imageUrl:'https://media.bunjang.co.kr/product/400981643_1_w360.jpg',brand:'BTS',price:3000,cat:'md'},
-    {id:'400981499',name:`(미개봉)방탄bts 아리랑 콘서트 고양콘 아미존 포카 풀세트 풀셋`,imageUrl:'https://media.bunjang.co.kr/product/400981499_1_w360.jpg',brand:'BTS',price:63820,cat:'photocard'},
-    {id:'400980734',name:`BTS 월드투어 아리랑 후드집업 (KK_M)`,imageUrl:'https://media.bunjang.co.kr/product/400980734_1_w360.jpg',brand:'BTS',price:200000,cat:'md'},
-    {id:'400980389',name:`Bts 포카 양도`,imageUrl:'https://media.bunjang.co.kr/product/400980389_1_w360.jpg',brand:'BTS',price:250000,cat:'photocard'},
-    {id:'400980128',name:`방탄 BTS 아미밤4 포카 (RM 슈가 제이홉 지민 정국)`,imageUrl:'https://media.bunjang.co.kr/product/400980128_1_w360.jpg',brand:'BTS',price:5000,cat:'photocard'},
-    {id:'400979860',name:`방탄 아미존 포카 양도`,imageUrl:'https://media.bunjang.co.kr/product/400979860_1_w360.jpg',brand:'BTS',price:70000,cat:'photocard'},
-    {id:'400979812',name:`방탄 BTS 고양콘 아미존 포카 (RM 제이홉)`,imageUrl:'https://media.bunjang.co.kr/product/400979812_1_w360.jpg',brand:'BTS',price:6000,cat:'photocard'},
-    {id:'400979277',name:`방탄 bts 아미존 포카 armyzone poca arirang 아리랑콘`,imageUrl:'https://media.bunjang.co.kr/product/400979277_1_w360.jpg',brand:'BTS',price:170000,cat:'photocard'},
-    {id:'400979251',name:`BTS 방탄소년단 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400979251_1_w360.jpg',brand:'BTS',price:90000,cat:'photocard'},
-    {id:'400978497',name:`방탄 앨범 나눔`,imageUrl:'https://media.bunjang.co.kr/product/400978497_1_w360.jpg',brand:'BTS',price:5310,cat:'photobook'},
-    {id:'400978461',name:`방탄소년단 BTS 고양 콘서트 아미존 포카 양도`,imageUrl:'https://media.bunjang.co.kr/product/400978461_1_w360.jpg',brand:'BTS',price:65000,cat:'photocard'},
-    {id:'400978062',name:`방탄소년단 앨범 및 포토북`,imageUrl:'https://media.bunjang.co.kr/product/400978062_1_w360.jpg',brand:'BTS',price:15000,cat:'album'},
-    {id:'400977858',name:`방탄 포춘박스 아미피디아 프루프 럭드 전시회 bts jk pc poca`,imageUrl:'https://media.bunjang.co.kr/product/400977858_1_w360.jpg',brand:'BTS',price:45000,cat:'photocard'},
-    {id:'400977398',name:`방탄 BTS 방탄소년단 응원봉 아미밤 army bomb ver 4`,imageUrl:'https://media.bunjang.co.kr/product/400977398_1_w360.jpg',brand:'BTS',price:90000,cat:'lightstick'},
-    {id:'400977333',name:`방탄소년단 아리랑 고양 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400977333_1_w360.jpg',brand:'BTS',price:80000,cat:'photocard'},
-    {id:'400976686',name:`방탄 고양 중콘 아미존 포카 (지민)`,imageUrl:'https://media.bunjang.co.kr/product/400976686_1_w360.jpg',brand:'BTS',price:27000,cat:'md'},
-    {id:'400976261',name:`방탄 고양 중콘 아미존 포카 (정국)`,imageUrl:'https://media.bunjang.co.kr/product/400976261_1_w360.jpg',brand:'BTS',price:27000,cat:'photocard'},
-    {id:'400975976',name:`방탄소년단 아리랑 고양 콘서트 고양콘 첫콘 입장특전 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400975976_1_w360.jpg',brand:'BTS',price:16000,cat:'photocard'},
-    {id:'400975873',name:`방탄 고양 중콘 아미존 포카 (태형)`,imageUrl:'https://media.bunjang.co.kr/product/400975873_1_w360.jpg',brand:'BTS',price:25000,cat:'photocard'},
-    {id:'400975548',name:`4월 12일 방탄 고양콘 아미밤 대여해주실분ㅜㅜ`,imageUrl:'https://media.bunjang.co.kr/product/400975548_1_w360.jpg',brand:'BTS',price:10000,cat:'lightstick'},
-    {id:'400975368',name:`(세트 일괄/미개봉) BTS 방탄 고양콘 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400975368_1_w360.jpg',brand:'BTS',price:50000,cat:'photocard'},
-    {id:'400974994',name:`방탄 2019썸머패키지 썸패`,imageUrl:'https://media.bunjang.co.kr/product/400974994_1_w360.jpg',brand:'BTS',price:16000,cat:'album'},
-    {id:'400974957',name:`방탄 비공굿 랜박`,imageUrl:'https://media.bunjang.co.kr/product/400974957_1_w360.jpg',brand:'BTS',price:5000,cat:'photobook'},
-    {id:'400974906',name:`방탄소년단 BTS 김석진 진 인형 미니니`,imageUrl:'https://media.bunjang.co.kr/product/400974906_1_w360.jpg',brand:'BTS',price:7500,cat:'plush'},
-    {id:'400974882',name:`방탄소년단 고양콘 아미부스 아미존 포카 미개봉  아리랑`,imageUrl:'https://media.bunjang.co.kr/product/400974882_1_w360.jpg',brand:'BTS',price:50000,cat:'photocard'},
-    {id:'400973569',name:`BTS 방탄소년단 포카`,imageUrl:'https://media.bunjang.co.kr/product/400973569_1_w360.jpg',brand:'BTS',price:613,cat:'photocard'},
-    {id:'400973300',name:`방탄소년단 BTS 아미존 armyzone`,imageUrl:'https://media.bunjang.co.kr/product/400973300_1_w360.jpg',brand:'BTS',price:120000,cat:'photocard'},
-    {id:'400972215',name:`방탄 고양콘 아미존 포토카드 세트`,imageUrl:'https://media.bunjang.co.kr/product/400972215_1_w360.jpg',brand:'BTS',price:55000,cat:'photocard'},
-    {id:'400971975',name:`BTS 고양콘 아미존 포토카드 일괄판매`,imageUrl:'https://media.bunjang.co.kr/product/400971975_1_w360.jpg',brand:'BTS',price:74460,cat:'photocard'},
-    {id:'400971927',name:`BTS Lightstick  ver 4`,imageUrl:'https://media.bunjang.co.kr/product/400971927_1_w360.jpg',brand:'BTS',price:900000,cat:'lightstick'},
-    {id:'400971829',name:`방탄소년단 butter 앨범 판매`,imageUrl:'https://media.bunjang.co.kr/product/400971829_1_w360.jpg',brand:'BTS',price:7000,cat:'album'},
-    {id:'400971098',name:`방탄 아리랑 아미존 현장수령 특전 석진 윤기 지민 태형 정국 포카`,imageUrl:'https://media.bunjang.co.kr/product/400971098_1_w360.jpg',brand:'BTS',price:613,cat:'photocard'},
-    {id:'400970942',name:`BTS 지민 제작 Never Walk Alone 후드티`,imageUrl:'https://media.bunjang.co.kr/product/400970942_1_w360.jpg',brand:'BTS',price:60000,cat:'md'},
-    {id:'400970915',name:`방탄 고양콘 아미존 armyzone 포카 세트`,imageUrl:'https://media.bunjang.co.kr/product/400970915_1_w360.jpg',brand:'BTS',price:50000,cat:'photocard'},
-    {id:'400970569',name:`방탄 앨범`,imageUrl:'https://media.bunjang.co.kr/product/400970569_1_w360.jpg',brand:'BTS',price:613,cat:'album'},
-    {id:'400970506',name:`BTS 뷔 V 김태형 방탄소년단 위버스 고양 콘서트 럭드 포카 POCA`,imageUrl:'https://media.bunjang.co.kr/product/400970506_1_w360.jpg',brand:'BTS',price:37230,cat:'photocard'},
-    {id:'400969840',name:`방탄소년단 아리랑 고양 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400969840_1_w360.jpg',brand:'BTS',price:80000,cat:'photocard'},
-    {id:'400969645',name:`BTS 진 jin 방탄소년단 위버스 고양 콘서트 럭드 포카 POCA`,imageUrl:'https://media.bunjang.co.kr/product/400969645_1_w360.jpg',brand:'BTS',price:28720,cat:'photocard'},
-    {id:'400967559',name:`BTS 응원봉 50개`,imageUrl:'https://media.bunjang.co.kr/product/400967559_1_w360.jpg',brand:'BTS',price:4250000,cat:'lightstick'},
-    {id:'400966704',name:`방탄소년단 Map Of The Soul 스페셜 에디션 응원봉 팝니다`,imageUrl:'https://media.bunjang.co.kr/product/400966704_1_w360.jpg',brand:'BTS',price:27000,cat:'lightstick'},
-    {id:'400966160',name:`(미개봉) 방탄 아리랑 앨범 2종세트 양도`,imageUrl:'https://media.bunjang.co.kr/product/400966160_1_w360.jpg',brand:'BTS',price:22000,cat:'album'},
-    {id:'400966022',name:`방탄bts 일본 매직샵 일직샵 디비디 dvd 딥디 정국태형지민석진윤기포카`,imageUrl:'https://media.bunjang.co.kr/product/400966022_1_w360.jpg',brand:'BTS',price:110000,cat:'album'},
-    {id:'400965650',name:`방탄소년단 BTS 아리랑 고양 콘서트 아미존 포카 세트 양도`,imageUrl:'https://media.bunjang.co.kr/product/400965650_1_w360.jpg',brand:'BTS',price:60000,cat:'photocard'},
-    {id:'400964388',name:`(일괄) 방탄 아미피디아 엽서 세트 양도 BTS`,imageUrl:'https://media.bunjang.co.kr/product/400964388_1_w360.jpg',brand:'BTS',price:220000,cat:'photocard'},
-    {id:'400963989',name:`무배) 방탄 RM 남준이 작업실 단체사진 액자`,imageUrl:'https://media.bunjang.co.kr/product/400963989_1_w360.jpg',brand:'BTS',price:11000,cat:'photobook'},
-    {id:'400963130',name:`방탄소년단 LP 판매`,imageUrl:'https://media.bunjang.co.kr/product/400963130_1_w360.jpg',brand:'BTS',price:25000,cat:'album'},
-    {id:'400962831',name:`방탄소년단 포카 판매`,imageUrl:'https://media.bunjang.co.kr/product/400962831_1_w360.jpg',brand:'BTS',price:613,cat:'photocard'},
-    {id:'400962679',name:`무배) 방탄 bts 지민 홈마 액자 3개`,imageUrl:'https://media.bunjang.co.kr/product/400962679_1_w360.jpg',brand:'BTS',price:22000,cat:'photobook'},
-    {id:'400962461',name:`BTS아미존 포카 일괄`,imageUrl:'https://media.bunjang.co.kr/product/400962461_1_w360.jpg',brand:'BTS',price:60000,cat:'photocard'},
-    {id:'400962139',name:`BTS 방탄소년단 아리랑 고양콘 아미존 포토카드 풀세트 일괄`,imageUrl:'https://media.bunjang.co.kr/product/400962139_1_w360.jpg',brand:'BTS',price:80000,cat:'photocard'},
-    {id:'400961712',name:`방탄소년단 아이랑 콘서트 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400961712_1_w360.jpg',brand:'BTS',price:60000,cat:'photocard'},
-    {id:'400961126',name:`BTS 방탄 아리랑 고양콘 아미존 픽업 앨범 위버스 럭드 RM 남준`,imageUrl:'https://media.bunjang.co.kr/product/400961126_1_w360.jpg',brand:'BTS',price:15000,cat:'photocard'},
-    {id:'400960655',name:`방탄 아미존 포카 풀셋 양도 (미개봉/애눌가능)`,imageUrl:'https://media.bunjang.co.kr/product/400960655_1_w360.jpg',brand:'BTS',price:60000,cat:'photocard'},
-    {id:'400959645',name:`BTS 미개봉 위버스 아리랑 얼리버드 특전 필름 키링 슈가 진 정국`,imageUrl:'https://media.bunjang.co.kr/product/400959645_1_w360.jpg',brand:'BTS',price:6000,cat:'photocard'},
-    {id:'400959567',name:`BTS 위버스 아리랑 얼리버드 특전 포카 진 rm 호석 태형 정국`,imageUrl:'https://media.bunjang.co.kr/product/400959567_1_w360.jpg',brand:'BTS',price:3000,cat:'photocard'},
-    {id:'400959307',name:`(수수료포함) BTS 방탄소년단 진 아이긴 포스터`,imageUrl:'https://media.bunjang.co.kr/product/400959307_1_w360.jpg',brand:'BTS',price:31000,cat:'photobook'},
-    {id:'400959235',name:`방탄 고양콘서트 고양콘 아미존 아미존미개봉 아미존풀세트`,imageUrl:'https://media.bunjang.co.kr/product/400959235_1_w360.jpg',brand:'BTS',price:50000,cat:'photocard'},
-    {id:'400959180',name:`방탄소년단 고양 아미존 포토카드 set`,imageUrl:'https://media.bunjang.co.kr/product/400959180_1_w360.jpg',brand:'BTS',price:54000,cat:'photocard'},
-    {id:'400959169',name:`윤기 슈가 방탄소년단 BTS 아리랑 고양콘 첫콘 입장특전 아미존 포카`,imageUrl:'https://media.bunjang.co.kr/product/400959169_1_w360.jpg',brand:'BTS',price:16000,cat:'photocard'},
-    {id:'400959033',name:`알엠 남준 방탄소년단 아리랑 고양 콘서트 고양콘 첫콘 입장특전 아미존포카`,imageUrl:'https://media.bunjang.co.kr/product/400959033_1_w360.jpg',brand:'BTS',price:10000,cat:'photocard'},
-    {id:'400954953',name:`24장 일괄) 방탄 매직샵 게스트북. 아미부스. 일본 포카 등`,imageUrl:'https://media.bunjang.co.kr/product/400954953_1_w360.jpg',brand:'BTS',price:80000,cat:'photocard'},
-    {id:'400953314',name:`처분 전부0.2) 방탄 BTS 공식굿즈 양도`,imageUrl:'https://media.bunjang.co.kr/product/400953314_1_w360.jpg',brand:'BTS',price:500,cat:'photocard'},
-    {id:'400948872',name:`BTS 아미밤 응원봉 Ver.4 갯수 문의주세요`,imageUrl:'https://media.bunjang.co.kr/product/400948872_1_w360.jpg',brand:'BTS',price:90000,cat:'lightstick'},
-    {id:'400947858',name:`31장 일괄) 방탄 오늘 엽서. 인화사진`,imageUrl:'https://media.bunjang.co.kr/product/400947858_1_w360.jpg',brand:'BTS',price:50000,cat:'photocard'},
-    {id:'400947587',name:`방탄 아리랑 cgv 라이브뷰잉 특전 미개봉`,imageUrl:'https://media.bunjang.co.kr/product/400947587_1_w360.jpg',brand:'BTS',price:20000,cat:'photocard'},
-    {id:'400946305',name:`BTS CGV 고양 특전 티켓 방탄소년단`,imageUrl:'https://media.bunjang.co.kr/product/400946305_1_w360.jpg',brand:'BTS',price:20000,cat:'photobook'},
-    {id:'400945941',name:`방탄 bts 비공굿 일괄`,imageUrl:'https://media.bunjang.co.kr/product/400945941_1_w360.jpg',brand:'BTS',price:10000,cat:'photobook'},
-    {id:'400945636',name:`방탄 고양 콘서트 아미존 포카 set`,imageUrl:'https://media.bunjang.co.kr/product/400945636_1_w360.jpg',brand:'BTS',price:57000,cat:'photocard'},
-    {id:'400945346',name:`BTS CGV 특전 방탄 아리랑 라이브뷰잉`,imageUrl:'https://media.bunjang.co.kr/product/400945346_1_w360.jpg',brand:'BTS',price:15000,cat:'photobook'},
-  ],
-  seventeen:[
-    {id:'401226807',name:`세븐틴 굿즈 나눔 받습니다! 무료나눔 무나 앨범 포카 비공굿`,imageUrl:'https://media.bunjang.co.kr/product/401226807_1_w360.jpg',brand:'SEVENTEEN',price:1004,cat:'photocard'},
-    {id:'401226497',name:`세븐틴 우지 호시 민규 도겸 승관 정한 버논 포카 일괄`,imageUrl:'https://media.bunjang.co.kr/product/401226497_1_w360.jpg',brand:'SEVENTEEN',price:5310,cat:'photocard'},
-    {id:'401226220',name:`세븐틴 일본 러브콘 팬미팅 굿즈`,imageUrl:'https://media.bunjang.co.kr/product/401226220_1_w360.jpg',brand:'SEVENTEEN',price:10670,cat:'lightstick'},
-    {id:'401223149',name:`(처분)세븐틴 재재계약 기념 비공굿 랜박`,imageUrl:'https://media.bunjang.co.kr/product/401223149_1_w360.jpg',brand:'SEVENTEEN',price:5000,cat:'photocard'},
-    {id:'401218735',name:`세븐틴 포카 정리중 양도 판매`,imageUrl:'https://media.bunjang.co.kr/product/401218735_1_w360.jpg',brand:'SEVENTEEN',price:1000,cat:'photocard'},
-    {id:'401218294',name:`세븐틴 뉴 투어 재팬 포토카드`,imageUrl:'https://media.bunjang.co.kr/product/401218294_1_w360.jpg',brand:'SEVENTEEN',price:20000,cat:'photocard'},
-    {id:'401218157',name:`세븐틴 굿즈 랜박`,imageUrl:'https://media.bunjang.co.kr/product/401218157_1_w360.jpg',brand:'SEVENTEEN',price:526,cat:'photocard'},
-    {id:'401216221',name:`세븐틴 포토카드 판매`,imageUrl:'https://media.bunjang.co.kr/product/401216221_1_w360.jpg',brand:'SEVENTEEN',price:52000,cat:'photocard'},
-    {id:'401210957',name:`세븐틴 포카 개당 0.6 모든 멤버`,imageUrl:'https://media.bunjang.co.kr/product/401210957_1_w360.jpg',brand:'SEVENTEEN',price:6000,cat:'photocard'},
-    {id:'401210831',name:`세븐틴 디노 슬로건 양도`,imageUrl:'https://media.bunjang.co.kr/product/401210831_1_w360.jpg',brand:'SEVENTEEN',price:8000,cat:'lightstick'},
-    {id:'401210033',name:`세븐틴 원우 드림 포카 양도`,imageUrl:'https://media.bunjang.co.kr/product/401210033_1_w360.jpg',brand:'SEVENTEEN',price:2222,cat:'photocard'},
-    {id:'401209391',name:`세븐틴 비공굿 부채 21개 일괄 판매`,imageUrl:'https://media.bunjang.co.kr/product/401209391_1_w360.jpg',brand:'SEVENTEEN',price:10000,cat:'lightstick'},
-    {id:'401208300',name:`세븐틴 원우 비더썬 도쿄회장한정`,imageUrl:'https://media.bunjang.co.kr/product/401208300_1_w360.jpg',brand:'SEVENTEEN',price:8000,cat:'photocard'},
-    {id:'401207720',name:`세븐틴 원우 캐럿존 2023 팔로우`,imageUrl:'https://media.bunjang.co.kr/product/401207720_1_w360.jpg',brand:'SEVENTEEN',price:35000,cat:'photocard'},
-    {id:'401207129',name:`세븐틴 원우 캐럿존 2023 캐럿랜드`,imageUrl:'https://media.bunjang.co.kr/product/401207129_1_w360.jpg',brand:'SEVENTEEN',price:41000,cat:'photocard'},
-    {id:'401205154',name:`세븐틴 디에잇 포토카드 양도`,imageUrl:'https://media.bunjang.co.kr/product/401205154_1_w360.jpg',brand:'SEVENTEEN',price:20000,cat:'photocard'},
-    {id:'401201959',name:`[미개봉] 세븐틴 원우 홈 아크릴스탠드 양도_포카 굿즈 앨범 인형 판매`,imageUrl:'https://media.bunjang.co.kr/product/401201959_1_w360.jpg',brand:'SEVENTEEN',price:32000,cat:'photocard'},
-    {id:'401198966',name:`세븐틴 호시 티렉터스컷 포카 렌티큘러 일괄 양도`,imageUrl:'https://media.bunjang.co.kr/product/401198966_1_w360.jpg',brand:'SEVENTEEN',price:11000,cat:'photocard'},
-    {id:'401194901',name:`(일괄)세븐틴 디에잇 캐런존 포카 2023 캐럿랜드 팔로우 서울`,imageUrl:'https://media.bunjang.co.kr/product/401194901_1_w360.jpg',brand:'SEVENTEEN',price:60000,cat:'photocard'},
-    {id:'401194566',name:`세븐틴 포카 세트 판매`,imageUrl:'https://media.bunjang.co.kr/product/401194566_1_w360.jpg',brand:'SEVENTEEN',price:10000,cat:'photocard'},
-    {id:'401194524',name:`세븐틴 호시 인형 10cm 흥쑤뇨 + 일본 게임기 모양 인형 파우치`,imageUrl:'https://media.bunjang.co.kr/product/401194524_1_w360.jpg',brand:'SEVENTEEN',price:25000,cat:'plush'},
-    {id:'401194248',name:`세븐틴 에스쿱스 비공굿 담요`,imageUrl:'https://media.bunjang.co.kr/product/401194248_1_w360.jpg',brand:'SEVENTEEN',price:12000,cat:'md'},
-    {id:'401193514',name:`10장] 세븐틴 디에잇 포카 캐럿존 멤버십 10주년 특전 미공포 캐럿반`,imageUrl:'https://media.bunjang.co.kr/product/401193514_1_w360.jpg',brand:'SEVENTEEN',price:27000,cat:'photocard'},
-    {id:'401193486',name:`세븐틴 민규 담요 비공굿`,imageUrl:'https://media.bunjang.co.kr/product/401193486_1_w360.jpg',brand:'SEVENTEEN',price:15000,cat:'md'},
-    {id:'401192205',name:`세븐틴 앨범 등 굿즈 대량 양도 판매 비공굿은 나눔해요 1.0 판매 양도`,imageUrl:'https://media.bunjang.co.kr/product/401192205_1_w360.jpg',brand:'SEVENTEEN',price:10000,cat:'photocard'},
-    {id:'401192065',name:`9장] 세븐틴 우지 포카 캐럿존 홈 트레카 셀포 10주년 멤버십 특전`,imageUrl:'https://media.bunjang.co.kr/product/401192065_1_w360.jpg',brand:'SEVENTEEN',price:25000,cat:'photocard'},
-    {id:'401191459',name:`세븐틴 17 IS RIGHT HERE 앨범 베스트앨범`,imageUrl:'https://media.bunjang.co.kr/product/401191459_1_w360.jpg',brand:'SEVENTEEN',price:4280,cat:'album'},
-    {id:'401190337',name:`5장] 세븐틴 준 공방 포카 앨포 멤버십 키트 위버스 특전`,imageUrl:'https://media.bunjang.co.kr/product/401190337_1_w360.jpg',brand:'SEVENTEEN',price:11000,cat:'photocard'},
-    {id:'401189158',name:`세븐틴 포카 일괄`,imageUrl:'https://media.bunjang.co.kr/product/401189158_1_w360.jpg',brand:'SEVENTEEN',price:1000,cat:'photocard'},
-    {id:'401188777',name:`12장] 세븐틴 조슈아 포카 공방 캐럿존 멤버십 10주년 트레카 캐럿반`,imageUrl:'https://media.bunjang.co.kr/product/401188777_1_w360.jpg',brand:'SEVENTEEN',price:30000,cat:'photocard'},
-    {id:'401188762',name:`세븐틴 유닛 포카 판매`,imageUrl:'https://media.bunjang.co.kr/product/401188762_1_w360.jpg',brand:'SEVENTEEN',price:526,cat:'photocard'},
-    {id:'401188204',name:`세븐틴 에스쿱스 포카 판매`,imageUrl:'https://media.bunjang.co.kr/product/401188204_1_w360.jpg',brand:'SEVENTEEN',price:1995,cat:'photocard'},
-    {id:'401188069',name:`세븐틴 뉴 앙콘 캐럿존 세트+문글라스+ CXM 캐럿존 세트`,imageUrl:'https://media.bunjang.co.kr/product/401188069_1_w360.jpg',brand:'SEVENTEEN',price:45000,cat:'photocard'},
-    {id:'401187661',name:`2025 세븐틴 캐럿존 포카`,imageUrl:'https://media.bunjang.co.kr/product/401187661_1_w360.jpg',brand:'SEVENTEEN',price:1717,cat:'photocard'},
-    {id:'401185849',name:`세븐틴 일본 팬클럽 특전 캐럿 일캐럿 매거진 잡지 13호 14호 양도`,imageUrl:'https://media.bunjang.co.kr/product/401185849_1_w360.jpg',brand:'SEVENTEEN',price:25000,cat:'photobook'},
-    {id:'401185165',name:`10장] 세븐틴 정한 포카 캐럿반 10주년 디스맨 키트 앨포 랜포 멤버십`,imageUrl:'https://media.bunjang.co.kr/product/401185165_1_w360.jpg',brand:'SEVENTEEN',price:35000,cat:'photocard'},
-    {id:'401185009',name:`[판매] 세븐틴 포토카드`,imageUrl:'https://media.bunjang.co.kr/product/401185009_1_w360.jpg',brand:'SEVENTEEN',price:12000,cat:'photocard'},
-    {id:'401184713',name:`세븐틴 응원봉 버전3`,imageUrl:'https://media.bunjang.co.kr/product/401184713_1_w360.jpg',brand:'SEVENTEEN',price:34000,cat:'lightstick'},
-    {id:'401183941',name:`(일괄 가격) 세븐틴 앙콘(사용감 적음) , 샤다콘(찍힘, 찢어짐 있음)`,imageUrl:'https://media.bunjang.co.kr/product/401183941_1_w360.jpg',brand:'SEVENTEEN',price:4000,cat:'photobook'},
-    {id:'401183554',name:`5장] 세븐틴 에스쿱스 포카 세트 위버스 특전 멤버십 키트 캐럿존 앨포`,imageUrl:'https://media.bunjang.co.kr/product/401183554_1_w360.jpg',brand:'SEVENTEEN',price:17000,cat:'photocard'},
-    {id:'401179147',name:`세븐틴 굿즈 급처`,imageUrl:'https://media.bunjang.co.kr/product/401179147_1_w360.jpg',brand:'SEVENTEEN',price:82000,cat:'photocard'},
-    {id:'401177553',name:`세븐틴 굿즈 묶음 팔아요`,imageUrl:'https://media.bunjang.co.kr/product/401177553_1_w360.jpg',brand:'SEVENTEEN',price:100000,cat:'photocard'},
-    {id:'401176256',name:`세븐틴 응원봉`,imageUrl:'https://media.bunjang.co.kr/product/401176256_1_w360.jpg',brand:'SEVENTEEN',price:48000,cat:'lightstick'},
-    {id:'401174701',name:`세븐틴 띠브실`,imageUrl:'https://media.bunjang.co.kr/product/401174701_1_w360.jpg',brand:'SEVENTEEN',price:1000,cat:'photocard'},
-    {id:'401172011',name:`세븐틴 happy burstday ID카드 버논`,imageUrl:'https://media.bunjang.co.kr/product/401172011_1_w360.jpg',brand:'SEVENTEEN',price:4000,cat:'photocard'},
-    {id:'401171470',name:`세븐틴 마에스트로 키트 판매`,imageUrl:'https://media.bunjang.co.kr/product/401171470_1_w360.jpg',brand:'SEVENTEEN',price:8000,cat:'photocard'},
-    {id:'401171465',name:`세븐틴 FML 앨범 세트`,imageUrl:'https://media.bunjang.co.kr/product/401171465_1_w360.jpg',brand:'SEVENTEEN',price:15000,cat:'album'},
-    {id:'401170161',name:`세븐틴 우지 포카 일괄`,imageUrl:'https://media.bunjang.co.kr/product/401170161_1_w360.jpg',brand:'SEVENTEEN',price:6000,cat:'photocard'},
-    {id:'401169327',name:`세븐틴 개봉앨범 급처`,imageUrl:'https://media.bunjang.co.kr/product/401169327_1_w360.jpg',brand:'SEVENTEEN',price:1234,cat:'album'},
-    {id:'401165222',name:`세븐틴 페더썬 캐럿반 판매합니다.`,imageUrl:'https://media.bunjang.co.kr/product/401165222_1_w360.jpg',brand:'SEVENTEEN',price:5000,cat:'album'},
-    {id:'401162269',name:`세븐틴 아타카 캐럿반`,imageUrl:'https://media.bunjang.co.kr/product/401162269_1_w360.jpg',brand:'SEVENTEEN',price:5000,cat:'album'},
-    {id:'401158923',name:`세븐틴 호시, 도겸 속성 7cm 겸티 인형 일괄 양도(미니 겸푸, 홋티)`,imageUrl:'https://media.bunjang.co.kr/product/401158923_1_w360.jpg',brand:'SEVENTEEN',price:37230,cat:'plush'},
-    {id:'401158904',name:`세븐틴 cxm hype vibes 위버스 럭드`,imageUrl:'https://media.bunjang.co.kr/product/401158904_1_w360.jpg',brand:'SEVENTEEN',price:8000,cat:'photocard'},
-    {id:'401158634',name:`세븐틴 뉴앙콘 캐런존 포카&입장굿즈`,imageUrl:'https://media.bunjang.co.kr/product/401158634_1_w360.jpg',brand:'SEVENTEEN',price:60000,cat:'photocard'},
-    {id:'401158416',name:`세븐틴 도겸 겸푸 단순 암실 보관 제품 급처`,imageUrl:'https://media.bunjang.co.kr/product/401158416_1_w360.jpg',brand:'SEVENTEEN',price:8000,cat:'plush'},
-    {id:'401157800',name:`세븐틴 아주나이스 스페셜에디션 콘서트 DVD`,imageUrl:'https://media.bunjang.co.kr/product/401157800_1_w360.jpg',brand:'SEVENTEEN',price:55000,cat:'album'},
-    {id:'401157715',name:`세븐틴스 헤븐 캐럿반(승관,원우,에스쿱스,호시)`,imageUrl:'https://media.bunjang.co.kr/product/401157715_1_w360.jpg',brand:'SEVENTEEN',price:20000,cat:'album'},
-    {id:'401157368',name:`세븐틴스 헤븐 포카 앨범 풀세트`,imageUrl:'https://media.bunjang.co.kr/product/401157368_1_w360.jpg',brand:'SEVENTEEN',price:20000,cat:'album'},
-    {id:'401157184',name:`[4+1]세븐틴 포카 양도`,imageUrl:'https://media.bunjang.co.kr/product/401157184_1_w360.jpg',brand:'SEVENTEEN',price:526,cat:'photocard'},
-    {id:'401156977',name:`세븐틴 보이즈위시 빨체통 엽서`,imageUrl:'https://media.bunjang.co.kr/product/401156977_1_w360.jpg',brand:'SEVENTEEN',price:15000,cat:'photocard'},
-    {id:'401156777',name:`세븐틴 호시, 도겸 속성 10cm 인형 겸티 일괄 양도(겸푸, 홋티)`,imageUrl:'https://media.bunjang.co.kr/product/401156777_1_w360.jpg',brand:'SEVENTEEN',price:42550,cat:'plush'},
-    {id:'401156406',name:`세븐틴 김민규 잡지`,imageUrl:'https://media.bunjang.co.kr/product/401156406_1_w360.jpg',brand:'SEVENTEEN',price:13000,cat:'photobook'},
-    {id:'401153654',name:`세븐틴 호시, 도겸 속성 인형 일괄 양도(겸푸, 홋티, 미니 겸티)`,imageUrl:'https://media.bunjang.co.kr/product/401153654_1_w360.jpg',brand:'SEVENTEEN',price:69140,cat:'plush'},
-    {id:'401152852',name:`세븐틴 앨범 판매 럭드, 랜포 포함!! 캐럿반은 천원!!`,imageUrl:'https://media.bunjang.co.kr/product/401152852_1_w360.jpg',brand:'SEVENTEEN',price:8000,cat:'album'},
-    {id:'401151344',name:`세븐틴 포카 판매`,imageUrl:'https://media.bunjang.co.kr/product/401151344_1_w360.jpg',brand:'SEVENTEEN',price:30000,cat:'photocard'},
-    {id:'401151017',name:`급처)))) 세븐틴 정한 포카 대량 양도`,imageUrl:'https://media.bunjang.co.kr/product/401151017_1_w360.jpg',brand:'SEVENTEEN',price:1717,cat:'photocard'},
-    {id:'401150783',name:`세븐틴 고잉세븐틴 앨범 및 원우 민규 포카, 에스쿱스 구성품 판매`,imageUrl:'https://media.bunjang.co.kr/product/401150783_1_w360.jpg',brand:'SEVENTEEN',price:5000,cat:'photocard'},
-    {id:'401148763',name:`세븐틴 비더썬 Be The Sun DVD, 디지털코드 개봉`,imageUrl:'https://media.bunjang.co.kr/product/401148763_1_w360.jpg',brand:'SEVENTEEN',price:70000,cat:'album'},
-    {id:'401148077',name:`세븐틴 10주년 봉봉이 피규어 키링 풀세트 svt 멤버쉽 키트`,imageUrl:'https://media.bunjang.co.kr/product/401148077_1_w360.jpg',brand:'SEVENTEEN',price:22000,cat:'plush'},
-    {id:'401147840',name:`세븐틴 포카 급처`,imageUrl:'https://media.bunjang.co.kr/product/401147840_1_w360.jpg',brand:'SEVENTEEN',price:500,cat:'photocard'},
-    {id:'401147523',name:`급처)세븐틴 공방 바람막이`,imageUrl:'https://media.bunjang.co.kr/product/401147523_1_w360.jpg',brand:'SEVENTEEN',price:31910,cat:'md'},
-    {id:'401146596',name:`세븐틴 호시 티거홋 인형 팔아요`,imageUrl:'https://media.bunjang.co.kr/product/401146596_1_w360.jpg',brand:'SEVENTEEN',price:7000,cat:'plush'},
-    {id:'401145216',name:`세븐틴 정한 24년 캐럿랜드 공식 이미지 피켓 우치와`,imageUrl:'https://media.bunjang.co.kr/product/401145216_1_w360.jpg',brand:'SEVENTEEN',price:12000,cat:'lightstick'},
-    {id:'401144289',name:`300원) 세븐틴 포카 양도 판매 김민규 문준휘 조슈아 우지 부승관`,imageUrl:'https://media.bunjang.co.kr/product/401144289_1_w360.jpg',brand:'SEVENTEEN',price:500,cat:'photocard'},
-    {id:'401142903',name:`세븐틴 호시우지 공방 역조공 포카 판매`,imageUrl:'https://media.bunjang.co.kr/product/401142903_1_w360.jpg',brand:'SEVENTEEN',price:130000,cat:'photocard'},
-    {id:'401142861',name:`세븐틴 포카 일괄 양도`,imageUrl:'https://media.bunjang.co.kr/product/401142861_1_w360.jpg',brand:'SEVENTEEN',price:2000,cat:'photocard'},
-    {id:'401142638',name:`세븐틴 디노 New 앙콘 캐럿존 양도`,imageUrl:'https://media.bunjang.co.kr/product/401142638_1_w360.jpg',brand:'SEVENTEEN',price:2500,cat:'photocard'},
-    {id:'401142413',name:`세븐틴 버논 New 앙콘 캐럿존 양도`,imageUrl:'https://media.bunjang.co.kr/product/401142413_1_w360.jpg',brand:'SEVENTEEN',price:2500,cat:'photocard'},
-    {id:'401142095',name:`세븐틴 승관 New 앙콘 캐럿존 양도`,imageUrl:'https://media.bunjang.co.kr/product/401142095_1_w360.jpg',brand:'SEVENTEEN',price:3500,cat:'photocard'},
-    {id:'401141682',name:`세븐틴 도겸 New 앙콘 캐럿존 양도`,imageUrl:'https://media.bunjang.co.kr/product/401141682_1_w360.jpg',brand:'SEVENTEEN',price:4500,cat:'photocard'},
-    {id:'401141635',name:`세븐틴 정한 팔로우콘 우치와 판매합니다!`,imageUrl:'https://media.bunjang.co.kr/product/401141635_1_w360.jpg',brand:'SEVENTEEN',price:12000,cat:'lightstick'},
-    {id:'401141391',name:`세븐틴 민규 New 앙콘 캐럿존 양도`,imageUrl:'https://media.bunjang.co.kr/product/401141391_1_w360.jpg',brand:'SEVENTEEN',price:6500,cat:'photocard'},
-    {id:'401141020',name:`세븐틴 디에잇 New 앙콘 캐럿존 양도`,imageUrl:'https://media.bunjang.co.kr/product/401141020_1_w360.jpg',brand:'SEVENTEEN',price:6500,cat:'photocard'},
-    {id:'401140624',name:`세븐틴 준 New 앙콘 캐럿존 양도`,imageUrl:'https://media.bunjang.co.kr/product/401140624_1_w360.jpg',brand:'SEVENTEEN',price:3500,cat:'photocard'},
-    {id:'401140389',name:`세븐틴 조슈아 New 앙콘 캐럿존 양도`,imageUrl:'https://media.bunjang.co.kr/product/401140389_1_w360.jpg',brand:'SEVENTEEN',price:3500,cat:'photocard'},
-    {id:'401140066',name:`세븐틴 에스쿱스 New 앙콘 캐럿존 양도`,imageUrl:'https://media.bunjang.co.kr/product/401140066_1_w360.jpg',brand:'SEVENTEEN',price:6500,cat:'photocard'},
-    {id:'401139989',name:`세븐틴 new 트레카`,imageUrl:'https://media.bunjang.co.kr/product/401139989_1_w360.jpg',brand:'SEVENTEEN',price:1717,cat:'photocard'},
-    {id:'401139774',name:`세븐틴 도겸 포카, 핸드폰고리`,imageUrl:'https://media.bunjang.co.kr/product/401139774_1_w360.jpg',brand:'SEVENTEEN',price:28000,cat:'photocard'},
-    {id:'401139553',name:`세븐틴 민규 이삭 스머프 키링  + 스니커즈 엽서 4p`,imageUrl:'https://media.bunjang.co.kr/product/401139553_1_w360.jpg',brand:'SEVENTEEN',price:10000,cat:'plush'},
-    {id:'401139515',name:`세븐틴 위버스 특전 마그넷 일괄 양도`,imageUrl:'https://media.bunjang.co.kr/product/401139515_1_w360.jpg',brand:'SEVENTEEN',price:3500,cat:'photocard'},
-    {id:'401138658',name:`세븐틴 민규 키링 양도`,imageUrl:'https://media.bunjang.co.kr/product/401138658_1_w360.jpg',brand:'SEVENTEEN',price:4500,cat:'photobook'},
-    {id:'401137999',name:`세븐틴 조슈아 포카, 휴대폰고리 포함`,imageUrl:'https://media.bunjang.co.kr/product/401137999_1_w360.jpg',brand:'SEVENTEEN',price:38000,cat:'photocard'},
-    {id:'401135477',name:`이삭토스트 세븐틴 스머프 키링 디노, 디에잇, 민규`,imageUrl:'https://media.bunjang.co.kr/product/401135477_1_w360.jpg',brand:'SEVENTEEN',price:8000,cat:'plush'},
-    {id:'401131735',name:`세븐틴 포카 판매합니다~~!! 가격 제시해주세요`,imageUrl:'https://media.bunjang.co.kr/product/401131735_1_w360.jpg',brand:'SEVENTEEN',price:1111,cat:'photocard'},
-    {id:'401129222',name:`세븐틴 비공굿 양도`,imageUrl:'https://media.bunjang.co.kr/product/401129222_1_w360.jpg',brand:'SEVENTEEN',price:4000,cat:'photobook'},
-    {id:'401129101',name:`세븐틴 슈스플 Ode To You 랜티큘러 포카 일괄`,imageUrl:'https://media.bunjang.co.kr/product/401129101_1_w360.jpg',brand:'SEVENTEEN',price:849000,cat:'photocard'},
-    {id:'401128807',name:`세븐틴 승관 이미지피켓 양도`,imageUrl:'https://media.bunjang.co.kr/product/401128807_1_w360.jpg',brand:'SEVENTEEN',price:7000,cat:'lightstick'},
-    {id:'401127832',name:`세븐틴 New 트레카 도겸,승관`,imageUrl:'https://media.bunjang.co.kr/product/401127832_1_w360.jpg',brand:'SEVENTEEN',price:2000,cat:'photocard'},
-    {id:'401126452',name:`세븐틴 도겸 우치와 양도`,imageUrl:'https://media.bunjang.co.kr/product/401126452_1_w360.jpg',brand:'SEVENTEEN',price:15000,cat:'lightstick'},
-    {id:'401124883',name:`세븐틴 에스쿱스 승철 클리어 아크릴 뱃지 호그와트 전차스 왕차스 포카`,imageUrl:'https://media.bunjang.co.kr/product/401124883_1_w360.jpg',brand:'SEVENTEEN',price:15000,cat:'photocard'},
-  ],
-  enhypen:[
-    {id:'400992461',name:`엔하이픈 양정원 슬로건`,imageUrl:'https://media.bunjang.co.kr/product/400992461_1_w360.jpg',brand:'ENHYPEN',price:10000,cat:'lightstick'},
-    {id:'400989991',name:`엔하이픈월드 성훈 아크릴 마그넷 클럽 스포츠 SPORTS 미개봉`,imageUrl:'https://media.bunjang.co.kr/product/400989991_1_w360.jpg',brand:'ENHYPEN',price:14500,cat:'md'},
-    {id:'400989574',name:`엔하이픈월드 정원 성훈 아크릴 마그넷 클럽 스포츠  미개봉`,imageUrl:'https://media.bunjang.co.kr/product/400989574_1_w360.jpg',brand:'ENHYPEN',price:14900,cat:'md'},
-    {id:'400989216',name:`엔하이픈 개봉 앨범 일괄`,imageUrl:'https://media.bunjang.co.kr/product/400989216_1_w360.jpg',brand:'ENHYPEN',price:35000,cat:'album'},
-    {id:'400988330',name:`엔하이픈 선우 디자이어 언리쉬 포카 일괄`,imageUrl:'https://media.bunjang.co.kr/product/400988330_1_w360.jpg',brand:'ENHYPEN',price:12000,cat:'photocard'},
-    {id:'400988215',name:`엔하이픈 선우 다크블러드 사운드웨이브 럭키드로우`,imageUrl:'https://media.bunjang.co.kr/product/400988215_1_w360.jpg',brand:'ENHYPEN',price:13000,cat:'photocard'},
-    {id:'400988050',name:`엔하이픈월드 제이 SP카드 클럽 스포츠 SPORTS QR미사용 미개봉`,imageUrl:'https://media.bunjang.co.kr/product/400988050_1_w360.jpg',brand:'ENHYPEN',price:39000,cat:'md'},
-    {id:'400987887',name:`(미개봉 새상품) 엔하이픈 니키 티머니 교통카드`,imageUrl:'https://media.bunjang.co.kr/product/400987887_1_w360.jpg',brand:'ENHYPEN',price:9500,cat:'photocard'},
-    {id:'400987761',name:`엔하이픈 제이 박종성 가요대축제 크리스마스 포카 양도`,imageUrl:'https://media.bunjang.co.kr/product/400987761_1_w360.jpg',brand:'ENHYPEN',price:15000,cat:'photocard'},
-    {id:'400987533',name:`엔하이픈 성훈 티머니 교통카드 (미개봉)`,imageUrl:'https://media.bunjang.co.kr/product/400987533_1_w360.jpg',brand:'ENHYPEN',price:35000,cat:'photocard'},
-    {id:'400986995',name:`엔하이픈 띠부씰 랜덤씰 무나 포토카드 무료나눔`,imageUrl:'https://media.bunjang.co.kr/product/400986995_1_w360.jpg',brand:'ENHYPEN',price:5000,cat:'photocard'},
-    {id:'400986619',name:`엔하이픈 제이 박종성 포카 일괄 양도`,imageUrl:'https://media.bunjang.co.kr/product/400986619_1_w360.jpg',brand:'ENHYPEN',price:3000,cat:'photocard'},
-    {id:'400986501',name:`엔하이픈 더베니쉬 포카 포토카드 enhypen 쇼케`,imageUrl:'https://media.bunjang.co.kr/product/400986501_1_w360.jpg',brand:'ENHYPEN',price:15000,cat:'photocard'},
-    {id:'400986130',name:`엔하이픈월드 제이 JAY 특전 2컷 두컷포토 클럽 스포츠 미개봉`,imageUrl:'https://media.bunjang.co.kr/product/400986130_1_w360.jpg',brand:'ENHYPEN',price:14900,cat:'md'},
-    {id:'400985335',name:`엔하이픈 정원희승제이제이크성훈선우니키 포카앨범비공굿키링 양도`,imageUrl:'https://media.bunjang.co.kr/product/400985335_1_w360.jpg',brand:'ENHYPEN',price:1000,cat:'photocard'},
-    {id:'400985324',name:`엔하이픈 싼 가격에 처분 받습니다`,imageUrl:'https://media.bunjang.co.kr/product/400985324_1_w360.jpg',brand:'ENHYPEN',price:1000,cat:'album'},
-    {id:'400984188',name:`엔하이픈 성훈 인형 10cm 훈니끼리`,imageUrl:'https://media.bunjang.co.kr/product/400984188_1_w360.jpg',brand:'ENHYPEN',price:20000,cat:'plush'},
-    {id:'400984033',name:`엔하이픈월드 선우 특전 포카 밤피르 클럽 스포츠 SPORTS 미개봉`,imageUrl:'https://media.bunjang.co.kr/product/400984033_1_w360.jpg',brand:'ENHYPEN',price:25900,cat:'md'},
-    {id:'400983168',name:`엔하이픈 성훈 디아이콘 일괄`,imageUrl:'https://media.bunjang.co.kr/product/400983168_1_w360.jpg',brand:'ENHYPEN',price:40000,cat:'photobook'},
-    {id:'400981796',name:`앤하이픈 헌혈 포카 전원 판매합니다(쿨거시 택포)`,imageUrl:'https://media.bunjang.co.kr/product/400981796_1_w360.jpg',brand:'ENHYPEN',price:15000,cat:'photocard'},
-    {id:'400981606',name:`(단순개봉) 엔하이픈 선우 웤더라 프리미엄 포토 액자`,imageUrl:'https://media.bunjang.co.kr/product/400981606_1_w360.jpg',brand:'ENHYPEN',price:8000,cat:'photobook'},
-    {id:'400981001',name:`enhypen 엔하이픈 제이크 생일 수건 핫팩 공방`,imageUrl:'https://media.bunjang.co.kr/product/400981001_1_w360.jpg',brand:'ENHYPEN',price:180000,cat:'md'},
-    {id:'400979404',name:`엔하이픈 성훈 인형 굿즈 훈니끼리 판매`,imageUrl:'https://media.bunjang.co.kr/product/400979404_1_w360.jpg',brand:'ENHYPEN',price:15000,cat:'plush'},
-    {id:'400978217',name:`엔하이픈 희승 파란후드 포카`,imageUrl:'https://media.bunjang.co.kr/product/400978217_1_w360.jpg',brand:'ENHYPEN',price:25000,cat:'photocard'},
-    {id:'400978162',name:`엔하이픈 성훈 포카 판매 양도`,imageUrl:'https://media.bunjang.co.kr/product/400978162_1_w360.jpg',brand:'ENHYPEN',price:2000,cat:'photocard'},
-    {id:'400977888',name:`엔하이픈 제이 슬로건 양도`,imageUrl:'https://media.bunjang.co.kr/product/400977888_1_w360.jpg',brand:'ENHYPEN',price:14000,cat:'lightstick'},
-    {id:'400977717',name:`엔하이픈 성훈 인형 훈댕이 양도`,imageUrl:'https://media.bunjang.co.kr/product/400977717_1_w360.jpg',brand:'ENHYPEN',price:40000,cat:'plush'},
-    {id:'400977526',name:`엔하이픈 제이 인형 양도 쫑큘라`,imageUrl:'https://media.bunjang.co.kr/product/400977526_1_w360.jpg',brand:'ENHYPEN',price:24000,cat:'plush'},
-    {id:'400976928',name:`엔하이픈 성훈 우치와`,imageUrl:'https://media.bunjang.co.kr/product/400976928_1_w360.jpg',brand:'ENHYPEN',price:15000,cat:'lightstick'},
-    {id:'400976414',name:`엔하이픈 티머니 교통카드 미개봉 (가격제시)`,imageUrl:'https://media.bunjang.co.kr/product/400976414_1_w360.jpg',brand:'ENHYPEN',price:500,cat:'photocard'},
-    {id:'400976296',name:`엔하이픈 제이 DESIRE: UNLEASH ENGENE ver. 포토카드`,imageUrl:'https://media.bunjang.co.kr/product/400976296_1_w360.jpg',brand:'ENHYPEN',price:4000,cat:'photocard'},
-    {id:'400975639',name:`에반 포카 판매 (구 엔하이픈) 엔하이픈 희승`,imageUrl:'https://media.bunjang.co.kr/product/400975639_1_w360.jpg',brand:'ENHYPEN',price:2500,cat:'album'},
-    {id:'400974441',name:`엔하이픈 포카 판매`,imageUrl:'https://media.bunjang.co.kr/product/400974441_1_w360.jpg',brand:'ENHYPEN',price:2000,cat:'photocard'},
-    {id:'400973613',name:`엔하이픈 말랑 핀버튼`,imageUrl:'https://media.bunjang.co.kr/product/400973613_1_w360.jpg',brand:'ENHYPEN',price:4000,cat:'photocard'},
-    {id:'400972743',name:`엔하이픈 제이크 심재윤 우치와 양도`,imageUrl:'https://media.bunjang.co.kr/product/400972743_1_w360.jpg',brand:'ENHYPEN',price:16000,cat:'lightstick'},
-    {id:'400972726',name:`엔하이픈 랜박`,imageUrl:'https://media.bunjang.co.kr/product/400972726_1_w360.jpg',brand:'ENHYPEN',price:5000,cat:'photocard'},
-    {id:'400971532',name:`엔하이픈 엔픈 럭드 앨범 위버스 정원 제이 니키 포토카드 포카 양도 판매`,imageUrl:'https://media.bunjang.co.kr/product/400971532_1_w360.jpg',brand:'ENHYPEN',price:1060,cat:'photocard'},
-    {id:'400969942',name:`엔하이픈 포토카드 양도 정원 제이 제이크 성훈 니키`,imageUrl:'https://media.bunjang.co.kr/product/400969942_1_w360.jpg',brand:'ENHYPEN',price:5000,cat:'photocard'},
-    {id:'400968160',name:`엔하이픈 포카 양도 제이 제이크 성훈 선우 정원 니키`,imageUrl:'https://media.bunjang.co.kr/product/400968160_1_w360.jpg',brand:'ENHYPEN',price:1130,cat:'photocard'},
-    {id:'400967399',name:`엔하이픈 이희승 엔니멀즈 인형 햄승이 햄승 EVAN`,imageUrl:'https://media.bunjang.co.kr/product/400967399_1_w360.jpg',brand:'ENHYPEN',price:30000,cat:'plush'},
-    {id:'400967291',name:`엔하이픈 정원 우치와`,imageUrl:'https://media.bunjang.co.kr/product/400967291_1_w360.jpg',brand:'ENHYPEN',price:15000,cat:'lightstick'},
-    {id:'400966560',name:`엔하이픈 이희승 뱀부부 인형 EVAN`,imageUrl:'https://media.bunjang.co.kr/product/400966560_1_w360.jpg',brand:'ENHYPEN',price:50000,cat:'plush'},
-    {id:'400966209',name:`엔하이픈 뮤브 1차 정원 럭드 미공포 포카`,imageUrl:'https://media.bunjang.co.kr/product/400966209_1_w360.jpg',brand:'ENHYPEN',price:54000,cat:'photocard'},
-    {id:'400965145',name:`엔하이픈 포카 양도해요!`,imageUrl:'https://media.bunjang.co.kr/product/400965145_1_w360.jpg',brand:'ENHYPEN',price:1130,cat:'photocard'},
-    {id:'400962400',name:`엔하이픈 포카 양도받아요!`,imageUrl:'https://media.bunjang.co.kr/product/400962400_1_w360.jpg',brand:'ENHYPEN',price:99999,cat:'photocard'},
-    {id:'400961392',name:`엔하이픈 제이 로맨스언톨드 포카`,imageUrl:'https://media.bunjang.co.kr/product/400961392_1_w360.jpg',brand:'ENHYPEN',price:2120,cat:'photocard'},
-    {id:'400955169',name:`엔하이픈 희승 포토카드 판매`,imageUrl:'https://media.bunjang.co.kr/product/400955169_1_w360.jpg',brand:'ENHYPEN',price:7000,cat:'photocard'},
-    {id:'400954643',name:`엔하이픈 포토카드 일괄 정원 희승 제이 성훈 선우 니키`,imageUrl:'https://media.bunjang.co.kr/product/400954643_1_w360.jpg',brand:'ENHYPEN',price:20000,cat:'photocard'},
-    {id:'400951045',name:`엔하이픈 양정원 로맨스 언톨드 이즈위 특전 포카 양도합니다`,imageUrl:'https://media.bunjang.co.kr/product/400951045_1_w360.jpg',brand:'ENHYPEN',price:29780,cat:'photocard'},
-    {id:'400949873',name:`엔하이픈 선우 enhypen sunoo 엔진존 재팬 포카`,imageUrl:'https://media.bunjang.co.kr/product/400949873_1_w360.jpg',brand:'ENHYPEN',price:15000,cat:'photocard'},
-    {id:'400949589',name:`엔하이픈 응원봉 엔진봉1 enhypen`,imageUrl:'https://media.bunjang.co.kr/product/400949589_1_w360.jpg',brand:'ENHYPEN',price:18000,cat:'lightstick'},
-    {id:'400948000',name:`엔하이픈 월드 클럽스포츠 니키 sp 세트 양도`,imageUrl:'https://media.bunjang.co.kr/product/400948000_1_w360.jpg',brand:'ENHYPEN',price:48000,cat:'photocard'},
-    {id:'400947992',name:`엔하이픈 보이스 키링 제이크`,imageUrl:'https://media.bunjang.co.kr/product/400947992_1_w360.jpg',brand:'ENHYPEN',price:31500,cat:'plush'},
-    {id:'400944197',name:`엔하이픈 제이크 쿠션 키링`,imageUrl:'https://media.bunjang.co.kr/product/400944197_1_w360.jpg',brand:'ENHYPEN',price:8000,cat:'plush'},
-    {id:'400943570',name:`엔하이픈 심재윤 포카 일괄로 처분받아요`,imageUrl:'https://media.bunjang.co.kr/product/400943570_1_w360.jpg',brand:'ENHYPEN',price:10000,cat:'photocard'},
-    {id:'400940197',name:`엔하이픈 니키 웤더라 포카`,imageUrl:'https://media.bunjang.co.kr/product/400940197_1_w360.jpg',brand:'ENHYPEN',price:12000,cat:'photocard'},
-    {id:'400939182',name:`리스테린 엔하이픈 키링 제이크`,imageUrl:'https://media.bunjang.co.kr/product/400939182_1_w360.jpg',brand:'ENHYPEN',price:5000,cat:'md'},
-    {id:'400938669',name:`엔하이픈 희승 B-DAY PAPER`,imageUrl:'https://media.bunjang.co.kr/product/400938669_1_w360.jpg',brand:'ENHYPEN',price:65000,cat:'photocard'},
-    {id:'400937556',name:`(양도받아요) 하자있는것도OK 엔하이픈 엔진봉 응원봉2`,imageUrl:'https://media.bunjang.co.kr/product/400937556_1_w360.jpg',brand:'ENHYPEN',price:35000,cat:'lightstick'},
-    {id:'400936986',name:`엔하이픈 성훈 포카 판매`,imageUrl:'https://media.bunjang.co.kr/product/400936986_1_w360.jpg',brand:'ENHYPEN',price:4200,cat:'photocard'},
-    {id:'400935962',name:`엔하이픈 심재윤 제이크 포카판매`,imageUrl:'https://media.bunjang.co.kr/product/400935962_1_w360.jpg',brand:'ENHYPEN',price:4200,cat:'photocard'},
-    {id:'400935107',name:`엔하이픈 제이 포카`,imageUrl:'https://media.bunjang.co.kr/product/400935107_1_w360.jpg',brand:'ENHYPEN',price:1000,cat:'photocard'},
-    {id:'400934581',name:`엔하이픈 응원봉 엔진봉2 포카 일괄`,imageUrl:'https://media.bunjang.co.kr/product/400934581_1_w360.jpg',brand:'ENHYPEN',price:6000,cat:'photocard'},
-    {id:'400933803',name:`엔하이픈 정원 포토카드 판매`,imageUrl:'https://media.bunjang.co.kr/product/400933803_1_w360.jpg',brand:'ENHYPEN',price:4000,cat:'photocard'},
-    {id:'400933530',name:`엔하이픈 엔진반 포카 거래`,imageUrl:'https://media.bunjang.co.kr/product/400933530_1_w360.jpg',brand:'ENHYPEN',price:2000,cat:'photocard'},
-    {id:'400932945',name:`엔하이픈 cgv 이머전 인 시네마 특전 니키 포카`,imageUrl:'https://media.bunjang.co.kr/product/400932945_1_w360.jpg',brand:'ENHYPEN',price:18000,cat:'photocard'},
-    {id:'400928286',name:`해피떤12cm 양도 엔하이픈 선우`,imageUrl:'https://media.bunjang.co.kr/product/400928286_1_w360.jpg',brand:'ENHYPEN',price:36000,cat:'plush'},
-    {id:'400926910',name:`엔하이픈 희승 다크문 헬리 인형+굿즈 일괄`,imageUrl:'https://media.bunjang.co.kr/product/400926910_1_w360.jpg',brand:'ENHYPEN',price:52000,cat:'plush'},
-    {id:'400924435',name:`엔하이픈 정원 포카 양도`,imageUrl:'https://media.bunjang.co.kr/product/400924435_1_w360.jpg',brand:'ENHYPEN',price:40000,cat:'photocard'},
-    {id:'400922816',name:`선우 리스테린 키링 양도 엔하이픈`,imageUrl:'https://media.bunjang.co.kr/product/400922816_1_w360.jpg',brand:'ENHYPEN',price:5000,cat:'md'},
-    {id:'400922749',name:`희승 에반 굿즈 일괄 판매 인형 포카 양도 엔하이픈`,imageUrl:'https://media.bunjang.co.kr/product/400922749_1_w360.jpg',brand:'ENHYPEN',price:1234,cat:'plush'},
-    {id:'400922239',name:`ENHYPEN 희승 디아이콘 Golden Age/Even-more 일괄`,imageUrl:'https://media.bunjang.co.kr/product/400922239_1_w360.jpg',brand:'ENHYPEN',price:70000,cat:'photobook'},
-    {id:'400922175',name:`엔하이픈 제이 뱀부부 양도 급처`,imageUrl:'https://media.bunjang.co.kr/product/400922175_1_w360.jpg',brand:'ENHYPEN',price:51060,cat:'plush'},
-    {id:'400921830',name:`엔하이픈 정원 선우 성훈 목배게 파자마 포카`,imageUrl:'https://media.bunjang.co.kr/product/400921830_1_w360.jpg',brand:'ENHYPEN',price:24000,cat:'md'},
-    {id:'400920942',name:`엔하이픈 블러드 나잇 자카 포카 양도`,imageUrl:'https://media.bunjang.co.kr/product/400920942_1_w360.jpg',brand:'ENHYPEN',price:100000,cat:'photocard'},
-    {id:'400919124',name:`양정원 우치와 ㅅㅊㅇ)엔하이픈 양정원 제이 제이크 박성훈 김선우 니키`,imageUrl:'https://media.bunjang.co.kr/product/400919124_1_w360.jpg',brand:'ENHYPEN',price:20000,cat:'lightstick'},
-    {id:'400916543',name:`엔하이픈 UNSEEN 도록`,imageUrl:'https://media.bunjang.co.kr/product/400916543_1_w360.jpg',brand:'ENHYPEN',price:70000,cat:'photobook'},
-    {id:'400914443',name:`엔하이픈 스티커`,imageUrl:'https://media.bunjang.co.kr/product/400914443_1_w360.jpg',brand:'ENHYPEN',price:5000,cat:'photocard'},
-    {id:'400910226',name:`엔하이픈 단체 띠부씰 띠뿌씰 엔진용`,imageUrl:'https://media.bunjang.co.kr/product/400910226_1_w360.jpg',brand:'ENHYPEN',price:1500,cat:'photocard'},
-    {id:'400910216',name:`ENHYPEN 희승 아티스트 메이드 뱃지 세트`,imageUrl:'https://media.bunjang.co.kr/product/400910216_1_w360.jpg',brand:'ENHYPEN',price:90000,cat:'md'},
-    {id:'400910117',name:`엔하이픈 선우 반사슬로건(오늘마감)`,imageUrl:'https://media.bunjang.co.kr/product/400910117_1_w360.jpg',brand:'ENHYPEN',price:20000,cat:'lightstick'},
-    {id:'400909491',name:`ENHYPEN 희승 아티스트 메이드 키링 컬렉션 일괄`,imageUrl:'https://media.bunjang.co.kr/product/400909491_1_w360.jpg',brand:'ENHYPEN',price:150000,cat:'md'},
-    {id:'400903449',name:`리스테린 엔하이픈 선우 키링`,imageUrl:'https://media.bunjang.co.kr/product/400903449_1_w360.jpg',brand:'ENHYPEN',price:3000,cat:'md'},
-    {id:'400903269',name:`엔하이픈 로맨스 언톨드 제이크 앨포 예티몰 포카 양도`,imageUrl:'https://media.bunjang.co.kr/product/400903269_1_w360.jpg',brand:'ENHYPEN',price:25000,cat:'photocard'},
-    {id:'400903063',name:`엔하이픈 일본 앨범 유니버셜 럭키드로우 아이스크림 양도`,imageUrl:'https://media.bunjang.co.kr/product/400903063_1_w360.jpg',brand:'ENHYPEN',price:35000,cat:'photocard'},
-    {id:'400902672',name:`엔하이픈 로맨스 언톨드 선우 이즈위 앨포 이불 포카 양도`,imageUrl:'https://media.bunjang.co.kr/product/400902672_1_w360.jpg',brand:'ENHYPEN',price:8000,cat:'photocard'},
-    {id:'400902528',name:`엔하이픈`,imageUrl:'https://media.bunjang.co.kr/product/400902528_1_w360.jpg',brand:'ENHYPEN',price:320000,cat:'photobook'},
-    {id:'400902140',name:`엔하이픈 월드 클럽스포츠 정원 풀셋 스페셜 베이직 양도`,imageUrl:'https://media.bunjang.co.kr/product/400902140_1_w360.jpg',brand:'ENHYPEN',price:95000,cat:'photocard'},
-    {id:'400901316',name:`엔하이픈 성훈 훈댕이 양도`,imageUrl:'https://media.bunjang.co.kr/product/400901316_1_w360.jpg',brand:'ENHYPEN',price:35000,cat:'plush'},
-    {id:'400900227',name:`에반 포카 일괄 양도 ( 구 엔하이픈 희승)`,imageUrl:'https://media.bunjang.co.kr/product/400900227_1_w360.jpg',brand:'ENHYPEN',price:20000,cat:'photocard'},
-    {id:'400899935',name:`엔하이픈 뮤브 1차 정원 미공포 포카`,imageUrl:'https://media.bunjang.co.kr/product/400899935_1_w360.jpg',brand:'ENHYPEN',price:54000,cat:'photocard'},
-    {id:'400897193',name:`엔하이픈 희승 포토카드 일괄 양도`,imageUrl:'https://media.bunjang.co.kr/product/400897193_1_w360.jpg',brand:'ENHYPEN',price:15000,cat:'photocard'},
-    {id:'400890498',name:`엔하이픈 응원봉`,imageUrl:'https://media.bunjang.co.kr/product/400890498_1_w360.jpg',brand:'ENHYPEN',price:39000,cat:'lightstick'},
-    {id:'400889263',name:`엔하이픈 포카 판매`,imageUrl:'https://media.bunjang.co.kr/product/400889263_1_w360.jpg',brand:'ENHYPEN',price:2000,cat:'photocard'},
-    {id:'400889200',name:`제시) 엔하이픈 정원 로맨스 언톨드 이즈위 포카 판매합니다!`,imageUrl:'https://media.bunjang.co.kr/product/400889200_1_w360.jpg',brand:'ENHYPEN',price:2009,cat:'photocard'},
-    {id:'400888456',name:`엔하이픈 성훈 포토카드 배드 디자이어 언리쉬 이즈위 특전 포카`,imageUrl:'https://media.bunjang.co.kr/product/400888456_1_w360.jpg',brand:'ENHYPEN',price:25000,cat:'photocard'},
-    {id:'400886837',name:`엔하이픈 개봉 앨범 판매`,imageUrl:'https://media.bunjang.co.kr/product/400886837_1_w360.jpg',brand:'ENHYPEN',price:1000,cat:'album'},
-    {id:'400885600',name:`희승 포카 양도 일괄 엔하이픈 급처 포토카드`,imageUrl:'https://media.bunjang.co.kr/product/400885600_1_w360.jpg',brand:'ENHYPEN',price:7000,cat:'photocard'},
-    {id:'400885497',name:`엔하이픈 개봉 앨범 풀구성 희승 성훈 포토카드`,imageUrl:'https://media.bunjang.co.kr/product/400885497_1_w360.jpg',brand:'ENHYPEN',price:9000,cat:'photocard'},
-    {id:'400884550',name:`엔하이픈 햄해미님 통판 스티커`,imageUrl:'https://media.bunjang.co.kr/product/400884550_1_w360.jpg',brand:'ENHYPEN',price:7000,cat:'photocard'},
-  ],
-};
-
-// ─────────────────────────────────────────
-//  REDASH API FETCH
-//  쿼리 컬럼 구조 확인 후 parseGoodsRow()를 수정하세요.
-//  현재는 API 실패 시 위 GOODS 하드코딩 데이터로 폴백합니다.
-// ─────────────────────────────────────────
-const FALLBACK_GOODS = JSON.parse(JSON.stringify(GOODS)); // 하드코딩 복사본 보존
-let goodsReady = false;
-
-// ── 상품 카테고리 정의 ──
-const GOODS_CATS = [
-  { id:'all',      label:'All',        emoji:'🛍️' },
-  { id:'album',    label:'Album',      emoji:'💿' },
-  { id:'photocard',label:'Photocard',  emoji:'🃏' },
-  { id:'lightstick',label:'Lightstick',emoji:'🔦' },
-  { id:'photobook',label:'Photobook',  emoji:'📸' },
-  { id:'figure',   label:'Figure',     emoji:'🏷️' },
-  { id:'apparel',  label:'Apparel',    emoji:'👕' },
-  { id:'plush',    label:'Plush',      emoji:'🧸' },
-  { id:'poster',   label:'Poster',     emoji:'🖼️' },
-  { id:'md',       label:'MD',         emoji:'🎁' },
-];
-
-// 실제 번장 카테고리ID + 상품명 키워드로 분류
-// catId 우선 → 상품명 키워드 보완
-function classifyGoods(name, catId) {
-  const c = String(catId||'');
-  const n = (name||'').toLowerCase();
-
-  // ── catId 기반 (정확도 높음) ──
-  if (c==='910100001') return 'photocard';
-  if (c==='910100002') return 'lightstick';
-  if (c==='910100003') return 'photobook';
-  if (c==='910100004') return 'album';
-  if (c==='910100005') return 'poster';
-  if (c==='910100006') return 'md';
-  if (c==='910100007') return 'photobook';
-  if (c==='910100008') return 'plush';
-  if (c==='910500001') return 'md';
-  if (c==='910800008') return 'figure';
-
-  // ── 상품명 키워드 보완 ──
-  if (/포토카드|포카|photo\s?card|트레카/.test(n)) return 'photocard';
-  if (/응원봉|라이트스틱|lightstick|슬로건|우치와|이미지피켓/.test(n)) return 'lightstick';
-  if (/앨범|album/.test(n)) return 'album';
-  if (/포토북|엽서|엽서북|photobook|도록|잡지/.test(n)) return 'photobook';
-  if (/인형|doll|플러시/.test(n)) return 'plush';
-  if (/포스터|poster/.test(n)) return 'poster';
-  if (/키링|아크릴|배지|핀|파츠|keyring|acrylic/.test(n)) return 'figure';
-  if (/후드|티셔츠|자켓|가방|수건|모자|cap|hoodie/.test(n)) return 'apparel';
-  return 'md';
-}
-
-// ─────────────────────────────────────────
-//  LIVE 분류 엔진
-//  상품명(1순위) → catId/cat(2순위)로 LIVE 타입 판별
-// ─────────────────────────────────────────
-const LIVE_RULES = [
-  {
-    type: 'concert',
-    label: '콘서트 현장 한정',
-    desc: '이 공연 입장 특전 · 현장 한정 매물',
-    color: '#D04060',
-    bg: 'rgba(208,64,96,0.07)',
-    border: 'rgba(208,64,96,0.2)',
-    keywords: [
-      '아미존','armyzone','army zone','입장특전','현장수령','현장한정',
-      '콘서트 포카','콘포카','공연포카','아미부스',
-      '첫콘','중콘','막콘','고양콘','부산콘','캐럿존','엔진존',
-      'cgv 특전','cgv 포카','라이브뷰잉 특전',
-    ],
-    eventTypes: ['concert','tour'],
-  },
-  {
-    type: 'fansign',
-    label: '팬사인 · 사인회',
-    desc: '팬사인회 참석자 한정 · 행사 직후 매물',
-    color: '#3060C0',
-    bg: 'rgba(48,96,192,0.07)',
-    border: 'rgba(48,96,192,0.2)',
-    keywords: [
-      '팬싸포','팬싸 포카','팬사인 포카','사인회포카','직촬포','직촬 포카','직찍',
-      '역조공','쇼케이스포','쇼케포카','쇼케 포카','쇼케이스 특전',
-      // 응모용 앨범 포카 (플랫폼 POB)
-      '위뮤포','위드뮤 포카','사운드웨이브 포카','사운드웨이브 럭키드로우','사운드웨이브 럭드',
-      '뮤직플랜트 포카','뮤플 포카','뮤직플랜트 럭드','뮤직플랜트 럭키드로우',
-      '예스24 포카','예스포','알라딘 포카','알라딘포','교보 포카','교보포',
-      '이즈위 포카','이즈위 특전','이즈위 럭드',
-    ],
-    eventTypes: ['fansign'],
-  },
-  {
-    type: 'gonbang',
-    label: '공방 · 공개방송',
-    desc: '방청 한정 지급 · 300명 이하 극희귀',
-    color: '#B06000',
-    bg: 'rgba(176,96,0,0.07)',
-    border: 'rgba(176,96,0,0.2)',
-    keywords: [
-      '공방포카','공방 포카','공방포','공방 특전',
-      '공개방송 포카','방청 포카','방청포카','방청특전',
-      '뮤직뱅크 포카','음악중심 포카','인기가요 포카','쇼챔피언 포카','엠카운트다운 포카',
-    ],
-    eventTypes: ['special'],
-  },
-  {
-    type: 'fancon',
-    label: '팬콘 · 팬미팅',
-    desc: '팬콘 / 팬미팅 현장 한정 매물',
-    color: '#207040',
-    bg: 'rgba(32,112,64,0.07)',
-    border: 'rgba(32,112,64,0.2)',
-    keywords: [
-      '캐럿랜드 포카','캐럿랜드포카','캐럿랜드 특전',
-      '팬미팅 포카','팬미팅포카','팬미팅 특전',
-      '팬콘 포카','팬콘포카','팬콘 특전',
-      '엔진반 포카','엔진반포카',
-      '뉴 앙콘 캐럿존','앙콘 캐럿존','뉴앙콘 캐럿존',
-    ],
-    eventTypes: ['fancon','fanmeeting'],
-  },
-  {
-    type: 'lucky',
-    label: '럭키드로우',
-    desc: '추첨 한정 지급 · 위버스 / 플랫폼 럭드',
-    color: '#7020B0',
-    bg: 'rgba(112,32,176,0.07)',
-    border: 'rgba(112,32,176,0.2)',
-    keywords: [
-      '럭키드로우','럭드','lucky draw',
-      '위버스 럭드','위버스 럭키드로우','weverse 럭드',
-      '유니버셜 럭드','유니버셜 럭키드로우',
-    ],
-    eventTypes: ['comeback','release'],
-  },
-  {
-    type: 'popup',
-    label: '팝업 · 전시 한정',
-    desc: '팝업스토어 / 전시회 현장 한정 매물',
-    color: '#905010',
-    bg: 'rgba(144,80,16,0.07)',
-    border: 'rgba(144,80,16,0.2)',
-    keywords: [
-      '팝업 포카','팝업포카','팝업 특전','팝업한정','팝업스토어 포카',
-      '전시회 포카','전시 포카','전시한정','전시회팝업',
-      '하우스 오브 뱀파이어 포카','하우스오브뱀파이어',
-    ],
-    eventTypes: ['special'],
-  },
-  {
-    type: 'membership',
-    label: '멤버십 한정',
-    desc: '팬클럽 회원 전용 지급 굿즈',
-    color: '#0060A0',
-    bg: 'rgba(0,96,160,0.07)',
-    border: 'rgba(0,96,160,0.2)',
-    keywords: [
-      '멤버십키트 포카','멤버십 포카','멤버십 특전','멤버십키트 특전',
-      '캐럿반 포카','캐럿반포카','엔진반 특전',
-      '헌혈포카','헌혈 포카',
-    ],
-    eventTypes: ['special'],
-  },
-];
-
-// 상품명 → LIVE 타입 반환 (없으면 null)
-// 1순위: 상품명 키워드 / 2순위: cat 힌트
-function detectLiveType(name, cat) {
-  const n = (name||'').toLowerCase();
-  for (const rule of LIVE_RULES) {
-    if (rule.keywords.some(k => n.includes(k.toLowerCase()))) {
-      return rule.type;
-    }
-  }
-  return null;
-}
-
-// 이벤트 타입 → 매칭되는 LIVE 룰들
-function liveRulesForEventType(eventType) {
-  return LIVE_RULES.filter(r => r.eventTypes.includes(eventType));
-}
-
-function parseGoodsRow(row) {
-  const name = row['상품명'] || '';
-  const catId = String(row['카테고리ID'] || '');
-  const rawId = row['상품ID'];
-  const id = rawId != null ? String(rawId) : '';
-  // 이미지 URL: 직접 URL이 없으면 상품 ID로 번장 CDN URL 구성
-  const imageUrl = row['상품이미지URL'] || (id ? `https://media.bunjang.co.kr/product/${id}_1_w360.jpg` : '');
-  return {
-    id,
-    name,
-    imageUrl,
-    brand:    row['브랜드명_ENG'] || row['브랜드명_KOR'] || '',
-    brandId:  row['브랜드코드']   || '',
-    price:    Number(row['가격']) || 0,
-    catId,
-    uid:      row['판매자UID']    || '',
-    cat:      classifyGoods(name, catId),
-  };
-}
-
-// 굿즈 카테고리 필터 상태
-let activeGoodsCat = 'all';
-
-
-async function fetchGoods() {
-  try {
-    const groups = ['bts', 'enhypen', 'seventeen'];
-    const results = await Promise.all(
-      groups.map(g => fetch(`/goods/goods-${g}.json`).then(r => r.ok ? r.json() : []))
-    );
-
-    let hasData = false;
-    groups.forEach((gid, i) => {
-      if (!Array.isArray(results[i]) || results[i].length === 0) return;
-      GOODS[gid] = results[i];
-      hasData = true;
-    });
-
-    if (hasData) {
-      goodsReady = true;
-      renderBottom();
-    }
-  } catch (err) {
-    console.warn('[KF_Calendar] Goods fetch 실패, 폴백 데이터 사용:', err.message);
-  }
-}
-
-// ─────────────────────────────────────────
 //  STATE
 // ─────────────────────────────────────────
-let view = 'month';              // 'week' | 'month'
-let activeGroup = 'bts';        // 첫 번째 그룹으로 시작
-let selectedDate = dKey(TODAY);  // 'YYYY-MM-DD'
+let view = 'month';
+let selectedDate = dKey(TODAY);
 let weekStart = getWeekStart(TODAY);
 let monthPivot = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
-let selectedEventId = null;      // which event chip is active
+
+// 공방 일정 데이터: { 'YYYY-MM-DD': { showName, episode, groups:[], rawTitle } }
+let LINEUP_BY_DATE = {};
+// 공방 화면에서 선택된 아티스트 원본 이름 (칩 클릭), '전체'면 null
+let selectedArtistName = null;
+// '전체' 탭 선택 여부
+let allGroupsSelected = false;
+
+// 공방 EVENTS 목록 (calendar dot 렌더용)
+let EVENTS = [];
+
+// ─────────────────────────────────────────
+//  SHOW LABELS
+// ─────────────────────────────────────────
+const SHOW_LABELS = {
+  music_core:    { name:'쇼! 음악중심', short:'음악중심', day:'SAT', color:'#E8823A' },
+  inkigayo:      { name:'SBS 인기가요', short:'인기가요', day:'SUN', color:'#A855C8' },
+  music_bank:    { name:'뮤직뱅크',     short:'뮤직뱅크', day:'FRI', color:'#4CAF50' },
+  mcountdown:    { name:'엠카운트다운', short:'엠카',     day:'THU', color:'#FF4757' },
+  show_champion: { name:'쇼챔피언',     short:'쇼챔',     day:'WED', color:'#00C4B4' },
+};
+
+// 프론트용 아티스트→그룹ID 매핑
+const ARTIST_TO_GROUP_FRONT = {
+  'BTS':'bts','방탄소년단':'bts','RM':'bts','Jin':'bts','진':'bts',
+  'SUGA':'bts','슈가':'bts','j-hope':'bts','j-Hope':'bts',
+  'Jimin':'bts','지민':'bts','V':'bts','뷔':'bts',
+  'Jung Kook':'bts','Jungkook':'bts','정국':'bts',
+  'SEVENTEEN':'seventeen','세븐틴':'seventeen',
+  'ENHYPEN':'enhypen','엔하이픈':'enhypen',
+  'aespa':'aespa','AESPA':'aespa',
+  'IVE':'ive',
+  'LE SSERAFIM':'lesserafim',
+  'NewJeans':'newjeans','NEWJEANS':'newjeans',
+  'TWICE':'twice','트와이스':'twice',
+  'BLACKPINK':'blackpink','블랙핑크':'blackpink',
+  'EXO':'exo',
+  'NCT':'nct','NCT 127':'nct127','NCT DREAM':'nctdream','NCT WISH':'nctwish',
+  'SUPER JUNIOR':'superjunior','슈퍼주니어':'superjunior',
+  'SHINee':'shinee','샤이니':'shinee',
+  'MONSTA X':'monstax',
+  'ATEEZ':'ateez','에이티즈':'ateez',
+  'Stray Kids':'straykids','STRAY KIDS':'straykids',
+  'TXT':'txt','TOMORROW X TOGETHER':'txt','투모로우바이투게더':'txt',
+  'ITZY':'itzy','있지':'itzy',
+  'NMIXX':'nmixx',
+  'PLAVE':'plave','플레이브':'plave',
+  'ZEROBASEONE':'zerobaseone','ZB1':'zerobaseone',
+  'BOYNEXTDOOR':'boynextdoor',
+  'TWS':'tws',
+  'KISS OF LIFE':'kissoflife',
+  'QWER':'qwer',
+  'ILLIT':'illit','아일릿':'illit',
+  'BABYMONSTER':'babymonster',
+  '&TEAM':'andteam',
+  'INI':'ini',
+  'EVNNE':'evnne','이븐':'evnne',
+  'CRAVITY':'cravity',
+  'THE BOYZ':'theboyz',
+  'ONEUS':'oneus','원어스':'oneus',
+  'GOT7':'got7',
+  'DAY6':'day6',
+  'tripleS':'triples',
+  'XIKERS':'xikers',
+  'NEXZ':'nexz','넥스지':'nexz',
+  'KATSEYE':'katseye',
+  'Xdinary Heroes':'xdinaryheroes',
+  'ALPHA DRIVE ONE':'alphadriveone',
+  '82MAJOR':'82major','82메이저':'82major',
+  'NCT WISH':'nctwish','엔시티 위시':'nctwish',
+  'NCT DREAM':'nctdream','엔시티 드림':'nctdream',
+  'NCT 127':'nct127','엔시티 127':'nct127',
+  '엔시티':'nct',
+  'CHUU':'chuu','츄':'chuu',
+  'WONHO':'wonho','원호':'wonho',
+  'HWASA':'hwasa','화사':'hwasa',
+  'SUNMI':'sunmi','선미':'sunmi',
+  'SOOJIN':'soojin','수진':'soojin',
+  'CHUNG HA':'chunga','청하':'chunga',
+  '이채연':'leechaeyeon',
+  'WHEEIN':'wheein','휘인':'wheein',
+  '박지훈':'parkjihoon',
+  'KINO':'kino','키노':'kino',
+  'PENTAGON':'pentagon','펜타곤':'pentagon',
+  '(G)I-DLE':'gidle','여자아이들':'gidle','GIDLE':'gidle',
+  'MAMAMOO':'mamamoo','마마무':'mamamoo',
+  'Red Velvet':'redvelvet','레드벨벳':'redvelvet',
+  'OMEGA X':'omegax',
+  'tripleS':'triples',
+  'DRIPPIN':'drippin',
+  'VERIVERY':'verivery',
+  'TNX':'tnx',
+  'KiiiKiii':'kiikikii',
+  'CORTIS':'cortis',
+  'MODYSSEY':'modyssey',
+  'INI':'ini',
+  'XIKERS':'xikers','자이커스':'xikers',
+};
 
 // ─────────────────────────────────────────
 //  UTILS
@@ -1274,55 +518,14 @@ function getWeekStart(d){
 }
 function addDays(d,n){ const c=new Date(d);c.setDate(c.getDate()+n);return c }
 function sameDay(a,b){ return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate() }
-function hexRgba(hex,a){
-  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
-  return `rgba(${r},${g},${b},${a})`;
-}
-function groupOf(id){ return GROUPS.find(g=>g.id===id)||GROUPS[0] }
-function shuffle(arr){ const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a }
+function isFuture(ds){ return ds > dKey(TODAY); }
 
-function filteredEvents(){
-  return EVENTS.filter(e=>e.group===activeGroup);
-}
 function eventsOnDate(ds){
-  return filteredEvents().filter(e=>e.date===ds);
+  return EVENTS.filter(e=>e.date===ds);
 }
 
-// ─────────────────────────────────────────
-//  BUILD TYPE LEGEND
-// ─────────────────────────────────────────
-function buildLegend(){
-  const el=document.getElementById('typeLegend');
-  el.innerHTML='';
-  Object.entries(TYPE_COLORS).forEach(([type,color])=>{
-    const item=document.createElement('div');
-    item.className='tleg-item';
-    item.innerHTML=`<span class="tleg-dot" style="background:${color}"></span>${TYPE_LABEL[type]||type}`;
-    el.appendChild(item);
-  });
-}
-
-// ─────────────────────────────────────────
-//  BUILD FILTER
-// ─────────────────────────────────────────
-function buildFilter(){
-  const row=document.getElementById('filterRow');
-  row.innerHTML='';
-  GROUPS.forEach(g=>{
-    const c=document.createElement('div');
-    c.className='chip'+(g.id===activeGroup?' on':'');
-    if(g.id===activeGroup){c.style.borderColor=g.color;c.style.color=g.color}
-    c.innerHTML=`<span class="cdot" style="background:${g.color}"></span>${g.label}`;
-    c.onclick=()=>{
-      activeGroup=g.id;
-      selectedEventId=null;
-      activeGoodsCat='all';
-      // 테마 전환
-      document.body.className=g.theme||'';
-      buildFilter();buildCal();renderBottom();
-    };
-    row.appendChild(c);
-  });
+function escHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ─────────────────────────────────────────
@@ -1339,9 +542,7 @@ function navNext(){ if(view==='week'){weekStart=addDays(weekStart,7)}else{monthP
 function goToday(){
   weekStart=getWeekStart(TODAY);
   monthPivot=new Date(TODAY.getFullYear(),TODAY.getMonth(),1);
-  selectedDate=dKey(TODAY);
-  selectedEventId=null;
-  buildCal();renderBottom();
+  selectDate(dKey(TODAY));
 }
 
 // ─────────────────────────────────────────
@@ -1374,11 +575,9 @@ function buildCal(){
 
 // ── WEEK VIEW ──
 function buildWeek(area){
-  // DOW header row
   const dowRow=document.createElement('div');
   dowRow.className='dow-row';
   for(let i=0;i<7;i++){
-    const d=addDays(weekStart,i);
     const cell=document.createElement('div');
     cell.className='dow-cell';
     cell.textContent=DOW_SHORT[i];
@@ -1386,45 +585,48 @@ function buildWeek(area){
   }
   area.appendChild(dowRow);
 
-  // Week day cells
   const grid=document.createElement('div');
   grid.className='week-grid';
 
   for(let i=0;i<7;i++){
     const d=addDays(weekStart,i);
     const ds=dKey(d);
-    const evts=eventsOnDate(ds);
     const isToday=sameDay(d,TODAY);
     const isSel=ds===selectedDate;
+    const future=isFuture(ds);
 
     const cell=document.createElement('div');
-    cell.className=['wday',isToday?'today':'',isSel?'on':'',i===0?'sun':'',i===6?'sat':''].filter(Boolean).join(' ');
+    const classes=['wday',isToday?'today':'',isSel?'on':'',i===0?'sun':'',i===6?'sat':'',future&&!isToday?'future':''].filter(Boolean).join(' ');
+    cell.className=classes;
 
     const num=document.createElement('div');
     num.className='wday-num';
     num.textContent=d.getDate();
     cell.appendChild(num);
 
-    if(evts.length){
+    const lineup = LINEUP_BY_DATE[ds];
+    if(lineup){
       const dc=document.createElement('div');
       dc.className='dots-col';
-      evts.slice(0,4).forEach(e=>{
-        const dot=document.createElement('div');
-        dot.className='evt-dot';
-        dot.style.background=TYPE_COLORS[e.type]||groupOf(e.group).color;
-        dot.title=TYPE_LABEL[e.type]||e.type;
-        dc.appendChild(dot);
-      });
-      if(evts.length>4){
-        const more=document.createElement('div');
-        more.style.cssText=`font-size:7px;color:var(--txt3);font-weight:700;line-height:1`;
-        more.textContent=`+${evts.length-4}`;
-        dc.appendChild(more);
+      const show = SHOW_LABELS[lineup.showName];
+      const showColor = show ? show.color : '#9B6FD8';
+      const dot=document.createElement('div');
+      dot.className='evt-dot';
+      dot.style.background=showColor;
+      dot.title=(show?show.short:lineup.showName)+' 공방';
+      dc.appendChild(dot);
+      const wRaw = parseRawTitleStatic(lineup.rawTitle);
+      const wCount = wRaw.length > 0 ? wRaw.length : lineup.groups.length;
+      if(wCount > 0){
+        const cnt=document.createElement('div');
+        cnt.style.cssText=`font-size:7px;color:${showColor};font-weight:800;line-height:1;margin-top:1px`;
+        cnt.textContent=`${wCount}팀`;
+        dc.appendChild(cnt);
       }
       cell.appendChild(dc);
     }
 
-    cell.onclick=()=>{ selectedDate=ds;selectedEventId=null;activeGoodsCat='all';buildCal();renderBottom();scrollToBottom() };
+    cell.onclick=()=>{ selectDate(ds); scrollToBottom(); };
     grid.appendChild(cell);
   }
   area.appendChild(grid);
@@ -1437,10 +639,9 @@ function buildMonth(area){
   const daysInM=new Date(y,m+1,0).getDate();
   const daysInPrev=new Date(y,m,0).getDate();
 
-  // DOW header
   const dowRow=document.createElement('div');
   dowRow.className='dow-row';
-  DOW_SHORT.forEach((d,i)=>{
+  DOW_SHORT.forEach(d=>{
     const c=document.createElement('div');
     c.className='dow-cell';
     c.textContent=d;
@@ -1461,57 +662,118 @@ function buildMonth(area){
   cells.forEach((c,idx)=>{
     const d=new Date(c.yr,c.mo,c.day);
     const ds=dKey(d);
-    const evts=eventsOnDate(ds);
     const isToday=sameDay(d,TODAY);
     const isSel=ds===selectedDate;
+    const future=isFuture(ds);
     const dow=idx%7;
 
     const cell=document.createElement('div');
-    cell.className=['mday',c.other?'other':'',isToday?'today':'',isSel?'on':'',dow===0?'sun':'',dow===6?'sat':''].filter(Boolean).join(' ');
+    cell.className=['mday',c.other?'other':'',isToday?'today':'',isSel?'on':'',dow===0?'sun':'',dow===6?'sat':'',future&&!isToday&&!c.other?'future':''].filter(Boolean).join(' ');
 
     const num=document.createElement('div');
     num.className='mday-num';
     num.textContent=c.day;
     cell.appendChild(num);
 
-    if(evts.length){
+    const mLineup = LINEUP_BY_DATE[ds];
+    if(mLineup){
+      const show = SHOW_LABELS[mLineup.showName];
+      const showColor = show ? show.color : '#9B6FD8';
       const dotsEl=document.createElement('div');
       dotsEl.className='mday-dots';
-      evts.slice(0,5).forEach(e=>{
-        const dot=document.createElement('div');
-        dot.className='mdot';
-        dot.style.background=TYPE_COLORS[e.type]||groupOf(e.group).color;
-        dot.title=TYPE_LABEL[e.type]||e.type;
-        dotsEl.appendChild(dot);
-      });
+      const dot=document.createElement('div');
+      dot.className='mdot';
+      dot.style.background=showColor;
+      dotsEl.appendChild(dot);
       cell.appendChild(dotsEl);
 
-      // show event pills (max 2) + more count
       const pillsEl=document.createElement('div');
       pillsEl.className='mday-evts';
-      const MAX_PILLS=2;
-      evts.slice(0,MAX_PILLS).forEach(e=>{
-        const g=groupOf(e.group);
-        const pill=document.createElement('div');
-        pill.className='mevt-pill';
-        pill.style.background=hexRgba(g.color,.2);
-        pill.style.color=g.color;
-        pill.textContent=e.name;
-        pillsEl.appendChild(pill);
-      });
-      if(evts.length>MAX_PILLS){
-        const more=document.createElement('div');
-        more.className='mevt-more';
-        more.textContent=`+${evts.length-MAX_PILLS} more`;
-        pillsEl.appendChild(more);
-      }
+      const pill=document.createElement('div');
+      pill.className='mevt-pill';
+      pill.style.background=showColor+'33';
+      pill.style.color=showColor;
+      const mRaw = parseRawTitleStatic(mLineup.rawTitle);
+      const mCount = mRaw.length > 0 ? mRaw.length : mLineup.groups.length;
+      pill.textContent=(show?show.short:mLineup.showName)+(mCount?` · ${mCount}팀`:'');
+      pillsEl.appendChild(pill);
       cell.appendChild(pillsEl);
     }
 
-    cell.onclick=()=>{ selectedDate=ds;selectedEventId=null;activeGoodsCat='all';buildCal();renderBottom();scrollToBottom() };
+    cell.onclick=()=>{ selectDate(ds); scrollToBottom(); };
     grid.appendChild(cell);
   });
   area.appendChild(grid);
+}
+
+// ─────────────────────────────────────────
+//  SELECT DATE — 날짜 선택 + 전체 탭 자동 활성
+// ─────────────────────────────────────────
+function selectDate(ds){
+  selectedDate = ds;
+  selectedArtistName = null;
+  const lineup = LINEUP_BY_DATE[ds];
+  if(lineup && (lineup.rawTitle || lineup.groups.length > 0)){
+    allGroupsSelected = true;
+  } else {
+    allGroupsSelected = false;
+  }
+  buildCal();
+  renderBottom();
+}
+
+function triggerAllGoods(ds){
+  const lineup = LINEUP_BY_DATE[ds];
+  if(!lineup) return;
+  const rawArtists = parseRawTitleStatic(lineup.rawTitle);
+  const query = rawArtists.length > 0 ? rawArtists.join(' ') : lineup.groups.join(' ');
+  if(query) fetchAndShowLiveGoods(query, true);
+}
+
+// 코너명/설명 텍스트 블랙리스트 — 칩에서 제거
+const SEGMENT_BLACKLIST = new Set([
+  '영 크리에이터 크루', '온 세상을 다정함으로 물들일 큐피드',
+  '뮤직뱅크 1위 앵콜직캠', '앵콜직캠', '직캠', '공연', '특집',
+]);
+
+// 세그먼트에서 실제 그룹명만 추출: "CRAVITY COMEBACK" → "CRAVITY"
+// ARTIST_TO_GROUP_FRONT 키 중 longest-prefix match 사용
+function cleanArtistSegment(seg) {
+  if (SEGMENT_BLACKLIST.has(seg)) return '';
+  const keys = Object.keys(ARTIST_TO_GROUP_FRONT).sort((a,b) => b.length - a.length);
+  for (const k of keys) {
+    if (seg === k || seg.startsWith(k + ' ') || seg.startsWith(k + '\u00a0')) {
+      return k;
+    }
+  }
+  return seg; // 매핑 없는 경우 원본 (개인 아티스트 등)
+}
+
+// parseRawTitle 전역 버전 (renderBottom 스코프 밖에서도 사용)
+function parseRawTitleStatic(raw) {
+  if (!raw) return [];
+  // HTML entity decode: &#39; → '
+  const decoded = raw.replace(/&#39;/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+  const dashIdx = decoded.indexOf(' - ');
+  let segments;
+  if (dashIdx !== -1) {
+    segments = decoded.slice(dashIdx + 3)
+      .replace(/\s+등\s*$/, '')
+      .split(',')
+      .map(s => s.replace(/\s*\([^)]*\)/g, '').trim());
+  } else {
+    segments = decoded.split(/\s*[·.]\s*/).map(s => s.trim()).filter(s => s);
+  }
+  // 중복 제거하면서 순서 유지
+  const seen = new Set();
+  const result = [];
+  for (const seg of segments) {
+    const cleaned = cleanArtistSegment(seg);
+    if (!cleaned || seen.has(cleaned)) continue;
+    seen.add(cleaned);
+    result.push(cleaned);
+  }
+  return result;
 }
 
 // ─────────────────────────────────────────
@@ -1523,169 +785,114 @@ function scrollToBottom(){
 }
 
 // ─────────────────────────────────────────
-//  PROMO BANNER — 가장 가까운 이벤트 기준
-// ─────────────────────────────────────────
-function getNextEvent(){
-  const today = dKey(TODAY);
-  const upcoming = filteredEvents()
-    .filter(e => e.date >= today)
-    .sort((a,b) => a.date.localeCompare(b.date));
-  // D+1 ~ D+7 지난 것도 포함 (이벤트 직후 매물)
-  const recent = filteredEvents()
-    .filter(e => {
-      const diff = Math.round((TODAY - new Date(e.date)) / 86400000);
-      return diff > 0 && diff <= 7;
-    })
-    .sort((a,b) => b.date.localeCompare(a.date));
-  return { upcoming: upcoming[0] || null, recent: recent[0] || null };
-}
-
-function renderPromoBanner(bot){
-  const { upcoming, recent } = getNextEvent();
-
-  // 우선순위: 이벤트 직후(D+1~7) > 이벤트 임박(D-3이내) > 일반 예정
-  let target = null, mode = null;
-
-  if(recent){
-    target = recent; mode = 'post';
-  } else if(upcoming){
-    const diff = Math.round((new Date(upcoming.date) - TODAY) / 86400000);
-    if(diff === 0){ target = upcoming; mode = 'today'; }
-    else if(diff <= 3){ target = upcoming; mode = 'soon'; }
-    else { target = upcoming; mode = 'pre'; }
-  }
-
-  if(!target) return;
-
-  const g = groupOf(target.group);
-  const [ey,em,ed] = target.date.split('-').map(Number);
-  const evtDate = new Date(ey, em-1, ed);
-  const diffDays = Math.round((evtDate - TODAY) / 86400000);
-
-  let icon, headline, sub, btnLabel, accentColor;
-  const LIVE_TYPES = ['fansign','fancon','comeback','popup'];
-  const isLive = LIVE_TYPES.includes(target.type);
-
-  if(mode === 'post'){
-    icon = '🔴';
-    headline = `${target.name}`;
-    sub = `이벤트 종료 후 ${Math.abs(diffDays)}일 · 지금 한정판 매물이 올라오고 있어요`;
-    btnLabel = '매물 바로 보기 →';
-    accentColor = '#FF4757';
-  } else if(mode === 'today'){
-    icon = isLive ? '🔴' : '🎤';
-    headline = `오늘! ${target.name}`;
-    sub = isLive ? '현장 한정 매물이 곧 올라옵니다 · 빠르게 확인하세요' : '오늘 공연 챙길 굿즈가 있나요?';
-    btnLabel = isLive ? '실시간 매물 보기 →' : '관련 굿즈 보기 →';
-    accentColor = '#FF4757';
-  } else if(mode === 'soon'){
-    icon = '⏰';
-    headline = `D-${diffDays} · ${target.name}`;
-    sub = isLive ? `이 이벤트 이후 한정 매물을 빠르게 만나보세요` : `공연 전에 챙겨갈 굿즈 둘러보세요`;
-    btnLabel = isLive ? '한정 매물 미리보기 →' : '준비할 굿즈 보기 →';
-    accentColor = g.color;
-  } else {
-    icon = TYPE_EMOJI[target.type] || '📅';
-    headline = `D-${diffDays} · ${target.name}`;
-    sub = isLive ? `이 이벤트 이후 올라올 한정 매물을 기억해두세요` : `이 일정을 위해 미리 준비해요`;
-    btnLabel = '관련 굿즈 보기 →';
-    accentColor = g.color;
-  }
-
-  const banner = document.createElement('div');
-  banner.className = 'promo-banner';
-  banner.style.cssText = `
-    margin:12px 16px 0;border-radius:14px;
-    background:rgba(255,255,255,0.72);
-    border:1.5px solid ${accentColor}33;
-    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-    padding:13px 14px;display:flex;align-items:flex-start;gap:10px;
-    box-shadow:0 2px 12px ${accentColor}18;
-    cursor:pointer;
-  `;
-  banner.innerHTML = `
-    <div style="font-size:22px;line-height:1;flex-shrink:0;margin-top:1px">${icon}</div>
-    <div style="flex:1;min-width:0">
-      <div style="font-size:11px;font-weight:800;color:${accentColor};letter-spacing:.3px;margin-bottom:2px;text-transform:uppercase">${TYPE_LABEL[target.type]||target.type} · ${g.label}</div>
-      <div style="font-size:13px;font-weight:700;color:var(--txt1);line-height:1.3;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${headline}</div>
-      <div style="font-size:11px;color:var(--txt2);line-height:1.4;margin-bottom:8px">${sub}</div>
-      <div style="font-size:11.5px;font-weight:700;color:${accentColor}">${btnLabel}</div>
-    </div>
-  `;
-  banner.onclick = () => {
-    selectedDate = target.date;
-    selectedEventId = target.id;
-    activeGoodsCat = 'all';
-    buildCal();
-    renderBottom();
-    scrollToBottom();
-  };
-  bot.appendChild(banner);
-}
-
-// ─────────────────────────────────────────
-//  BOTTOM: events + goods
+//  BOTTOM: date header + group chips + goods
 // ─────────────────────────────────────────
 function renderBottom(){
   const bot=document.getElementById('bottom');
   bot.innerHTML='';
 
-  // 프로모 배너: 항상 상단에 표시
-  renderPromoBanner(bot);
-
-  // 배너-헤더 간격
-  const bannerGap = document.createElement('div');
-  bannerGap.style.cssText = 'height:12px';
-  bot.appendChild(bannerGap);
-
   const [y,mo,d]=selectedDate.split('-').map(Number);
   const dateObj=new Date(y,mo-1,d);
   const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
-  // ── Selected date header ──
-  const hdr=document.createElement('div');
-  hdr.className='sel-hdr';
-  const evtsOnDay=eventsOnDate(selectedDate);
-  hdr.innerHTML=`
-    <div>
-      <div class="sel-date">${dayNames[dateObj.getDay()]}, ${MONTH_NAMES[mo-1]} ${d}</div>
-      <div class="sel-sub">${evtsOnDay.length ? evtsOnDay.length+' event'+(evtsOnDay.length>1?'s':'') : 'No scheduled events'}</div>
-    </div>
-    ${evtsOnDay.length ? `<div class="evt-badge">${evtsOnDay.length}</div>` : ''}
-  `;
+  const lineup = LINEUP_BY_DATE[selectedDate];
+  const show   = lineup ? (SHOW_LABELS[lineup.showName] || { name: lineup.showName, color:'#9B6FD8', short: lineup.showName }) : null;
+
+  const rawArtists = lineup ? parseRawTitleStatic(lineup.rawTitle) : [];
+  // 실제 칩으로 표시되는 수: rawArtists가 있으면 그 수, 없으면 groups 수
+  const chipCount = rawArtists.length > 0 ? rawArtists.length : (lineup ? lineup.groups.length : 0);
+
+  // ── Date header ──
+  const hdr = document.createElement('div');
+  hdr.className = 'sel-hdr';
+  if(lineup && show){
+    hdr.innerHTML=`
+      <div>
+        <div class="sel-date">${dayNames[dateObj.getDay()]}, ${MONTH_NAMES[mo-1]} ${d}</div>
+        <div class="sel-sub" style="display:flex;align-items:center;gap:6px;margin-top:3px">
+          <span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;color:#fff;background:${show.color}">${show.short}</span>
+          <span style="color:var(--txt2);font-size:12px">${lineup.episode ? lineup.episode+'회 · ' : ''}${chipCount}팀 출연</span>
+        </div>
+      </div>
+      <div class="evt-badge" style="background:${show.color}">${chipCount}</div>
+    `;
+  } else {
+    hdr.innerHTML=`
+      <div>
+        <div class="sel-date">${dayNames[dateObj.getDay()]}, ${MONTH_NAMES[mo-1]} ${d}</div>
+        <div class="sel-sub">공방 일정 없음</div>
+      </div>
+    `;
+  }
   bot.appendChild(hdr);
 
-  // ── Events strip ──
-  if(evtsOnDay.length){
-    const strip=document.createElement('div');
-    strip.className='events-strip';
-    evtsOnDay.forEach((e,i)=>{
-      const g=groupOf(e.group);
-      const chip=document.createElement('div');
-      chip.className='evt-chip'+(e.id===selectedEventId?' on':'');
-      const [ey,em,ed] = e.date.split('-').map(Number);
-      const evtDate = new Date(ey, em-1, ed);
-      const diffDays = Math.round((evtDate - TODAY) / 86400000);
-      const ddayStr = diffDays === 0 ? 'D-Day' : diffDays > 0 ? `D-${diffDays}` : `D+${Math.abs(diffDays)}`;
-      const ddayColor = diffDays === 0 ? '#FF4757' : diffDays > 0 ? g.color : 'var(--txt3)';
-      chip.innerHTML=`
-        <div class="evt-chip-dot" style="background:${g.color}"></div>
-        <div class="evt-chip-body">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-            <div class="evt-chip-group" style="color:${g.color}">${g.label}</div>
-            <div style="font-size:9.5px;font-weight:800;color:${ddayColor};letter-spacing:.3px">${ddayStr}</div>
-          </div>
-          <div class="evt-chip-name">${e.name}</div>
-          <div class="evt-chip-type">${TYPE_EMOJI[e.type]||''} ${TYPE_LABEL[e.type]||e.type} · ${e.venue}</div>
-        </div>
+  // ── Group chips ──
+  if(lineup && chipCount > 0){
+    const strip = document.createElement('div');
+    strip.style.cssText = 'padding:8px 14px 4px;display:flex;flex-wrap:wrap;gap:7px;';
+
+    // ── 전체 탭 ──
+    const allChip = document.createElement('div');
+    const allActive = allGroupsSelected;
+    allChip.style.cssText = `
+      display:inline-flex;align-items:center;gap:4px;
+      padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:700;
+      cursor:pointer;user-select:none;
+      border:1.5px solid ${allActive ? 'var(--accent)' : 'rgba(160,130,210,0.2)'};
+      background:${allActive ? 'var(--accent)' : 'rgba(255,255,255,0.7)'};
+      color:${allActive ? '#fff' : 'var(--txt1)'};
+      transition:all .15s;
+      -webkit-tap-highlight-color:transparent;
+    `;
+    allChip.textContent = '전체';
+    allChip.onclick = () => {
+      selectedArtistName = null;
+      allGroupsSelected = true;
+      renderBottom();
+    };
+    strip.appendChild(allChip);
+
+    // ── 개별 그룹 칩 ──
+    const artists = rawArtists.length > 0 ? rawArtists : lineup.groups;
+    artists.forEach(artistName => {
+      const chip = document.createElement('div');
+      const isActive = !allGroupsSelected && selectedArtistName === artistName;
+      const chipColor = '#9B6FD8';
+      chip.style.cssText = `
+        display:inline-flex;align-items:center;gap:4px;
+        padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:700;
+        cursor:pointer;user-select:none;
+        border:1.5px solid ${isActive ? chipColor : 'rgba(160,130,210,0.2)'};
+        background:${isActive ? chipColor : 'rgba(255,255,255,0.7)'};
+        color:${isActive ? '#fff' : 'var(--txt1)'};
+        transition:all .15s;
+        -webkit-tap-highlight-color:transparent;
       `;
-      chip.onclick=()=>{
-        selectedEventId=(selectedEventId===e.id?null:e.id);
+      chip.textContent = artistName;
+      chip.onclick = () => {
+        const toggling = !allGroupsSelected && selectedArtistName === artistName;
+        selectedArtistName = toggling ? null : artistName;
+        allGroupsSelected = false;
         renderBottom();
+        if(selectedArtistName) fetchAndShowLiveGoods(selectedArtistName);
       };
       strip.appendChild(chip);
     });
+
     bot.appendChild(strip);
+
+    // 안내 메시지
+    if(!allGroupsSelected && !selectedArtistName){
+      const hint = document.createElement('div');
+      hint.style.cssText = 'padding:2px 14px 8px;font-size:11px;color:var(--txt2)';
+      hint.textContent = '원하는 그룹을 선택하면 번장 매물을 바로 확인할 수 있어요';
+      bot.appendChild(hint);
+    } else if(selectedArtistName){
+      const hint = document.createElement('div');
+      hint.style.cssText = 'padding:2px 14px 8px;font-size:11px;color:var(--txt2)';
+      hint.textContent = `${selectedArtistName} 한정판 굿즈 표시 중`;
+      bot.appendChild(hint);
+    }
   }
 
   // ── Divider ──
@@ -1693,280 +900,205 @@ function renderBottom(){
   div.className='divider';
   bot.appendChild(div);
 
-  // ── Goods header & grid ──
-  renderGoods(bot, evtsOnDay);
-}
+  // ── Goods 섹션 ──
+  if(selectedArtistName || allGroupsSelected){
+    const liveGoodsArea = document.createElement('div');
+    liveGoodsArea.id = 'live-goods-area';
+    liveGoodsArea.style.cssText = 'padding:20px 14px;text-align:center;color:var(--txt2);font-size:13px';
+    const label = selectedArtistName || '전체';
+    liveGoodsArea.innerHTML = `<div style="display:inline-block;width:20px;height:20px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px"></div>${escHtml(label)} 매물 검색 중…`;
+    bot.appendChild(liveGoodsArea);
 
-// ── 이벤트 이름에서 매칭용 키워드 추출 ──
-function extractKeywords(eventName) {
-  // 괄호/특수문자 제거 후 2자 이상 토큰만
-  const cleaned = eventName
-    .replace(/[()[\]{}「」『』【】〔〕·•,\-–—_/\\|!?~@#$%^&*+=<>:;"']/g, ' ')
-    .toLowerCase();
-  const tokens = cleaned.split(/\s+/).filter(t => t.length >= 2);
-  // 너무 일반적인 단어 제외
-  const STOP = new Set(['concert','tour','the','and','for','with','feat','live','night','day',
-    'bts','enhypen','seventeen','세븐틴','방탄','엔하이픈','소년단']);
-  return tokens.filter(t => !STOP.has(t));
-}
-
-// 상품명이 키워드와 얼마나 매칭되는지 점수 반환
-function keywordScore(itemName, keywords) {
-  if(!keywords.length) return 0;
-  const name = itemName.toLowerCase();
-  let score = 0;
-  keywords.forEach(kw => { if(name.includes(kw)) score++; });
-  return score;
-}
-
-function escHtml(s){
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function renderGoods(bot, evtsOnDay){
-  // ── 컨텍스트 결정 ──
-  let targetGroup = activeGroup;
-  let targetEvent = null;
-  if(selectedEventId){
-    targetEvent = EVENTS.find(e=>e.id===selectedEventId);
-    if(targetEvent) targetGroup = targetEvent.group;
-  } else if(evtsOnDay.length === 1){
-    targetEvent = evtsOnDay[0];
+    // DOM에 붙인 직후 즉시 fetch
+    if(selectedArtistName){
+      fetchAndShowLiveGoods(selectedArtistName);
+    } else if(allGroupsSelected && lineup){
+      const ra = parseRawTitleStatic(lineup.rawTitle);
+      const artists = ra.length > 0 ? ra : lineup.groups;
+      fetchAllGroupGoods(artists);
+    }
+  } else if(lineup){
+    const prompt = document.createElement('div');
+    prompt.style.cssText = 'padding:16px 16px 20px;text-align:center;color:var(--txt2);font-size:12.5px';
+    prompt.textContent = '위에서 그룹을 선택하면 번장 한정판 매물을 바로 볼 수 있어요';
+    bot.appendChild(prompt);
+  } else {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'padding:20px 16px;text-align:center;color:var(--txt2);font-size:12.5px';
+    empty.textContent = '공방 일정이 있는 날짜를 선택하세요';
+    bot.appendChild(empty);
   }
+}
 
-  const groupPool = (GOODS[targetGroup]||[]).map(i=>({...i, groupId:targetGroup}));
+// ─────────────────────────────────────────
+//  LIVE GOODS: 번장 실시간 검색
+// ─────────────────────────────────────────
+// 전체 탭: 여러 그룹을 각각 검색해서 합치기
+async function fetchAllGroupGoods(artists) {
+  const area = document.getElementById('live-goods-area');
+  if(!area) return;
 
-  // ── LAYER 1: LIVE 매물 분류 ──
-  // 이벤트가 선택된 경우 해당 이벤트 타입에 맞는 LIVE 룰만, 없으면 모든 룰
-  const applicableRules = targetEvent
-    ? liveRulesForEventType(targetEvent.type)
-    : LIVE_RULES;
+  try {
+    const results = await Promise.all(
+      artists.map(a =>
+        fetch(`/api/goods?artist=${encodeURIComponent(a)}&n=40`)
+          .then(r => r.ok ? r.json() : { items: [] })
+          .then(d => d.items || [])
+          .catch(() => [])
+      )
+    );
 
-  const liveItems = [];
-  const liveTypeMap = new Map(); // itemId → liveType
-  groupPool.forEach(item => {
-    const lt = detectLiveType(item.name, item.cat);
-    if(lt && applicableRules.some(r=>r.type===lt)){
-      liveItems.push(item);
-      liveTypeMap.set(item.id, lt);
+    const freshArea = document.getElementById('live-goods-area');
+    if(!freshArea || !allGroupsSelected) return;
+
+    // 중복 제거 후 최신순 정렬
+    const seen = new Set();
+    const items = [];
+    for(const group of results){
+      for(const item of group){
+        if(seen.has(item.id)) continue;
+        seen.add(item.id);
+        items.push(item);
+      }
     }
-  });
+    items.sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
 
-  // ── LAYER 2: 추천 매물 (LIVE 아닌 것) ──
-  const liveIds = new Set(liveItems.map(i=>i.id));
-  const recItems = groupPool.filter(i=>!liveIds.has(i.id));
+    freshArea.innerHTML = '';
 
-  // 추천 정렬: 이벤트 타입별 카테고리 우선순위 → 키워드 매칭
-  const evtTypes = targetEvent
-    ? [targetEvent.type]
-    : [...new Set(evtsOnDay.map(e=>e.type))];
-  const catScores={};
-  evtTypes.forEach(t=>{
-    (TYPE_CAT_PRIORITY[t]||[]).forEach((cat,i)=>{
-      catScores[cat]=(catScores[cat]||0)+(10-i);
-    });
-  });
-  const priorityCats=Object.entries(catScores).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
-  const matchKeywords = targetEvent
-    ? extractKeywords(targetEvent.name)
-    : [...new Set(evtsOnDay.flatMap(e=>extractKeywords(e.name)))];
-
-  recItems.sort((a,b)=>{
-    const ks = keywordScore(b.name,matchKeywords) - keywordScore(a.name,matchKeywords);
-    if(ks!==0) return ks;
-    if(priorityCats.length){
-      const ai=priorityCats.indexOf(a.cat), bi=priorityCats.indexOf(b.cat);
-      return (ai===-1?999:ai)-(bi===-1?999:bi);
-    }
-    return 0;
-  });
-
-  const g = groupOf(targetGroup);
-
-  // ── LIVE 섹션 렌더 ──
-  if(liveItems.length > 0){
-    const liveRule = applicableRules.find(r=>r.type===liveTypeMap.get(liveItems[0].id)) || LIVE_RULES[0];
-    const liveSection = document.createElement('div');
-    liveSection.className='live-section';
-    liveSection.style.borderColor = liveRule.border;
-    liveSection.style.background = liveRule.bg;
-
-    // 헤더
-    const lhdr = document.createElement('div');
-    lhdr.className='live-header';
-    lhdr.innerHTML=`
+    const hdr = document.createElement('div');
+    hdr.className = 'rec-header';
+    hdr.innerHTML = `
       <div>
-        <div class="live-badge" style="color:${liveRule.color};background:${liveRule.bg};border-color:${liveRule.border}">
-          <span class="live-badge-dot" style="background:${liveRule.color}"></span>
-          LIVE · ${liveRule.label}
-        </div>
-        <div class="live-label" style="color:${liveRule.color}">${liveRule.desc}</div>
-        <div class="live-sub">${liveItems.length}개 매물 등록됨</div>
+        <div class="rec-label">공방 매물</div>
+        <div class="rec-title">이날 출연 그룹 한정판 굿즈</div>
+        <div class="rec-sub">${items.length > 0 ? `${items.length}개 매물 · 최신순` : '등록된 매물 없음'}</div>
       </div>
-      <a href="market.html?group=${targetGroup}&live=${liveRule.type}" target="_blank"
-         style="font-size:11px;font-weight:600;color:${liveRule.color};text-decoration:none;white-space:nowrap">전체 보기 →</a>
     `;
-    liveSection.appendChild(lhdr);
+    freshArea.appendChild(hdr);
 
-    // 가로 스크롤 카드
-    const scroll = document.createElement('div');
-    scroll.className='live-scroll';
-    const row = document.createElement('div');
-    row.className='live-row';
-    liveItems.slice(0,12).forEach(item=>{
-      const url=`https://globalbunjang.com/product/${item.id}`;
-      const imgSrc=item.imageUrl?(location.protocol==='file:'?item.imageUrl:`/api/image?url=${encodeURIComponent(item.imageUrl)}`):'';
-      const a=document.createElement('a');
-      a.className='live-card';
-      a.href=url; a.target='_blank'; a.rel='noopener';
-      a.innerHTML=`
-        <div class="live-card-img-wrap">
-          ${imgSrc?`<img class="live-card-img" src="${imgSrc}" alt="${escHtml(item.name)}" loading="lazy" onerror="this.style.opacity='0'">`:''}
-          <div class="live-card-img-fallback">🃏</div>
+    if(items.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'goods-empty';
+      empty.textContent = '이날 출연 그룹 관련 한정판 굿즈 매물이 없습니다.';
+      freshArea.appendChild(empty);
+      return;
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'goods-grid';
+    items.slice(0, 60).forEach((item, i) => {
+      const productUrl = `https://globalbunjang.com/product/${item.id}`;
+      const imgSrc = item.imageUrl ? `/api/image?url=${encodeURIComponent(item.imageUrl)}` : '';
+      const imgHtml = imgSrc ? `<img src="${imgSrc}" alt="${escHtml(item.name)}" loading="lazy" onerror="this.classList.add('err')">` : '';
+      const card = document.createElement('div');
+      card.className = 'gcard';
+      card.style.cssText = `animation:fadeUp .22s ease both;animation-delay:${i*15}ms`;
+      card.innerHTML = `
+        <div class="gcard-img">
+          <div class="gcard-img-bg" style="background:var(--accent)"></div>
+          <div class="gcard-img-fallback">🎤</div>
+          ${imgHtml}
         </div>
-        <div class="live-card-body">
-          <div class="live-card-name">${escHtml(item.name)}</div>
-          <div class="live-card-price" style="color:${liveRule.color}">₩${item.price.toLocaleString()}</div>
-        </div>`;
-      row.appendChild(a);
-    });
-    scroll.appendChild(row);
-    liveSection.appendChild(scroll);
-    bot.appendChild(liveSection);
-  }
-
-  // ── 추천 섹션 헤더 ──
-  const recLabel = targetEvent
-    ? REC_LABEL[targetEvent.type] || '이 일정 관련 굿즈'
-    : evtsOnDay.length ? '오늘 일정 관련 굿즈' : `${g.label} 인기 매물`;
-  const recDesc = targetEvent
-    ? targetEvent.name
-    : evtsOnDay.length
-      ? `${evtsOnDay.length}개 일정 기준 · 이벤트를 탭하면 필터됩니다`
-      : 'Bunjang Global 최신 매물';
-
-  const recEyebrow = targetEvent
-    ? (REC_EYEBROW[targetEvent.type] || '💡 이 일정 관련 굿즈')
-    : (evtsOnDay.length ? '💡 오늘 일정 기준' : '🛍️ 인기 매물');
-
-  const rhdr=document.createElement('div');
-  rhdr.className='rec-header';
-  rhdr.innerHTML=`
-    <div>
-      <div class="rec-label">${recEyebrow}</div>
-      <div class="rec-title">${recLabel}</div>
-      <div class="rec-sub">${escHtml(recDesc)}</div>
-    </div>
-    <button class="see-all" onclick="window.open('market.html?group=${targetGroup}${targetEvent?'&event='+encodeURIComponent(targetEvent.name):''}','_blank')">See all →</button>
-  `;
-  bot.appendChild(rhdr);
-
-  // ── 카테고리 필터 칩 ──
-  const presentCats=new Set(recItems.map(i=>i.cat));
-  const filterEl=document.createElement('div');
-  filterEl.className='goods-filter';
-  GOODS_CATS.forEach(cat=>{
-    if(cat.id!=='all' && !presentCats.has(cat.id)) return;
-    const chip=document.createElement('div');
-    chip.className='gf-chip'+(activeGoodsCat===cat.id?' on':'');
-    chip.textContent=`${cat.emoji} ${cat.label}`;
-    chip.onclick=()=>{
-      activeGoodsCat=cat.id;
-      const filtered2=activeGoodsCat==='all'?recItems:recItems.filter(i=>i.cat===activeGoodsCat);
-      renderGoods_grid(gridContainer, filtered2);
-      filterEl.querySelectorAll('.gf-chip').forEach(c=>c.classList.remove('on'));
-      chip.classList.add('on');
-    };
-    filterEl.appendChild(chip);
-  });
-  bot.appendChild(filterEl);
-
-  // ── 추천 그리드 ──
-  const gridContainer=document.createElement('div');
-  bot.appendChild(gridContainer);
-  const initFiltered = activeGoodsCat==='all'?recItems:recItems.filter(i=>i.cat===activeGoodsCat);
-  renderGoods_grid(gridContainer, initFiltered);
-}
-
-// 이벤트 타입별 추천 레이블
-const REC_LABEL = {
-  concert:    '이 공연에 가신다면',
-  tour:       '이 공연에 가신다면',
-  comeback:   '이 컴백 관련 굿즈',
-  release:    '이 발매 관련 굿즈',
-  fansign:    '팬사인 응모하려면',
-  fancon:     '이 팬미팅 관련 굿즈',
-  fanmeeting: '이 팬미팅 관련 굿즈',
-  special:    '이 이벤트 관련 굿즈',
-};
-const REC_EYEBROW = {
-  concert:    '🎤 공연 챙겨갈 것들',
-  tour:       '🎤 공연 챙겨갈 것들',
-  comeback:   '💿 이 컴백 관련 굿즈',
-  release:    '📦 이 발매 관련 굿즈',
-  fansign:    '✍️ 팬사인 응모하려면',
-  fancon:     '🎉 이 팬미팅 관련 굿즈',
-  fanmeeting: '🎉 이 팬미팅 관련 굿즈',
-  special:    '📺 이 이벤트 관련 굿즈',
-};
-
-function renderGoods_grid(container, list){
-  container.innerHTML='';
-
-  if(list.length===0){
-    const empty=document.createElement('div');
-    empty.className='goods-empty';
-    empty.textContent='No items in this category.';
-    container.appendChild(empty);
-    return;
-  }
-
-  const grid=document.createElement('div');
-  grid.className='goods-grid';
-
-  list.slice(0,24).forEach((item,i)=>{
-    const g=groupOf(item.groupId);
-    const catInfo=GOODS_CATS.find(c=>c.id===item.cat)||GOODS_CATS[GOODS_CATS.length-1];
-    const card=document.createElement('div');
-    card.className='gcard';
-    card.style.animationDelay=`${i*25}ms`;
-    card.style.animation='fadeUp .22s ease both';
-
-    const fallbackEmoji=catInfo.emoji||'📦';
-    const brandLabel=item.brand||g.label;
-    const productUrl=item.id?`https://globalbunjang.com/product/${item.id}`:'';
-    const imgSrc=item.imageUrl?(location.protocol==='file:'?item.imageUrl:`/api/image?url=${encodeURIComponent(item.imageUrl)}`):'';
-    const imgHtml=imgSrc
-      ? `<img src="${imgSrc}" alt="${item.name}" loading="lazy" onerror="this.classList.add('err')">`
-      : '';
-
-
-    card.innerHTML=`
-      <div class="gcard-img">
-        <div class="gcard-img-bg" style="background:${g.color}"></div>
-        <div class="gcard-img-fallback">${fallbackEmoji}</div>
-        ${imgHtml}
-        <div class="gcard-cat">${catInfo.emoji} ${catInfo.label}</div>
-      </div>
-      <div class="gcard-body">
-        <div class="gcard-group" style="color:${g.color}">${brandLabel}</div>
-        <div class="gcard-name">${item.name}</div>
-        <div class="gcard-bottom">
-          <div class="gcard-price">₩${item.price.toLocaleString()}<span>KRW</span></div>
-          <div class="cart-btn" onclick="event.stopPropagation();${productUrl?`window.open('${productUrl}','_blank')`:`window.open('https://globalbunjang.com','_blank')`}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-            </svg>
+        <div class="gcard-body">
+          <div class="gcard-name">${escHtml(item.name)}</div>
+          <div class="gcard-bottom">
+            <div class="gcard-price">₩${item.price.toLocaleString()}<span>KRW</span></div>
+            <div class="cart-btn" onclick="event.stopPropagation();window.open('${productUrl}','_blank')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              </svg>
+            </div>
           </div>
         </div>
-      </div>
-    `;
-    card.onclick=()=>{ window.open(productUrl||'https://globalbunjang.com','_blank'); };
-    grid.appendChild(card);
-  });
+      `;
+      card.onclick = () => window.open(productUrl, '_blank');
+      grid.appendChild(card);
+    });
+    freshArea.appendChild(grid);
 
-  container.appendChild(grid);
+  } catch(err) {
+    const a = document.getElementById('live-goods-area');
+    if(a) a.innerHTML = `<div style="padding:16px 14px;color:var(--txt2);font-size:12px">매물 로드 실패: ${escHtml(err.message)}</div>`;
+  }
+}
+
+async function fetchAndShowLiveGoods(artistName) {
+  const area = document.getElementById('live-goods-area');
+  if(!area) return;
+
+  try {
+    const res = await fetch(`/api/goods?artist=${encodeURIComponent(artistName)}&n=60`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const items = data.items || [];
+
+    const freshArea = document.getElementById('live-goods-area');
+    if(!freshArea) return;
+
+    freshArea.innerHTML = '';
+
+    const displayName = allGroupsSelected ? '이날 출연 그룹' : artistName;
+    const hdr = document.createElement('div');
+    hdr.className = 'rec-header';
+    hdr.innerHTML = `
+      <div>
+        <div class="rec-label">공방 매물</div>
+        <div class="rec-title">${escHtml(displayName)} 한정판 굿즈</div>
+        <div class="rec-sub">${items.length > 0 ? `${items.length}개 매물 · 최신순` : '등록된 매물 없음'}</div>
+      </div>
+      <a href="https://bunjang.co.kr/search/products?q=${encodeURIComponent(artistName+' 공방')}&order=date" target="_blank" rel="noopener"
+         style="font-size:11px;font-weight:600;color:var(--accent);text-decoration:none;white-space:nowrap">전체 보기 →</a>
+    `;
+    freshArea.appendChild(hdr);
+
+    if(items.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'goods-empty';
+      empty.textContent = `${displayName} 관련 한정판 굿즈 매물이 없습니다.`;
+      freshArea.appendChild(empty);
+      return;
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'goods-grid';
+    items.slice(0, 40).forEach((item, i) => {
+      const productUrl = `https://globalbunjang.com/product/${item.id}`;
+      const imgSrc = item.imageUrl ? `/api/image?url=${encodeURIComponent(item.imageUrl)}` : '';
+      const imgHtml = imgSrc
+        ? `<img src="${imgSrc}" alt="${escHtml(item.name)}" loading="lazy" onerror="this.classList.add('err')">`
+        : '';
+      const card = document.createElement('div');
+      card.className = 'gcard';
+      card.style.cssText = `animation:fadeUp .22s ease both;animation-delay:${i*20}ms`;
+      card.innerHTML = `
+        <div class="gcard-img">
+          <div class="gcard-img-bg" style="background:var(--accent)"></div>
+          <div class="gcard-img-fallback">🎤</div>
+          ${imgHtml}
+        </div>
+        <div class="gcard-body">
+          <div class="gcard-name">${escHtml(item.name)}</div>
+          <div class="gcard-bottom">
+            <div class="gcard-price">₩${item.price.toLocaleString()}<span>KRW</span></div>
+            <div class="cart-btn" onclick="event.stopPropagation();window.open('${productUrl}','_blank')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      `;
+      card.onclick = () => window.open(productUrl, '_blank');
+      grid.appendChild(card);
+    });
+    freshArea.appendChild(grid);
+
+  } catch(err) {
+    const area2 = document.getElementById('live-goods-area');
+    if(area2) area2.innerHTML = `<div style="padding:16px 14px;color:var(--txt2);font-size:12px">매물 로드 실패: ${escHtml(err.message)}</div>`;
+  }
 }
 
 // ─────────────────────────────────────────
@@ -1981,42 +1113,71 @@ function toast(msg){
 }
 
 // ─────────────────────────────────────────
-//  INIT
+//  공방 일정 로드 (Supabase music_show_lineups)
 // ─────────────────────────────────────────
-// 초기 테마 적용
-const _initGroup = GROUPS.find(g=>g.id===activeGroup);
-if(_initGroup) document.body.className=_initGroup.theme||'';
-
-buildFilter();
-buildLegend();
-buildCal();
-renderBottom();
-fetchGoods();
-fetchEvents(); // Supabase에서 일정 로드
-
-// ─────────────────────────────────────────
-//  SUPABASE: 일정 로드
-// ─────────────────────────────────────────
-async function fetchEvents() {
+async function fetchMusicShowLineups() {
   try {
-    const res = await supaFetch('events?select=*&order=date_start.asc');
-    if (!res.ok) { console.warn('[KF_Calendar] fetchEvents HTTP', res.status); return; }
+    const since = new Date(TODAY);
+    since.setMonth(since.getMonth() - 6);
+    const sinceStr = dKey(since);
+    const res = await supaFetch(
+      `music_show_lineups?select=*&broad_date=gte.${sinceStr}&order=broad_date.asc`
+    );
+    if (!res.ok) { console.warn('[KF_Calendar] fetchLineups HTTP', res.status); return; }
     const rows = await res.json();
     if (!Array.isArray(rows) || rows.length === 0) return;
-    EVENTS = rows.map(r => ({
-      id:    r.id,
-      group: r.group_id,
-      date:  r.date_start,          // "2026-04-09" 형식 그대로 사용
-      name:  r.name,
-      type:  r.type,
-      venue: r.venue || '',
-    }));
-    buildCal();
-    renderBottom();
+
+    LINEUP_BY_DATE = {};
+    rows.forEach(r => {
+      const dateKey = (r.broad_date || '').slice(0, 10);
+      if (!dateKey) return;
+      LINEUP_BY_DATE[dateKey] = {
+        showName: r.show_name,
+        episode:  r.episode_number,
+        groups:   r.groups || [],
+        rawTitle: r.raw_title || '',
+      };
+    });
+
+    EVENTS = rows.map(r => {
+      const show = SHOW_LABELS[r.show_name] || { name: r.show_name, color: '#9B6FD8' };
+      return {
+        id:    `lineup-${r.id}`,
+        group: r.show_name,
+        date:  (r.broad_date || '').slice(0, 10),
+        name:  show.name,
+        type:  'gonbang',
+        venue: r.episode_number ? `${r.episode_number}회` : '',
+        color: show.color,
+      };
+    });
+
+    // Default to most recent past show with lineup
+    const todayKey = dKey(TODAY);
+    const pastDates = Object.keys(LINEUP_BY_DATE)
+      .filter(ds => ds <= todayKey)
+      .sort();
+    if(pastDates.length > 0) {
+      const ds = pastDates[pastDates.length - 1];
+      const [y,mo] = ds.split('-').map(Number);
+      weekStart = getWeekStart(new Date(y, mo-1, parseInt(ds.split('-')[2])));
+      monthPivot = new Date(y, mo-1, 1);
+      selectDate(ds);
+    } else {
+      buildCal();
+      renderBottom();
+    }
   } catch(e) {
-    console.warn('[KF_Calendar] fetchEvents 실패:', e.message);
+    console.warn('[KF_Calendar] fetchLineups 실패:', e.message);
   }
 }
+
+// ─────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────
+buildCal();
+renderBottom();
+fetchMusicShowLineups();
 
 // ─────────────────────────────────────────
 //  FAN SUBMISSION MODAL
@@ -2042,24 +1203,7 @@ function openSubmitModal() {
              style="cursor:pointer;font-size:20px;color:var(--txt2);">×</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:12px;">
-        <select id="sf-group" style="${inputStyle()}">
-          <option value="">— Group —</option>
-          <option value="bts">BTS</option>
-          <option value="enhypen">ENHYPEN</option>
-          <option value="seventeen">SEVENTEEN</option>
-        </select>
-        <select id="sf-type" style="${inputStyle()}">
-          <option value="">— Event Type —</option>
-          <option value="comeback">Comeback</option>
-          <option value="concert">Concert</option>
-          <option value="tour">Tour</option>
-          <option value="fansign">Fan Sign</option>
-          <option value="fancon">Fan Con</option>
-          <option value="release">Release</option>
-          <option value="special">Special</option>
-        </select>
         <input id="sf-name" placeholder="Event name" style="${inputStyle()}">
-        <input id="sf-venue" placeholder="Venue / Location" style="${inputStyle()}">
         <input id="sf-date" type="date" style="${inputStyle()}">
         <input id="sf-nick" placeholder="Your nickname (optional)" style="${inputStyle()}">
         <input id="sf-url" placeholder="Source URL (official notice, article…)" style="${inputStyle()}">
@@ -2080,17 +1224,14 @@ function inputStyle() {
 }
 
 async function submitEvent() {
-  const group = document.getElementById('sf-group').value;
-  const type  = document.getElementById('sf-type').value;
   const name  = document.getElementById('sf-name').value.trim();
-  const venue = document.getElementById('sf-venue').value.trim();
   const date  = document.getElementById('sf-date').value;
   const nick  = document.getElementById('sf-nick').value.trim();
   const url   = document.getElementById('sf-url').value.trim();
   const msg   = document.getElementById('sf-msg');
 
-  if (!group || !type || !name || !date) {
-    msg.style.color = '#e05'; msg.textContent = 'Please fill in Group, Type, Name, Date.'; return;
+  if (!name || !date) {
+    msg.style.color = '#e05'; msg.textContent = 'Please fill in Name and Date.'; return;
   }
 
   msg.style.color = 'var(--txt2)'; msg.textContent = 'Submitting…';
@@ -2099,8 +1240,7 @@ async function submitEvent() {
     const res = await supaFetch('event_submissions', {
       method: 'POST',
       body: JSON.stringify({
-        group_id: group, type, name, venue,
-        date_start: date,
+        name, date_start: date,
         submitted_by: nick,
         evidence_url: url,
       }),

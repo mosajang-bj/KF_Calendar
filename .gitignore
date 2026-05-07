@@ -1,9 +1,18 @@
 # 환경변수 (API 키 포함 — 절대 커밋하지 마세요)
 .env
 .env.local
+.env*.local
 
 # Vercel
 .vercel/
+.vercel
+
+# Node
+node_modules/
+package-lock.json
+
+# Claude Code
+.claude/
 
 # macOS
 .DS_Store

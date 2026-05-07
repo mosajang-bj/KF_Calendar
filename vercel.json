@@ -1,5 +1,15 @@
 {
   "version": 2,
+  "crons": [
+    {
+      "path": "/api/sync-shows",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/sync-youtube",
+      "schedule": "0 0 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",

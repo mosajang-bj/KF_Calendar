@@ -131,6 +131,7 @@ select option{background:#0d0d14}
 
 <div class="tabs">
   <div class="tab on"  onclick="showTab('calendar')">📅 Calendar</div>
+  <div class="tab"     onclick="showTab('lineups')">🎤 공방 일정</div>
   <div class="tab"     onclick="showTab('submissions')">Fan Submissions <span id="pending-cnt" class="badge-count" style="display:none"></span></div>
   <div class="tab"     onclick="showTab('history')">Review History</div>
   <div class="tab"     onclick="showTab('feedback')">Feedback</div>
@@ -183,6 +184,59 @@ select option{background:#0d0d14}
 
     <div class="cal-grid-wrap">
       <div class="cal-grid" id="cal-grid"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ 공방 일정 TAB ═══════════════ -->
+  <div id="tab-lineups" style="display:none">
+    <div class="sec-hdr" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 style="font-size:16px;font-weight:700;color:#c4a0f0">공방 일정 관리</h2>
+      <button onclick="syncImbc()" style="background:#306090;border:none;color:#fff;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
+        🔄 음악중심 자동 수집
+      </button>
+    </div>
+
+    <!-- 수동 입력 폼 -->
+    <div style="background:#13131f;border:1px solid #22223a;border-radius:12px;padding:20px;margin-bottom:24px">
+      <h3 style="font-size:13px;font-weight:700;color:#aaa;margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em">수동 입력 (음악중심 외 방송사)</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px">
+        <div>
+          <label style="font-size:11px;color:#666;display:block;margin-bottom:4px">방송 프로그램</label>
+          <select id="lf-show" style="width:100%;background:#1e1e30;border:1px solid #2a2a40;color:#e0e0f0;padding:8px 10px;border-radius:8px;font-size:13px">
+            <option value="inkigayo">SBS 인기가요</option>
+            <option value="music_bank">KBS 뮤직뱅크</option>
+            <option value="mcountdown">Mnet 엠카운트다운</option>
+            <option value="show_champion">MBC M 쇼챔피언</option>
+            <option value="the_show">SBS M 더쇼</option>
+            <option value="music_core">MBC 음악중심</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:#666;display:block;margin-bottom:4px">방송일</label>
+          <input id="lf-date" type="date" style="width:100%;background:#1e1e30;border:1px solid #2a2a40;color:#e0e0f0;padding:8px 10px;border-radius:8px;font-size:13px">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#666;display:block;margin-bottom:4px">회차 번호 (선택)</label>
+          <input id="lf-episode" type="text" placeholder="예: 1299" style="width:100%;background:#1e1e30;border:1px solid #2a2a40;color:#e0e0f0;padding:8px 10px;border-radius:8px;font-size:13px">
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:#666;display:block;margin-bottom:6px">출연 아티스트 (줄바꿈 또는 점(·) 구분으로 입력)</label>
+        <textarea id="lf-artists" rows="4" placeholder="예:&#10;BTS&#10;IVE&#10;LE SSERAFIM&#10;aespa" style="width:100%;background:#1e1e30;border:1px solid #2a2a40;color:#e0e0f0;padding:10px;border-radius:8px;font-size:13px;resize:vertical;line-height:1.5"></textarea>
+        <div style="font-size:11px;color:#555;margin-top:4px">네이버 검색에서 복사한 출연진 목록을 그대로 붙여넣어도 됩니다.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button onclick="submitLineup()" style="background:#9040d0;border:none;color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">저장</button>
+        <span id="lf-msg" style="font-size:12px;color:#888"></span>
+      </div>
+    </div>
+
+    <!-- 최근 입력된 공방 일정 목록 -->
+    <div>
+      <h3 style="font-size:13px;font-weight:700;color:#aaa;margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em">최근 공방 일정</h3>
+      <div id="lineup-list" style="display:flex;flex-direction:column;gap:8px">
+        <div style="color:#555;font-size:13px">불러오는 중...</div>
+      </div>
     </div>
   </div>
 
@@ -248,8 +302,8 @@ select option{background:#0d0d14}
 </div><!-- /content -->
 
 <script>
-const SUPA_URL = 'https://zbnronyslswwbwdiuzjg.supabase.co';
-const SUPA_KEY = 'sb_publishable_Io-m0ZUsJTNky1ANkXpQ-g_JoWZrzWO';
+const SUPA_URL = 'https://kzffotlfdtubkbxsjqiv.supabase.co';
+const SUPA_KEY = 'sb_publishable__Qi94MjMjmOJRuotulyOZA_ftnVkHxL';
 
 async function api(path, opts={}) {
   const {prefer, headers: extra, ...rest} = opts;
@@ -268,7 +322,7 @@ async function api(path, opts={}) {
 }
 
 // ── STATE ──
-const TABS = ['calendar','submissions','history','feedback','add'];
+const TABS = ['calendar','lineups','submissions','history','feedback','add'];
 let allEvents = [];
 let calYear, calMonth;
 let filterGroup = 'all';
@@ -289,9 +343,143 @@ function showTab(name) {
     document.querySelectorAll('.tab')[TABS.indexOf(t)].classList.toggle('on', t===name);
   });
   if(name==='calendar')    renderCal();
+  if(name==='lineups')     loadLineups();
   if(name==='submissions') loadSubmissions();
   if(name==='history')     loadHistory();
   if(name==='feedback')    loadFeedback();
+}
+
+// ── 공방 일정 ──
+const SHOW_LABELS_ADMIN = {
+  music_core:    '🎵 MBC 음악중심',
+  inkigayo:      '🎵 SBS 인기가요',
+  music_bank:    '🎵 KBS 뮤직뱅크',
+  mcountdown:    '🎵 Mnet 엠카운트다운',
+  show_champion: '🎵 MBC M 쇼챔피언',
+  the_show:      '🎵 SBS M 더쇼',
+};
+const SHOW_COLORS_ADMIN = {
+  music_core:'#E8823A', inkigayo:'#A855C8', music_bank:'#4CAF50',
+  mcountdown:'#FF4757', show_champion:'#00C4B4', the_show:'#6B94D6',
+};
+
+async function loadLineups() {
+  const el = document.getElementById('lineup-list');
+  el.innerHTML = '<div style="color:#555;font-size:13px">불러오는 중...</div>';
+  try {
+    const res = await supaFetch('music_show_lineups?select=*&order=broad_date.desc&limit=50');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = await res.json();
+    if (!rows.length) { el.innerHTML = '<div style="color:#555;font-size:13px">데이터 없음</div>'; return; }
+    el.innerHTML = '';
+    rows.forEach(r => {
+      const color = SHOW_COLORS_ADMIN[r.show_name] || '#9B6FD8';
+      const label = SHOW_LABELS_ADMIN[r.show_name] || r.show_name;
+      const row = document.createElement('div');
+      row.style.cssText = `background:#13131f;border:1px solid #22223a;border-left:3px solid ${color};border-radius:8px;padding:10px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px`;
+      row.innerHTML = `
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="color:${color};font-size:12px;font-weight:700">${label}</span>
+            ${r.episode_number ? `<span style="color:#555;font-size:11px">${r.episode_number}회</span>` : ''}
+            <span style="color:#444;font-size:11px">${r.broad_date}</span>
+            <span style="color:#333;font-size:10px;padding:1px 6px;border:1px solid #333;border-radius:10px">${r.source}</span>
+          </div>
+          <div style="color:#888;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.raw_title || r.groups.join(' · ')}</div>
+        </div>
+        <button onclick="deleteLineup(${r.id}, this)" style="background:#3a1010;border:1px solid #6a2020;color:#f08080;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0">삭제</button>
+      `;
+      el.appendChild(row);
+    });
+  } catch(e) {
+    el.innerHTML = `<div style="color:#f08080;font-size:13px">오류: ${e.message}</div>`;
+  }
+}
+
+async function deleteLineup(id, btn) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  btn.textContent = '...';
+  try {
+    const res = await supaFetch(`music_show_lineups?id=eq.${id}`, { method:'DELETE' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    btn.closest('div[style]').remove();
+  } catch(e) {
+    alert('삭제 실패: ' + e.message);
+    btn.textContent = '삭제';
+  }
+}
+
+async function submitLineup() {
+  const show    = document.getElementById('lf-show').value;
+  const date    = document.getElementById('lf-date').value;
+  const episode = document.getElementById('lf-episode').value.trim();
+  const raw     = document.getElementById('lf-artists').value;
+  const msg     = document.getElementById('lf-msg');
+
+  if (!show || !date) { msg.style.color='#f08080'; msg.textContent='방송과 날짜는 필수입니다.'; return; }
+
+  // 아티스트 파싱 (줄바꿈 또는 점 구분)
+  const artists = raw.split(/[\n·.]+/).map(s=>s.trim()).filter(s=>s.length>0);
+  if (!artists.length) { msg.style.color='#f08080'; msg.textContent='아티스트를 한 명 이상 입력하세요.'; return; }
+
+  // 그룹 ID 매핑 (index.html의 ARTIST_TO_GROUP_FRONT와 동일)
+  const ARTIST_MAP = {
+    'BTS':'bts','방탄소년단':'bts','SEVENTEEN':'seventeen','세븐틴':'seventeen',
+    'ENHYPEN':'enhypen','엔하이픈':'enhypen','aespa':'aespa','IVE':'ive',
+    'LE SSERAFIM':'lesserafim','NewJeans':'newjeans','TWICE':'twice','트와이스':'twice',
+    'BLACKPINK':'blackpink','EXO':'exo','NCT 127':'nct127','NCT DREAM':'nctdream',
+    'NCT WISH':'nctwish','ATEEZ':'ateez','에이티즈':'ateez',
+    'Stray Kids':'straykids','STRAY KIDS':'straykids',
+    'TXT':'txt','투모로우바이투게더':'txt','ITZY':'itzy','NMIXX':'nmixx',
+    'PLAVE':'plave','플레이브':'plave','ZEROBASEONE':'zerobaseone','ZB1':'zerobaseone',
+    'BOYNEXTDOOR':'boynextdoor','TWS':'tws','KISS OF LIFE':'kissoflife',
+    'QWER':'qwer','ILLIT':'illit','아일릿':'illit','BABYMONSTER':'babymonster',
+    '&TEAM':'andteam','INI':'ini','EVNNE':'evnne','CRAVITY':'cravity',
+    'THE BOYZ':'theboyz','ONEUS':'oneus','GOT7':'got7','DAY6':'day6',
+    'tripleS':'triples','NEXZ':'nexz','KATSEYE':'katseye',
+    'Xdinary Heroes':'xdinaryheroes','ALPHA DRIVE ONE':'alphadriveone',
+  };
+  const groups = [...new Set(artists.map(a=>ARTIST_MAP[a]).filter(Boolean))];
+
+  msg.style.color='#888'; msg.textContent='저장 중...';
+  try {
+    const res = await supaFetch('music_show_lineups', {
+      method: 'POST',
+      prefer: 'resolution=merge-duplicates',
+      body: JSON.stringify({
+        show_name: show,
+        broad_date: date,
+        episode_number: episode || null,
+        groups,
+        raw_title: artists.join(' · '),
+        source: 'manual',
+      }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+    msg.style.color='#60d090'; msg.textContent='✓ 저장됨';
+    document.getElementById('lf-artists').value = '';
+    document.getElementById('lf-episode').value = '';
+    loadLineups();
+  } catch(e) {
+    msg.style.color='#f08080'; msg.textContent='오류: ' + e.message;
+  }
+}
+
+async function syncImbc() {
+  const btn = event.target;
+  btn.textContent = '수집 중...'; btn.disabled = true;
+  try {
+    const secret = prompt('SYNC_SECRET을 입력하세요 (없으면 Enter)') || '';
+    const res = await fetch(`/api/sync-imbc?secret=${encodeURIComponent(secret)}`);
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+    alert(`✓ 음악중심 ${json.synced}회차 수집 완료`);
+    loadLineups();
+  } catch(e) {
+    alert('수집 실패: ' + e.message);
+  } finally {
+    btn.textContent = '🔄 음악중심 자동 수집'; btn.disabled = false;
+  }
 }
 
 // ── INIT ──

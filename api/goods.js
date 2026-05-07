@@ -1,49 +1,62 @@
 // api/goods.js — Vercel Serverless Function (CommonJS)
-const REDASH_HOST = process.env.REDASH_HOST || 'redash.bunjang.io';
+// 그룹명 + 공방/역조공/공방포/사녹 키워드로 번장 검색 → 최신순 반환
+// GET /api/goods?artist=방탄소년단&n=30
 
-const QUERIES = [
-  { group: 'bts',       queryId: 24366 },
-  { group: 'enhypen',   queryId: 24367 },
-  { group: 'seventeen', queryId: 24368 },
-];
-
-const LIMIT_PER_GROUP = 100;
-
-async function fetchQuery(queryId, apiKey) {
-  const url = `https://${REDASH_HOST}/api/queries/${queryId}/results.json?api_key=${apiKey}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(25000) });
-  if (!res.ok) throw new Error(`Query ${queryId}: HTTP ${res.status}`);
-  const json = await res.json();
-  if (json.job) throw new Error(`Query ${queryId}: 실행 중`);
-  const rows = json?.query_result?.data?.rows || [];
-  return rows.slice(0, LIMIT_PER_GROUP);
-}
+const BUNJANG_API = 'https://api.bunjang.co.kr/api/1/find_v2.json';
+const KEYWORDS = ['공방포', '역조공', '공방', '사녹'];
 
 module.exports = async function handler(req, res) {
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    return res.status(204).end();
-  }
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  if (req.method === 'OPTIONS') return res.status(204).end();
 
-  const REDASH_API_KEY = process.env.REDASH_API_KEY;
-  if (!REDASH_API_KEY) {
-    return res.status(500).json({ error: 'REDASH_API_KEY 환경변수 없음' });
-  }
+  const artist = (req.query.artist || '').trim();
+  if (!artist) return res.status(400).json({ error: 'artist 파라미터 필요' });
+
+  const n = Math.min(parseInt(req.query.n || '50', 10), 100);
 
   try {
-    const results = await Promise.all(
-      QUERIES.map(q => fetchQuery(q.queryId, REDASH_API_KEY))
+    // 각 키워드로 검색 → 합치기
+    const results = await Promise.allSettled(
+      KEYWORDS.map(kw => {
+        const q = encodeURIComponent(`${artist} ${kw}`);
+        const url = `${BUNJANG_API}?q=${q}&order=date&n=${n}&page=0`;
+        return fetch(url, {
+          headers: { 'User-Agent': 'Mozilla/5.0' },
+          signal: AbortSignal.timeout(10000),
+        }).then(r => r.ok ? r.json() : { list: [] });
+      })
     );
 
-    const data = {};
-    QUERIES.forEach((q, i) => { data[q.group] = results[i]; });
+    // 중복 제거 (pid 기준), 최신순 정렬
+    const seen = new Set();
+    const items = [];
+    for (const r of results) {
+      if (r.status !== 'fulfilled') continue;
+      for (const p of (r.value.list || [])) {
+        if (seen.has(p.pid)) continue;
+        seen.add(p.pid);
+        items.push({
+          id:         p.pid,
+          name:       p.name,
+          price:      parseInt(p.price, 10) || 0,
+          imageUrl:   p.product_image
+            ? p.product_image.replace('{res}', '360')
+            : '',
+          updatedAt:  p.update_time || 0,
+          status:     p.status, // '0'=판매중
+        });
+      }
+    }
 
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=600');
-    return res.status(200).json(data);
+    // 판매중인 것만, 최신순
+    const live = items
+      .filter(i => i.status === '0')
+      .sort((a, b) => b.updatedAt - a.updatedAt);
+
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
+    return res.status(200).json({ artist, items: live });
   } catch (err) {
-    return res.status(502).json({ error: 'Redash 연결 실패', detail: err.message });
+    return res.status(502).json({ error: err.message });
   }
 };
