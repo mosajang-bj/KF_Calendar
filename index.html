@@ -143,7 +143,7 @@ body{
   -webkit-tap-highlight-color:transparent;
 }
 .wday:hover{background:#F0F0F0}
-.wday.on{background:#FDF3F3}
+.wday.on{background:#F0F0F0}
 .wday.future{opacity:.4}
 
 .wday-num{
@@ -152,13 +152,13 @@ body{
   font-size:14px;font-weight:600;color:var(--txt1);letter-spacing:0;
 }
 .wday.today .wday-num{
-  background:var(--accent);color:#fff;font-weight:700;
-  box-shadow:0 3px 10px rgba(216,12,24,0.3);
+  background:#191919;color:#fff;font-weight:700;
+  box-shadow:0 3px 10px rgba(0,0,0,0.18);
 }
 .wday.sun .wday-num{color:#E57373}
 .wday.sat .wday-num{color:#5C9EE8}
 .wday.today.sun .wday-num,.wday.today.sat .wday-num{color:#fff}
-.wday.on:not(.today) .wday-num{background:rgba(216,12,24,0.08);color:var(--accent)}
+.wday.on:not(.today) .wday-num{background:rgba(25,25,25,0.1);color:var(--txt1)}
 
 .dots-col{display:flex;flex-direction:row;flex-wrap:wrap;gap:2px;margin-top:5px;align-items:center;justify-content:center;max-width:36px}
 .evt-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
@@ -179,7 +179,7 @@ body{
   -webkit-tap-highlight-color:transparent;
 }
 .mday:hover{background:#F4F4F4}
-.mday.on{background:#FDF3F3;box-shadow:0 0 0 1.5px rgba(216,12,24,0.25)}
+.mday.on{background:#F4F4F4;box-shadow:0 0 0 1.5px rgba(25,25,25,0.15)}
 .mday.other{opacity:.3}
 .mday.future{opacity:.4}
 .mday-num{
@@ -188,7 +188,7 @@ body{
   display:flex;align-items:center;justify-content:center;
   margin-bottom:3px;color:var(--txt1);
 }
-.mday.today .mday-num{background:var(--accent);color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(216,12,24,0.3)}
+.mday.today .mday-num{background:#191919;color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.18)}
 .mday.sun .mday-num{color:#E57373}
 .mday.sat .mday-num{color:#5C9EE8}
 .mday.today.sun .mday-num,.mday.today.sat .mday-num{color:#fff}
