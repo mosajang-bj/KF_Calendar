@@ -239,6 +239,7 @@ body{
   grid-template-columns:repeat(2,1fr);
   gap:20px 12px;
   padding:0 20px 32px;
+  background:#FFFFFF;
 }
 
 /* GDS Product Card */
@@ -905,7 +906,7 @@ function renderBottom(){
   if(selectedArtistName || allGroupsSelected){
     const liveGoodsArea = document.createElement('div');
     liveGoodsArea.id = 'live-goods-area';
-    liveGoodsArea.style.cssText = 'padding:20px 0;text-align:center;color:var(--txt2);font-size:13px';
+    liveGoodsArea.style.cssText = 'padding:20px 0;text-align:center;color:var(--txt2);font-size:13px;background:#FFFFFF';
     const label = selectedArtistName || '전체';
     liveGoodsArea.innerHTML = `<div style="display:inline-block;width:20px;height:20px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px"></div>${escHtml(label)} 매물 검색 중…`;
     bot.appendChild(liveGoodsArea);
