@@ -89,16 +89,15 @@ function dKey(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-// 오늘부터 다음달 말일까지 특정 요일의 날짜 목록
-function futureDatesForDay(dayOfWeek) {
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  // 다음달 말일
+// since 날짜부터 다음달 말일까지 특정 요일의 날짜 목록 (기본: 30일 전부터)
+function datesForDay(dayOfWeek, sinceDate) {
+  const start = sinceDate ? new Date(sinceDate) : new Date(Date.now() - 30 * 86400000);
+  start.setHours(0,0,0,0);
+  const today = new Date(); today.setHours(0,0,0,0);
   const end = new Date(today.getFullYear(), today.getMonth()+2, 0);
 
   const dates = [];
-  const cur = new Date(today);
-  // 오늘부터 순회
+  const cur = new Date(start);
   while (cur <= end) {
     if (cur.getDay() === dayOfWeek) dates.push(dKey(new Date(cur)));
     cur.setDate(cur.getDate()+1);
@@ -216,12 +215,14 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: 'unauthorized' });
   }
 
+  const since = req.query.since || null; // 백필용: ?since=2026-05-08
+
   const log = [];
   let totalUpserted = 0;
 
   for (const show of SHOWS_IMBC) {
-    // ① 미래 날짜 뼈대 채우기
-    const futureDates = futureDatesForDay(show.dayOfWeek);
+    // ① since~다음달말 범위의 날짜 뼈대 채우기 (기본: 30일 전부터)
+    const futureDates = datesForDay(show.dayOfWeek, since);
     const skeletonRows = futureDates.map(d => ({
       show_name: show.show_name,
       broad_date: d,

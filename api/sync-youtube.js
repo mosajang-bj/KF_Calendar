@@ -190,12 +190,13 @@ function dKey(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-function futureDatesForDay(dayOfWeek) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+function datesForDay(dayOfWeek, sinceDate) {
+  const start = sinceDate ? new Date(sinceDate) : new Date(Date.now() - 30 * 86400000);
+  start.setHours(0, 0, 0, 0);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
   const end = new Date(today.getFullYear(), today.getMonth() + 2, 0);
   const dates = [];
-  const cur = new Date(today);
+  const cur = new Date(start);
   while (cur <= end) {
     if (cur.getDay() === dayOfWeek) dates.push(dKey(new Date(cur)));
     cur.setDate(cur.getDate() + 1);
@@ -285,16 +286,19 @@ module.exports = async function handler(req, res) {
   if (!SUPA_SERVICE_KEY) return res.status(500).json({ error: 'SUPA_SERVICE_KEY 없음' });
   if (!YOUTUBE_API_KEY)  return res.status(500).json({ error: 'YOUTUBE_API_KEY 없음' });
 
-  // 60일 전부터 검색 (최근 데이터 + 약간의 여유)
-  const publishedAfter = new Date(Date.now() - 60 * 86400 * 1000).toISOString();
+  const since = req.query.since || null; // 백필용: ?since=2026-05-08
+  // since가 있으면 그 날짜부터, 없으면 60일 전부터 YouTube 검색
+  const publishedAfter = since
+    ? new Date(since).toISOString()
+    : new Date(Date.now() - 60 * 86400 * 1000).toISOString();
 
   const log = [];
   let totalUpserted = 0;
 
   for (const show of SHOWS) {
     try {
-      // ① 미래 날짜 뼈대 생성
-      const futureDates = futureDatesForDay(show.dayOfWeek);
+      // ① since~다음달말 범위의 날짜 뼈대 생성 (기본: 30일 전부터)
+      const futureDates = datesForDay(show.dayOfWeek, since);
       const skeletonRows = futureDates.map(d => ({
         show_name: show.show_name,
         broad_date: d,
