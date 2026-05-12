@@ -50,7 +50,7 @@ body{
   min-height:100%;
   background:#F6F6F6;
   position:relative;
-  overflow-x:hidden;
+  overflow-x:clip;
 }
 
 /* ════════════════════════════════════════
@@ -396,9 +396,6 @@ body{
 
 <!-- CALENDAR AREA -->
 <div class="cal-area" id="calArea"></div>
-
-<!-- CHIP TABS: sticky, outside .bottom so overflow-x:hidden doesn't break sticky -->
-<div id="chip-area" class="chip-sticky" style="display:none"></div>
 
 <!-- BOTTOM: Events + Goods -->
 <div class="bottom" id="bottom">
@@ -863,11 +860,10 @@ function renderBottom(){
   // date header는 일반 flow
   bot.appendChild(hdr);
 
-  // ── Group chips — #chip-area (.bottom 밖 sticky) ──
-  const chipArea = document.getElementById('chip-area');
-  chipArea.innerHTML = '';
+  // ── Group chips (sticky, .bottom 안) ──
   if(lineup && chipCount > 0){
-    chipArea.style.display = '';
+    const stickyWrap = document.createElement('div');
+    stickyWrap.className = 'chip-sticky';
 
     const strip = document.createElement('div');
     strip.style.cssText = 'padding:8px 16px 10px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;';
@@ -903,9 +899,8 @@ function renderBottom(){
       strip.appendChild(chip);
     });
 
-    chipArea.appendChild(strip);
-  } else {
-    chipArea.style.display = 'none';
+    stickyWrap.appendChild(strip);
+    bot.appendChild(stickyWrap);
   }
 
   // ── Divider ──
