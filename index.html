@@ -897,9 +897,11 @@ function renderBottom(){
     allChip.textContent = '전체';
     if(allActive) allChip.dataset.active = 'true';
     allChip.onclick = () => {
+      const sy = window.scrollY;
       selectedArtistName = null;
       allGroupsSelected = true;
       renderBottom();
+      requestAnimationFrame(() => window.scrollTo(0, sy));
     };
     strip.appendChild(allChip);
 
@@ -912,10 +914,12 @@ function renderBottom(){
       chip.textContent = artistName;
       if(isActive) chip.dataset.active = 'true';
       chip.onclick = () => {
+        const sy = window.scrollY;
         const toggling = !allGroupsSelected && selectedArtistName === artistName;
         selectedArtistName = toggling ? null : artistName;
         allGroupsSelected = false;
         renderBottom();
+        requestAnimationFrame(() => window.scrollTo(0, sy));
         if(selectedArtistName) fetchAndShowLiveGoods(selectedArtistName);
       };
       strip.appendChild(chip);
