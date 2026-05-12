@@ -51,6 +51,7 @@ body{
   background:#F6F6F6;
   position:relative;
   overflow-x:clip;
+  overscroll-behavior:contain;
 }
 
 /* ════════════════════════════════════════
@@ -894,6 +895,7 @@ function renderBottom(){
     const allActive = allGroupsSelected;
     allChip.style.cssText = pillBase + `background:${allActive ? '#191919' : '#F6F6F6'};color:${allActive ? '#FFFFFF' : '#8C8C8C'};`;
     allChip.textContent = '전체';
+    if(allActive) allChip.dataset.active = 'true';
     allChip.onclick = () => {
       selectedArtistName = null;
       allGroupsSelected = true;
@@ -908,6 +910,7 @@ function renderBottom(){
       const isActive = !allGroupsSelected && selectedArtistName === artistName;
       chip.style.cssText = pillBase + `background:${isActive ? '#191919' : '#F6F6F6'};color:${isActive ? '#FFFFFF' : '#8C8C8C'};`;
       chip.textContent = artistName;
+      if(isActive) chip.dataset.active = 'true';
       chip.onclick = () => {
         const toggling = !allGroupsSelected && selectedArtistName === artistName;
         selectedArtistName = toggling ? null : artistName;
@@ -920,6 +923,11 @@ function renderBottom(){
 
     stickyWrap.appendChild(strip);
     bot.appendChild(stickyWrap);
+
+    requestAnimationFrame(() => {
+      const activeChip = strip.querySelector('[data-active="true"]');
+      if(activeChip) activeChip.scrollIntoView({behavior:'instant',inline:'nearest',block:'nearest'});
+    });
   }
 
   // ── Divider ──
