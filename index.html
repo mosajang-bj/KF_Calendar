@@ -971,7 +971,7 @@ async function fetchAllGroupGoods(artists) {
     hdr.className = 'goods-intro';
     hdr.innerHTML = `
       <div class="goods-intro-eyebrow">실시간 공방 매물</div>
-      <div class="goods-intro-title">공방에 참여한 아이돌의<br>실시간 매물을 확인해보세요</div>
+      <div class="goods-intro-title">오늘 공방 포카 · 역조공 굿즈<br>지금 바로 확인하세요</div>
       <div class="goods-intro-footer">
         <div class="goods-intro-sub">${items.length > 0 ? `${items.length}개 매물 · 최신순` : '등록된 매물 없음'}</div>
       </div>
@@ -1036,7 +1036,7 @@ async function fetchAndShowLiveGoods(artistName) {
     hdr.className = 'goods-intro';
     hdr.innerHTML = `
       <div class="goods-intro-eyebrow">실시간 공방 매물</div>
-      <div class="goods-intro-title">공방에 참여한 <em>${escHtml(displayName)}</em>의<br>실시간 매물을 확인해보세요</div>
+      <div class="goods-intro-title">오늘 공방 포카 · 역조공 굿즈<br>지금 바로 확인하세요</div>
       <div class="goods-intro-footer">
         <div class="goods-intro-sub">${items.length > 0 ? `${items.length}개 매물 · 최신순` : '등록된 매물 없음'}</div>
         <a href="https://bunjang.co.kr/search/products?q=${encodeURIComponent(artistName+' 공방')}&order=date" target="_blank" rel="noopener" class="goods-intro-link">번장에서 더 보기 →</a>
