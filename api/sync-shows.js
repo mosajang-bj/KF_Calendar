@@ -158,6 +158,15 @@ function parseBroadDate(ep) {
   return null;
 }
 
+// naver source로 저장된 날짜 조회 (iMBC가 덮어쓰지 않도록)
+async function getNaverProtectedDates(showName) {
+  const res = await fetch(
+    `${SUPA_URL}/rest/v1/music_show_lineups?show_name=eq.${showName}&source=eq.naver&select=broad_date`,
+    { headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` } }
+  ).then(r => r.json()).catch(() => []);
+  return new Set((res || []).map(r => r.broad_date));
+}
+
 // Supabase helpers
 async function supaHeaders() {
   return {
@@ -182,14 +191,14 @@ async function upsertRows(rows) {
     if (res.ok) { ok += chunk.length; continue; }
     // fallback: 개별 upsert
     for (const row of chunk) {
-      // 기존 행 확인
       const existing = await fetch(
-        `${SUPA_URL}/rest/v1/music_show_lineups?show_name=eq.${row.show_name}&broad_date=eq.${row.broad_date}&select=id,groups,raw_title`,
+        `${SUPA_URL}/rest/v1/music_show_lineups?show_name=eq.${row.show_name}&broad_date=eq.${row.broad_date}&select=id,groups,source`,
         { headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` } }
       ).then(r=>r.json()).catch(()=>[]);
 
       if (existing.length > 0) {
-        // 그룹/raw_title이 있는 행은 덮어쓰지 않음 (뼈대만 채우는 경우)
+        // naver source 우선 — imbc/date_rule이 덮어쓰지 않음
+        if (existing[0].source === 'naver' && row.source !== 'naver') { ok++; continue; }
         if (row.source === 'date_rule' && existing[0].groups?.length > 0) { ok++; continue; }
         await fetch(`${SUPA_URL}/rest/v1/music_show_lineups?id=eq.${existing[0].id}`, {
           method: 'PATCH',
@@ -237,12 +246,14 @@ module.exports = async function handler(req, res) {
     const skelOk = await upsertRows(skeletonRows);
     log.push(`[${show.show_name}] 뼈대 ${skelOk}/${futureDates.length}개`);
 
-    // ② iMBC에서 최근 에피소드 가져와서 groups 업데이트
+    // ② iMBC에서 최근 에피소드 가져와서 groups 업데이트 (naver 데이터 보호)
+    const naverDates = await getNaverProtectedDates(show.show_name);
     const episodes = await fetchImbcEpisodes(show.programId);
     const dataRows = [];
     for (const ep of episodes) {
       const date = parseBroadDate(ep);
       if (!date) continue;
+      if (naverDates.has(date)) continue; // naver 우선: iMBC가 덮어쓰지 않음
       const { raw, artists } = show.show_name === 'music_core'
         ? parseMusicCore(ep)
         : parseShowChampion(ep);

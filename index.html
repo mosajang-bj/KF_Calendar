@@ -898,10 +898,16 @@ function renderBottom(){
     if(allActive) allChip.dataset.active = 'true';
     allChip.onclick = () => {
       const sy = window.scrollY;
+      const botEl = document.getElementById('bottom');
+      if(botEl) botEl.style.minHeight = botEl.offsetHeight + 'px';
       selectedArtistName = null;
       allGroupsSelected = true;
       renderBottom();
-      requestAnimationFrame(() => window.scrollTo(0, sy));
+      requestAnimationFrame(() => {
+        const b = document.getElementById('bottom');
+        if(b) b.style.minHeight = '';
+        window.scrollTo(0, sy);
+      });
     };
     strip.appendChild(allChip);
 
@@ -915,12 +921,17 @@ function renderBottom(){
       if(isActive) chip.dataset.active = 'true';
       chip.onclick = () => {
         const sy = window.scrollY;
+        const botEl = document.getElementById('bottom');
+        if(botEl) botEl.style.minHeight = botEl.offsetHeight + 'px';
         const toggling = !allGroupsSelected && selectedArtistName === artistName;
         selectedArtistName = toggling ? null : artistName;
         allGroupsSelected = false;
         renderBottom();
-        requestAnimationFrame(() => window.scrollTo(0, sy));
-        if(selectedArtistName) fetchAndShowLiveGoods(selectedArtistName);
+        requestAnimationFrame(() => {
+          const b = document.getElementById('bottom');
+          if(b) b.style.minHeight = '';
+          window.scrollTo(0, sy);
+        });
       };
       strip.appendChild(chip);
     });
