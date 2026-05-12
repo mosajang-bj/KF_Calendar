@@ -228,10 +228,16 @@ body{
 .sel-sub{font-size:12px;color:var(--txt2);margin-top:3px;letter-spacing:0;display:flex;align-items:center;gap:6px}
 .evt-badge{
   font-size:12px;font-weight:700;
-  min-width:28px;height:28px;padding:0 10px;
-  border-radius:9999px;background:var(--accent);color:#fff;
+  width:32px;height:32px;flex-shrink:0;
+  border-radius:50%;background:var(--accent);color:#fff;
   display:flex;align-items:center;justify-content:center;
   letter-spacing:0;
+}
+.show-badge{
+  display:inline-flex;align-items:center;
+  font-size:11px;font-weight:700;letter-spacing:0;
+  color:#fff;line-height:1;
+  padding:4px 8px;border-radius:6px;
 }
 
 /* goods grid */
@@ -840,7 +846,7 @@ function renderBottom(){
       <div>
         <div class="sel-date">${dayNames[dateObj.getDay()]}, ${MONTH_NAMES[mo-1]} ${d}</div>
         <div class="sel-sub" style="display:flex;align-items:center;gap:6px;margin-top:3px">
-          <span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;color:#fff;background:${show.color}">${show.short}</span>
+          <span class="show-badge" style="background:${show.color}">${show.short}</span>
           <span style="color:var(--txt2);font-size:12px">${lineup.episode ? lineup.episode+'회 · ' : ''}${chipCount}팀 출연</span>
         </div>
       </div>
