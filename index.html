@@ -926,7 +926,7 @@ function renderBottom(){
 
     requestAnimationFrame(() => {
       const activeChip = strip.querySelector('[data-active="true"]');
-      if(activeChip) activeChip.scrollIntoView({behavior:'instant',inline:'nearest',block:'nearest'});
+      if(activeChip) strip.scrollLeft = activeChip.offsetLeft - (strip.offsetWidth - activeChip.offsetWidth) / 2;
     });
   }
 
