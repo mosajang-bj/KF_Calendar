@@ -905,6 +905,47 @@ function artistDisplayName(name) {
 }
 
 // ─────────────────────────────────────────
+//  GROUP POPULARITY RANK (CSV Top100 기준)
+//  key: ARTIST_TO_GROUP_FRONT 값(group ID), value: 순위(낮을수록 인기)
+// ─────────────────────────────────────────
+const GROUP_RANK = {
+  'nct':1,'seventeen':2,'bts':3,'ive':4,'txt':5,
+  'straykids':6,'plave':7,'boynextdoor':8,'zerobaseone':10,
+  'day6':11,'theboyz':12,'aespa':13,'enhypen':14,'monstax':15,
+  'newjeans':16,'exo':17,'tws':18,'ateez':19,'btob':20,
+  'shinee':21,'lesserafim':22,'triples':24,'twice':28,'nmixx':29,
+  'andteam':30,'blackpink':32,'redvelvet':33,'treasure':34,
+  'cravity':36,'gidle':37,'astro':38,'superjunior':40,
+  'illit':42,'itzy':44,'mamamoo':45,'kissoflife':53,
+  'kep1er':57,'babymonster':58,'oneus':64,'nflying':68,
+  'got7':76,'billlie':77,'pentagon':80,'xikers':80,
+  'xdinaryheroes':49,'qwer':52,'evnne':75,'nexz':83,
+  'alphadriveone':27,'82major':87,
+};
+
+// artist 이름(raw) → group ID 반환
+function getGroupId(name) {
+  return ARTIST_TO_GROUP_FRONT[name] || null;
+}
+
+// 칩 순서 정렬: CSV 순위 있으면 그 순위, 없으면 매물 수 조회 후 재정렬
+async function sortedArtists(artists) {
+  const ranked = [];
+  const unranked = [];
+
+  for (const a of artists) {
+    const gid = getGroupId(a);
+    const rank = gid ? (GROUP_RANK[gid] ?? null) : null;
+    if (rank !== null) ranked.push({ name: a, rank });
+    else unranked.push(a);
+  }
+  ranked.sort((a, b) => a.rank - b.rank);
+
+  // 순위 있는 것 먼저, 없는 것은 뒤에 임시 배치
+  return { initial: [...ranked.map(r => r.name), ...unranked], unranked };
+}
+
+// ─────────────────────────────────────────
 //  SCROLL TO BOTTOM
 // ─────────────────────────────────────────
 function scrollToBottom(){
@@ -985,12 +1026,14 @@ function renderBottom(){
     strip.appendChild(allChip);
 
     // ── 개별 그룹 칩 ──
-    const artists = rawArtists.length > 0 ? rawArtists : lineup.groups;
-    artists.forEach(artistName => {
+    const rawList = rawArtists.length > 0 ? rawArtists : lineup.groups;
+
+    function makeChip(artistName) {
       const chip = document.createElement('button');
       const isActive = !allGroupsSelected && selectedArtistName === artistName;
       chip.style.cssText = pillBase + `background:${isActive ? '#191919' : '#F6F6F6'};color:${isActive ? '#FFFFFF' : '#8C8C8C'};`;
       chip.textContent = artistDisplayName(artistName);
+      chip.dataset.artist = artistName;
       if(isActive) chip.dataset.active = 'true';
       chip.onclick = () => {
         const toggling = !allGroupsSelected && selectedArtistName === artistName;
@@ -998,7 +1041,29 @@ function renderBottom(){
         allGroupsSelected = false;
         renderBottom();
       };
-      strip.appendChild(chip);
+      return chip;
+    }
+
+    // 1. CSV 순위 기준 즉시 정렬 후 칩 렌더
+    sortedArtists(rawList).then(({ initial, unranked }) => {
+      initial.forEach(name => strip.appendChild(makeChip(name)));
+
+      // 2. 순위 없는 그룹만 백그라운드에서 매물 수 조회 후 재정렬
+      if (unranked.length > 1) {
+        Promise.all(unranked.map(a =>
+          fetch(`/api/goods?artist=${encodeURIComponent(a)}&n=1`)
+            .then(r => r.ok ? r.json() : { items: [] })
+            .then(d => ({ name: a, count: (d.items || []).length }))
+            .catch(() => ({ name: a, count: 0 }))
+        )).then(results => {
+          results.sort((a, b) => b.count - a.count);
+          // strip에서 unranked 칩들만 꺼내서 순서 재배치
+          results.forEach(({ name }) => {
+            const chip = strip.querySelector(`[data-artist="${CSS.escape(name)}"]`);
+            if (chip) strip.appendChild(chip); // 맨 뒤로 이동 후 순서대로
+          });
+        });
+      }
     });
 
     stickyWrap.appendChild(strip);
