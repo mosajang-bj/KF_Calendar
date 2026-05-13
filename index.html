@@ -11,7 +11,7 @@
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Bunjang Global — K-pop 공방 캘린더</title>
+<title>Bunjang Global — K-pop Music Show Calendar</title>
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
 /* ════════════════════════════════════════
@@ -463,6 +463,25 @@ let selectedDate = dKey(TODAY);
 let weekStart = getWeekStart(TODAY);
 let monthPivot = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
 
+// ── Product name KR→EN keyword map ──
+const KR_TO_EN = {
+  '공방포카':'Fan Postcard','공방 포카':'Fan Postcard','포카':'Photocard','역조공':'Fan Gift',
+  '역조공 굿즈':'Fan Gift Goods','조공':'Gift','공방':'Music Show','사녹':'Pre-recorded Show',
+  '한정판':'Limited Edition','한정':'Limited','공식':'Official','굿즈':'Goods',
+  '앨범':'Album','미개봉':'Unsealed','개봉':'Opened','직캠':'Fancam','콘서트':'Concert',
+  '팬사인회':'Fan Sign','사인회':'Sign Event','포토북':'Photobook','브로마이드':'Bromide',
+  '스티커':'Sticker','키링':'Keyring','엽서':'Postcard','피규어':'Figure',
+  '뱃지':'Badge','마스코트':'Mascot','담요':'Blanket','에코백':'Eco Bag',
+  '폴라로이드':'Polaroid','미니포토':'Mini Photo','트레카':'Trading Card',
+};
+function translateName(name){
+  let result = name;
+  for(const [kr, en] of Object.entries(KR_TO_EN)){
+    result = result.split(kr).join(en);
+  }
+  return result;
+}
+
 // 공방 일정 데이터: { 'YYYY-MM-DD': { showName, episode, groups:[], rawTitle } }
 let LINEUP_BY_DATE = {};
 // 공방 화면에서 선택된 아티스트 원본 이름 (칩 클릭), '전체'면 null
@@ -477,11 +496,11 @@ let EVENTS = [];
 //  SHOW LABELS
 // ─────────────────────────────────────────
 const SHOW_LABELS = {
-  music_core:    { name:'쇼! 음악중심', short:'음악중심', day:'SAT', color:'#E8823A' },
-  inkigayo:      { name:'SBS 인기가요', short:'인기가요', day:'SUN', color:'#A855C8' },
-  music_bank:    { name:'뮤직뱅크',     short:'뮤직뱅크', day:'FRI', color:'#4CAF50' },
-  mcountdown:    { name:'엠카운트다운', short:'엠카',     day:'THU', color:'#FF4757' },
-  show_champion: { name:'쇼챔피언',     short:'쇼챔',     day:'WED', color:'#00C4B4' },
+  music_core:    { name:'Show! Music Core', short:'Music Core',    day:'SAT', color:'#E8823A' },
+  inkigayo:      { name:'SBS Inkigayo',     short:'Inkigayo',      day:'SUN', color:'#A855C8' },
+  music_bank:    { name:'Music Bank',       short:'Music Bank',    day:'FRI', color:'#4CAF50' },
+  mcountdown:    { name:'M Countdown',      short:'M Countdown',   day:'THU', color:'#FF4757' },
+  show_champion: { name:'Show Champion',    short:'Show Champion', day:'WED', color:'#00C4B4' },
 };
 
 // 프론트용 아티스트→그룹ID 매핑
@@ -666,14 +685,14 @@ function buildWeek(area){
       const dot=document.createElement('div');
       dot.className='evt-dot';
       dot.style.background=showColor;
-      dot.title=(show?show.short:lineup.showName)+' 공방';
+      dot.title=(show?show.short:lineup.showName)+' Lineup';
       dc.appendChild(dot);
       const wRaw = parseRawTitleStatic(lineup.rawTitle);
       const wCount = wRaw.length > 0 ? wRaw.length : lineup.groups.length;
       if(wCount > 0){
         const cnt=document.createElement('div');
         cnt.style.cssText=`font-size:7px;color:${showColor};font-weight:800;line-height:1;margin-top:1px`;
-        cnt.textContent=`${wCount}팀`;
+        cnt.textContent=`${wCount}`;
         dc.appendChild(cnt);
       }
       cell.appendChild(dc);
@@ -748,7 +767,7 @@ function buildMonth(area){
       pill.style.color=showColor;
       const mRaw = parseRawTitleStatic(mLineup.rawTitle);
       const mCount = mRaw.length > 0 ? mRaw.length : mLineup.groups.length;
-      pill.textContent=(show?show.short:mLineup.showName)+(mCount?` · ${mCount}팀`:'');
+      pill.textContent=(show?show.short:mLineup.showName)+(mCount?` · ${mCount}`:'');
       pillsEl.appendChild(pill);
       cell.appendChild(pillsEl);
     }
@@ -787,6 +806,7 @@ function triggerAllGoods(ds){
 const SEGMENT_BLACKLIST = new Set([
   '영 크리에이터 크루', '온 세상을 다정함으로 물들일 큐피드',
   '뮤직뱅크 1위 앵콜직캠', '앵콜직캠', '직캠', '공연', '특집',
+  'Encore Fancam', 'Special',
 ]);
 
 // 세그먼트에서 실제 그룹명만 추출: "CRAVITY COMEBACK" → "CRAVITY"
@@ -811,7 +831,7 @@ function parseRawTitleStatic(raw) {
   let segments;
   if (dashIdx !== -1) {
     segments = decoded.slice(dashIdx + 3)
-      .replace(/\s+등\s*$/, '')
+      .replace(/\s+등\s*$/, '').replace(/\s+etc\.?\s*$/i, '')
       .split(',')
       .map(s => s.replace(/\s*\([^)]*\)/g, '').trim());
   } else {
@@ -864,7 +884,7 @@ function renderBottom(){
         <div class="sel-date">${dayNames[dateObj.getDay()]}, ${MONTH_NAMES[mo-1]} ${d}</div>
         <div class="sel-sub" style="display:flex;align-items:center;gap:6px;margin-top:3px">
           <span class="show-badge" style="background:${show.color}">${show.short}</span>
-          <span style="color:var(--txt2);font-size:12px">${lineup.episode ? lineup.episode+'회 · ' : ''}${chipCount}팀 출연</span>
+          <span style="color:var(--txt2);font-size:12px">${lineup.episode ? 'EP '+lineup.episode+' · ' : ''}${chipCount} Artists</span>
         </div>
       </div>
       <div class="evt-badge" style="background:${show.color}">${chipCount}</div>
@@ -873,7 +893,7 @@ function renderBottom(){
     hdr.innerHTML=`
       <div>
         <div class="sel-date">${dayNames[dateObj.getDay()]}, ${MONTH_NAMES[mo-1]} ${d}</div>
-        <div class="sel-sub">공방 일정 없음</div>
+        <div class="sel-sub">No show scheduled</div>
       </div>
     `;
   }
@@ -894,7 +914,7 @@ function renderBottom(){
     const allChip = document.createElement('button');
     const allActive = allGroupsSelected;
     allChip.style.cssText = pillBase + `background:${allActive ? '#191919' : '#F6F6F6'};color:${allActive ? '#FFFFFF' : '#8C8C8C'};`;
-    allChip.textContent = '전체';
+    allChip.textContent = 'All';
     if(allActive) allChip.dataset.active = 'true';
     allChip.onclick = () => {
       const sy = window.scrollY;
@@ -955,8 +975,8 @@ function renderBottom(){
     const liveGoodsArea = document.createElement('div');
     liveGoodsArea.id = 'live-goods-area';
     liveGoodsArea.style.cssText = 'padding:20px 0;text-align:center;color:var(--txt2);font-size:13px;background:#FFFFFF';
-    const label = selectedArtistName || '전체';
-    liveGoodsArea.innerHTML = `<div style="display:inline-block;width:20px;height:20px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px"></div>${escHtml(label)} 매물 검색 중…`;
+    const label = selectedArtistName || 'All';
+    liveGoodsArea.innerHTML = `<div style="display:inline-block;width:20px;height:20px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px"></div>Searching ${escHtml(label)} listings…`;
     bot.appendChild(liveGoodsArea);
 
     // DOM에 붙인 직후 즉시 fetch
@@ -970,12 +990,12 @@ function renderBottom(){
   } else if(lineup){
     const prompt = document.createElement('div');
     prompt.style.cssText = 'padding:16px 16px 20px;text-align:center;color:var(--txt2);font-size:12.5px';
-    prompt.textContent = '위에서 그룹을 선택하면 번장 한정판 매물을 바로 볼 수 있어요';
+    prompt.textContent = 'Select a group above to browse Bunjang listings';
     bot.appendChild(prompt);
   } else {
     const empty = document.createElement('div');
     empty.style.cssText = 'padding:20px 16px;text-align:center;color:var(--txt2);font-size:12.5px';
-    empty.textContent = '공방 일정이 있는 날짜를 선택하세요';
+    empty.textContent = 'Select a date with a show scheduled';
     bot.appendChild(empty);
   }
 }
@@ -1019,10 +1039,10 @@ async function fetchAllGroupGoods(artists) {
     hdr.className = 'goods-intro';
     hdr.innerHTML = `
       <div class="goods-intro-title-row">
-        <div class="goods-intro-title">오늘 올라온 공방 포카 · 역조공 굿즈<br>지금 바로 확인하세요</div>
+        <div class="goods-intro-title">Today's Fan Goods &amp; Postcards<br>Check them out now</div>
       </div>
       <div class="goods-intro-footer">
-        <div class="goods-intro-sub">${items.length > 0 ? `${items.length}개 매물 · 최신순` : '등록된 매물 없음'}</div>
+        <div class="goods-intro-sub">${items.length > 0 ? `${items.length} listings · Latest` : 'No listings found'}</div>
       </div>
     `;
     freshArea.appendChild(hdr);
@@ -1030,7 +1050,7 @@ async function fetchAllGroupGoods(artists) {
     if(items.length === 0){
       const empty = document.createElement('div');
       empty.className = 'goods-empty';
-      empty.textContent = '이날 출연 그룹 관련 공방 굿즈 매물이 없습니다.';
+      empty.textContent = 'No fan goods listings found for today\'s artists.';
       freshArea.appendChild(empty);
       return;
     }
@@ -1040,7 +1060,8 @@ async function fetchAllGroupGoods(artists) {
     items.slice(0, 60).forEach((item, i) => {
       const productUrl = `https://globalbunjang.com/product/${item.id}`;
       const imgSrc = item.imageUrl ? `/api/image?url=${encodeURIComponent(item.imageUrl)}` : '';
-      const imgHtml = imgSrc ? `<img src="${imgSrc}" alt="${escHtml(item.name)}" loading="lazy" onerror="this.classList.add('err')">` : '';
+      const itemName = translateName(item.name);
+      const imgHtml = imgSrc ? `<img src="${imgSrc}" alt="${escHtml(itemName)}" loading="lazy" onerror="this.classList.add('err')">` : '';
       const card = document.createElement('div');
       card.className = 'gcard';
       card.style.cssText = `animation:fadeUp .22s ease both;animation-delay:${i*15}ms`;
@@ -1050,7 +1071,7 @@ async function fetchAllGroupGoods(artists) {
           ${imgHtml}
         </div>
         <div class="gcard-body">
-          <div class="gcard-name">${escHtml(item.name)}</div>
+          <div class="gcard-name">${escHtml(itemName)}</div>
           <div class="gcard-price">₩${item.price.toLocaleString()}</div>
         </div>
       `;
@@ -1061,7 +1082,7 @@ async function fetchAllGroupGoods(artists) {
 
   } catch(err) {
     const a = document.getElementById('live-goods-area');
-    if(a) a.innerHTML = `<div style="padding:16px 14px;color:var(--txt2);font-size:12px">매물 로드 실패: ${escHtml(err.message)}</div>`;
+    if(a) a.innerHTML = `<div style="padding:16px 14px;color:var(--txt2);font-size:12px">Failed to load listings: ${escHtml(err.message)}</div>`;
   }
 }
 
@@ -1080,18 +1101,18 @@ async function fetchAndShowLiveGoods(artistName) {
 
     freshArea.innerHTML = '';
 
-    const displayName = allGroupsSelected ? '이날 출연 그룹' : artistName;
+    const displayName = allGroupsSelected ? "Today's Artists" : artistName;
     const hdr = document.createElement('div');
     hdr.className = 'goods-intro';
     hdr.innerHTML = `
       <div class="goods-intro-title-row">
-        <div class="goods-intro-title">${escHtml(displayName)} 공방 포카 · 역조공 굿즈</div>
+        <div class="goods-intro-title">${escHtml(displayName)} Fan Goods &amp; Postcards</div>
         <a href="https://globalbunjang.com/search?q=${encodeURIComponent(artistName+' 공방')}&order=date" target="_blank" rel="noopener" class="goods-intro-chevron">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
         </a>
       </div>
       <div class="goods-intro-footer">
-        <div class="goods-intro-sub">${items.length > 0 ? `${items.length}개 매물 · 최신순` : '등록된 매물 없음'}</div>
+        <div class="goods-intro-sub">${items.length > 0 ? `${items.length} listings · Latest` : 'No listings found'}</div>
       </div>
     `;
     freshArea.appendChild(hdr);
@@ -1099,7 +1120,7 @@ async function fetchAndShowLiveGoods(artistName) {
     if(items.length === 0){
       const empty = document.createElement('div');
       empty.className = 'goods-empty';
-      empty.textContent = `${displayName} 관련 공방 굿즈 매물이 없습니다.`;
+      empty.textContent = `No fan goods listings found for ${displayName}.`;
       freshArea.appendChild(empty);
       return;
     }
@@ -1109,8 +1130,9 @@ async function fetchAndShowLiveGoods(artistName) {
     items.slice(0, 40).forEach((item, i) => {
       const productUrl = `https://globalbunjang.com/product/${item.id}`;
       const imgSrc = item.imageUrl ? `/api/image?url=${encodeURIComponent(item.imageUrl)}` : '';
+      const itemName = translateName(item.name);
       const imgHtml = imgSrc
-        ? `<img src="${imgSrc}" alt="${escHtml(item.name)}" loading="lazy" onerror="this.classList.add('err')">`
+        ? `<img src="${imgSrc}" alt="${escHtml(itemName)}" loading="lazy" onerror="this.classList.add('err')">`
         : '';
       const card = document.createElement('div');
       card.className = 'gcard';
@@ -1121,7 +1143,7 @@ async function fetchAndShowLiveGoods(artistName) {
           ${imgHtml}
         </div>
         <div class="gcard-body">
-          <div class="gcard-name">${escHtml(item.name)}</div>
+          <div class="gcard-name">${escHtml(itemName)}</div>
           <div class="gcard-price">₩${item.price.toLocaleString()}</div>
         </div>
       `;
@@ -1132,7 +1154,7 @@ async function fetchAndShowLiveGoods(artistName) {
 
   } catch(err) {
     const area2 = document.getElementById('live-goods-area');
-    if(area2) area2.innerHTML = `<div style="padding:16px 14px;color:var(--txt2);font-size:12px">매물 로드 실패: ${escHtml(err.message)}</div>`;
+    if(area2) area2.innerHTML = `<div style="padding:16px 14px;color:var(--txt2);font-size:12px">Failed to load listings: ${escHtml(err.message)}</div>`;
   }
 }
 
@@ -1182,7 +1204,7 @@ async function fetchMusicShowLineups() {
         date:  (r.broad_date || '').slice(0, 10),
         name:  show.name,
         type:  'gonbang',
-        venue: r.episode_number ? `${r.episode_number}회` : '',
+        venue: r.episode_number ? `EP ${r.episode_number}` : '',
         color: show.color,
       };
     });
