@@ -9,7 +9,7 @@ const SUPA_SERVICE_KEY = process.env.SUPA_SERVICE_KEY;
 const MANUAL_EN_MAP = {
   '가비엔제이': 'Gavy NJ',
   '이예준': 'Lee Ye-jun',
-  '크레이즈엔젤': 'CrazeAngel',
+  '크레이즈엔젤': 'CrazAngel',
   '오션': 'O3ean',
   '영파씨': 'YOUNG POSSE',
   '하이키': 'H1-KEY',
