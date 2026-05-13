@@ -884,6 +884,9 @@ function scrollToBottom(){
 // ─────────────────────────────────────────
 function renderBottom(){
   const bot=document.getElementById('bottom');
+  // 페이지 전체 높이를 미리 고정해서 innerHTML 초기화 시 스크롤 튀는 것 방지
+  const prevPageHeight = document.body.scrollHeight;
+  document.body.style.minHeight = prevPageHeight + 'px';
   bot.innerHTML='';
 
   const [y,mo,d]=selectedDate.split('-').map(Number);
@@ -940,16 +943,13 @@ function renderBottom(){
     if(allActive) allChip.dataset.active = 'true';
     allChip.onclick = () => {
       const sy = window.scrollY;
-      const botEl = document.getElementById('bottom');
-      if(botEl) botEl.style.minHeight = botEl.offsetHeight + 'px';
       selectedArtistName = null;
       allGroupsSelected = true;
       renderBottom();
-      requestAnimationFrame(() => {
-        const b = document.getElementById('bottom');
-        if(b) b.style.minHeight = '';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        document.body.style.minHeight = '';
         window.scrollTo(0, sy);
-      });
+      }));
     };
     strip.appendChild(allChip);
 
@@ -963,17 +963,14 @@ function renderBottom(){
       if(isActive) chip.dataset.active = 'true';
       chip.onclick = () => {
         const sy = window.scrollY;
-        const botEl = document.getElementById('bottom');
-        if(botEl) botEl.style.minHeight = botEl.offsetHeight + 'px';
         const toggling = !allGroupsSelected && selectedArtistName === artistName;
         selectedArtistName = toggling ? null : artistName;
         allGroupsSelected = false;
         renderBottom();
-        requestAnimationFrame(() => {
-          const b = document.getElementById('bottom');
-          if(b) b.style.minHeight = '';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          document.body.style.minHeight = '';
           window.scrollTo(0, sy);
-        });
+        }));
       };
       strip.appendChild(chip);
     });
