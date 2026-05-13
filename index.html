@@ -1560,55 +1560,138 @@ function openMyGroups() {
   const sheet = document.createElement('div');
   sheet.className = 'myg-sheet';
 
+  let searchQuery = '';
+  const selArr = [...selected]; // 순서 유지 배열
+
+  function syncSelected() {
+    selected = new Set(selArr);
+  }
+
   function renderSheet() {
+    syncSelected();
+    const slots = [0,1,2].map(i => selArr[i] || null);
+    const canSave = selArr.length > 0;
+
     sheet.innerHTML = `
       <div class="myg-handle"></div>
       <div class="myg-head">
         <div>
           <div class="myg-title">My Groups</div>
-          <div class="myg-sub">Pick up to ${MAX_SELECTION} groups to follow. Only their schedules will be highlighted.</div>
+          <div class="myg-sub">Search and pick up to 3 groups — your personal K-pop lineup.</div>
         </div>
         <button class="myg-close" id="myg-close-btn">✕</button>
       </div>
-      <div class="myg-list" id="myg-list"></div>
+
+      <!-- 선택 슬롯 3개 -->
+      <div style="display:flex;gap:8px;padding:12px 20px 4px;">
+        ${slots.map((name, i) => `
+          <div style="flex:1;border-radius:10px;border:1.5px ${name ? 'solid #191919' : 'dashed rgba(25,25,25,0.18)'};
+               background:${name ? '#191919' : '#F6F6F6'};
+               min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+               gap:2px;cursor:${name ? 'pointer' : 'default'};transition:all .15s;position:relative;"
+               ${name ? `data-remove="${escHtml(name)}"` : ''}>
+            <span style="font-size:10px;font-weight:700;color:${name ? 'rgba(255,255,255,0.5)' : 'var(--txt3)'};letter-spacing:.5px;">${i+1}</span>
+            ${name
+              ? `<span style="font-size:12px;font-weight:800;color:#fff;text-align:center;padding:0 6px;line-height:1.2;">${escHtml(artistDisplayName(name))}</span>
+                 <span style="position:absolute;top:4px;right:6px;font-size:11px;color:rgba(255,255,255,0.5);line-height:1;">✕</span>`
+              : `<span style="font-size:11px;color:var(--txt3);">empty</span>`
+            }
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- 검색창 -->
+      <div style="padding:10px 20px 0;">
+        <div style="display:flex;align-items:center;gap:8px;background:#F6F6F6;border-radius:10px;padding:10px 14px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input id="myg-search" type="text" placeholder="Search groups…" value="${escHtml(searchQuery)}"
+            style="border:none;background:none;outline:none;font-size:14px;font-weight:600;
+                   color:var(--txt1);width:100%;font-family:inherit;letter-spacing:0;"
+            autocomplete="off" autocorrect="off" spellcheck="false"/>
+          ${searchQuery ? `<button id="myg-search-clear" style="border:none;background:none;padding:0;cursor:pointer;color:var(--txt2);font-size:16px;line-height:1;">✕</button>` : ''}
+        </div>
+      </div>
+
+      <!-- 검색 결과 -->
+      <div id="myg-list" style="overflow-y:auto;max-height:36vh;padding:8px 20px 12px;"></div>
+
       <div class="myg-footer">
-        <button class="myg-skip" id="myg-skip">Skip for now</button>
-        <button class="myg-save" id="myg-save" ${selected.size === 0 ? 'disabled' : ''}>
-          ${selected.size > 0 ? `Follow ${selected.size} Group${selected.size > 1 ? 's' : ''}` : 'Select a Group'}
+        <button class="myg-skip" id="myg-skip">Skip</button>
+        <button class="myg-save" id="myg-save" ${!canSave ? 'disabled' : ''}>
+          ${canSave ? `Follow ${selArr.length} Group${selArr.length > 1 ? 's' : ''}` : 'Select a Group'}
         </button>
       </div>
     `;
 
-    const list = sheet.querySelector('#myg-list');
-    allArtists.forEach(artistName => {
-      const isSel = selected.has(artistName);
-      const isDisabled = !isSel && selected.size >= MAX_SELECTION;
-      const chip = document.createElement('button');
-      chip.className = `myg-chip${isSel ? ' sel' : ''}${isDisabled ? ' disabled' : ''}`;
-      chip.textContent = artistDisplayName(artistName);
-      chip.onclick = () => {
-        if (selected.has(artistName)) selected.delete(artistName);
-        else if (selected.size < MAX_SELECTION) selected.add(artistName);
+    // 슬롯 클릭 → 해당 그룹 제거
+    sheet.querySelectorAll('[data-remove]').forEach(el => {
+      el.onclick = () => {
+        const name = el.dataset.remove;
+        const idx = selArr.indexOf(name);
+        if (idx > -1) selArr.splice(idx, 1);
         renderSheet();
       };
-      list.appendChild(chip);
     });
 
+    // 검색 입력
+    const input = sheet.querySelector('#myg-search');
+    input.oninput = () => { searchQuery = input.value; renderSheet(); };
+    input.focus();
+
+    const clearBtn = sheet.querySelector('#myg-search-clear');
+    if (clearBtn) clearBtn.onclick = () => { searchQuery = ''; renderSheet(); };
+
+    // 검색 결과 목록
+    const q = searchQuery.trim().toLowerCase();
+    const filtered = allArtists.filter(a => {
+      const en = artistDisplayName(a).toLowerCase();
+      return !q || en.includes(q) || a.toLowerCase().includes(q);
+    });
+
+    const list = sheet.querySelector('#myg-list');
+    if (filtered.length === 0) {
+      list.innerHTML = `<div style="text-align:center;color:var(--txt2);font-size:13px;padding:20px 0;">No results</div>`;
+    } else {
+      filtered.forEach(artistName => {
+        const isSel = selArr.includes(artistName);
+        const rank = selArr.indexOf(artistName); // 0,1,2 or -1
+        const isDisabled = !isSel && selArr.length >= MAX_SELECTION;
+        const row = document.createElement('div');
+        row.style.cssText = `display:flex;align-items:center;justify-content:space-between;
+          padding:11px 0;border-bottom:1px solid var(--border);cursor:${isDisabled?'default':'pointer'};
+          opacity:${isDisabled?'0.35':'1'};`;
+        row.innerHTML = `
+          <span style="font-size:14px;font-weight:700;color:var(--txt1);">${escHtml(artistDisplayName(artistName))}</span>
+          <div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;
+            border:${isSel?'none':'1.5px solid rgba(25,25,25,0.2)'};
+            background:${isSel?'#191919':'transparent'};
+            display:flex;align-items:center;justify-content:center;
+            font-size:11px;font-weight:800;color:${isSel?'#fff':'var(--txt3)'};">
+            ${isSel ? rank+1 : ''}
+          </div>
+        `;
+        if (!isDisabled) {
+          row.onclick = () => {
+            if (isSel) selArr.splice(selArr.indexOf(artistName), 1);
+            else selArr.push(artistName);
+            renderSheet();
+          };
+        }
+        list.appendChild(row);
+      });
+    }
+
     sheet.querySelector('#myg-close-btn').onclick = () => {
-      myGroups = null;
-      clearMyGroups();
-      applyMyGroups();
-      closeMyGroups(sheet);
+      myGroups = null; clearMyGroups(); applyMyGroups(); closeMyGroups(sheet);
     };
     sheet.querySelector('#myg-skip').onclick = () => {
-      myGroups = null;
-      clearMyGroups();
-      applyMyGroups();
-      closeMyGroups(sheet);
+      myGroups = null; clearMyGroups(); applyMyGroups(); closeMyGroups(sheet);
     };
     sheet.querySelector('#myg-save').onclick = () => {
-      if (selected.size === 0) return;
-      myGroups = [...selected];
+      if (selArr.length === 0) return;
+      myGroups = [...selArr];
       saveMyGroups(myGroups);
       applyMyGroups();
       closeMyGroups(sheet);
