@@ -1,5 +1,6 @@
 // api/sync-imbc.js
 // iMBC PreviewList API → Supabase music_show_lineups upsert
+const { resolveEnNames } = require('./artist-en-name');
 // 수동 호출: GET /api/sync-imbc?secret=YOUR_SECRET
 // 또는 Vercel Cron으로 매주 토요일 자동 실행 (vercel.json 참고)
 
@@ -149,18 +150,23 @@ module.exports = async function handler(req, res) {
     const episodes = await fetchAllEpisodes();
     console.log(`[sync-imbc] 총 ${episodes.length}회차 수집`);
 
+    // 한국어 아티스트명 → 공식 영문명 변환
+    const allArtists = [...new Set(episodes.flatMap(ep => parseArtists(ep.ContentTitle || '')))];
+    const enNameMap = await resolveEnNames(allArtists);
+
     const rows = episodes.map(ep => {
       const artists = parseArtists(ep.ContentTitle);
       const groupIds = mapToGroupIds(artists);
+      const enArtists = artists.map(a => enNameMap[a] || a);
       return {
         show_name:      'music_core',
         episode_number: ep.ContentNumber || null,
-        broad_date:     ep.BroadDate,          // "YYYY-MM-DD"
+        broad_date:     ep.BroadDate,
         groups:         groupIds,
-        raw_title:      ep.ContentTitle || '',
+        raw_title:      enArtists.join(' · '),
         source:         'imbc_api',
       };
-    }).filter(r => r.broad_date); // 날짜 없는 항목 제외
+    }).filter(r => r.broad_date);
 
     // 50개씩 나눠서 upsert (Supabase 요청 크기 제한 대비)
     const CHUNK = 50;

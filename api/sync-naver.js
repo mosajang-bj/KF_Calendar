@@ -2,6 +2,8 @@
 // 뮤직뱅크(금) + 쇼챔피언(수) — Naver 회차정보 탭 크롤링 → Supabase upsert
 // Vercel Cron: 0 0 * * * (매일 09:00 KST)
 
+const { resolveEnNames } = require('./artist-en-name');
+
 const SUPA_URL         = 'https://kzffotlfdtubkbxsjqiv.supabase.co';
 const SUPA_SERVICE_KEY = process.env.SUPA_SERVICE_KEY;
 const SYNC_SECRET      = process.env.SYNC_SECRET || '';
@@ -251,14 +253,21 @@ module.exports = async function handler(req, res) {
         continue;
       }
 
-      const dataRows = episodes.map(ep => ({
-        show_name: show.show_name,
-        broad_date: ep.date,
-        groups: mapArtists(ep.performers),
-        raw_title: `${show.label} - ${ep.performers.join(', ')}`,
-        episode_number: ep.no || null,
-        source: 'naver',
-      }));
+      // 한국어 performer명 → 공식 영문명 변환
+      const allPerformers = [...new Set(episodes.flatMap(ep => ep.performers))];
+      const enNameMap = await resolveEnNames(allPerformers);
+
+      const dataRows = episodes.map(ep => {
+        const enPerformers = ep.performers.map(p => enNameMap[p] || p);
+        return {
+          show_name: show.show_name,
+          broad_date: ep.date,
+          groups: mapArtists(ep.performers),
+          raw_title: `${show.show_name} - ${enPerformers.join(', ')}`,
+          episode_number: ep.no || null,
+          source: 'naver',
+        };
+      });
 
       const dataOk = await upsertRows(dataRows);
       log.push(`[${show.show_name}] Naver 업데이트 ${dataOk}/${dataRows.length}개`);
