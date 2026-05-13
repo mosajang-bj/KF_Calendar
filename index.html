@@ -850,6 +850,28 @@ function parseRawTitleStatic(raw) {
 }
 
 // ─────────────────────────────────────────
+//  ARTIST DISPLAY NAME (KR → Official EN)
+// ─────────────────────────────────────────
+const ARTIST_DISPLAY_NAME = {
+  // BTS & solos
+  '방탄소년단':'BTS','진':'Jin','슈가':'SUGA','지민':'Jimin','뷔':'V','정국':'Jung Kook',
+  // groups
+  '세븐틴':'SEVENTEEN','엔하이픈':'ENHYPEN','트와이스':'TWICE','블랙핑크':'BLACKPINK',
+  '슈퍼주니어':'SUPER JUNIOR','샤이니':'SHINee','에이티즈':'ATEEZ',
+  '투모로우바이투게더':'TOMORROW X TOGETHER','있지':'ITZY','플레이브':'PLAVE',
+  '아일릿':'ILLIT','이븐':'EVNNE','원어스':'ONEUS','넥스지':'NEXZ',
+  '82메이저':'82MAJOR','엔시티 위시':'NCT WISH','엔시티 드림':'NCT DREAM',
+  '엔시티 127':'NCT 127','엔시티':'NCT','츄':'CHUU','원호':'WONHO',
+  '화사':'HWASA','선미':'SUNMI','수진':'SOOJIN','청하':'CHUNG HA',
+  '이채연':'LEE CHAEYEON','휘인':'WHEEIN','박지훈':'PARK JIHOON',
+  '키노':'KINO','펜타곤':'PENTAGON','여자아이들':'(G)I-DLE','마마무':'MAMAMOO',
+  '레드벨벳':'Red Velvet','자이커스':'XIKERS',
+};
+function artistDisplayName(name) {
+  return ARTIST_DISPLAY_NAME[name] || name;
+}
+
+// ─────────────────────────────────────────
 //  SCROLL TO BOTTOM
 // ─────────────────────────────────────────
 function scrollToBottom(){
@@ -937,7 +959,7 @@ function renderBottom(){
       const chip = document.createElement('button');
       const isActive = !allGroupsSelected && selectedArtistName === artistName;
       chip.style.cssText = pillBase + `background:${isActive ? '#191919' : '#F6F6F6'};color:${isActive ? '#FFFFFF' : '#8C8C8C'};`;
-      chip.textContent = artistName;
+      chip.textContent = artistDisplayName(artistName);
       if(isActive) chip.dataset.active = 'true';
       chip.onclick = () => {
         const sy = window.scrollY;
@@ -1107,7 +1129,7 @@ async function fetchAndShowLiveGoods(artistName) {
     freshArea.style.minHeight = freshArea.offsetHeight + 'px';
     freshArea.innerHTML = '';
 
-    const displayName = allGroupsSelected ? "Today's Artists" : artistName;
+    const displayName = allGroupsSelected ? "Today's Artists" : artistDisplayName(artistName);
     const hdr = document.createElement('div');
     hdr.className = 'goods-intro';
     hdr.innerHTML = `
