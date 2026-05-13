@@ -465,18 +465,53 @@ let monthPivot = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
 
 // ── Product name KR→EN keyword map ──
 const KR_TO_EN = {
-  '공방포카':'Fan Postcard','공방 포카':'Fan Postcard','포카':'Photocard','역조공':'Fan Gift',
-  '역조공 굿즈':'Fan Gift Goods','조공':'Gift','공방':'Music Show','사녹':'Pre-recorded Show',
-  '한정판':'Limited Edition','한정':'Limited','공식':'Official','굿즈':'Goods',
-  '앨범':'Album','미개봉':'Unsealed','개봉':'Opened','직캠':'Fancam','콘서트':'Concert',
-  '팬사인회':'Fan Sign','사인회':'Sign Event','포토북':'Photobook','브로마이드':'Bromide',
+  // ── 공방 관련 ──
+  '공방포카':'Fan Postcard','공방 포카':'Fan Postcard','공방굿즈':'Fan Goods',
+  '공방 굿즈':'Fan Goods','공방':'Music Show Broadcast',
+  '역조공 굿즈':'Fan Gift Goods','역조공':'Fan Gift',
+  '조공':'Fan Gift','사녹':'Pre-recorded',
+  // ── 포토카드 ──
+  '포토카드':'Photocard','포카':'Photocard','트레이딩카드':'Trading Card',
+  '트레카':'Trading Card','미니포토':'Mini Photo','폴라로이드':'Polaroid',
+  // ── 앨범/음반 ──
+  '앨범':'Album','미개봉':'Unsealed','개봉':'Opened','음반':'Album',
+  '정규앨범':'Full Album','미니앨범':'Mini Album','싱글앨범':'Single Album',
+  '리패키지':'Repackage','스페셜앨범':'Special Album',
+  // ── 굿즈 종류 ──
+  '굿즈':'Goods','공식굿즈':'Official Goods','공식 굿즈':'Official Goods',
+  '공식':'Official','한정판':'Limited Edition','한정':'Limited',
+  '포토북':'Photobook','브로마이드':'Bromide','포스터':'Poster',
   '스티커':'Sticker','키링':'Keyring','엽서':'Postcard','피규어':'Figure',
   '뱃지':'Badge','마스코트':'Mascot','담요':'Blanket','에코백':'Eco Bag',
-  '폴라로이드':'Polaroid','미니포토':'Mini Photo','트레카':'Trading Card',
+  '슬로건':'Slogan','응원봉':'Light Stick','라이트스틱':'Light Stick',
+  '팬클럽키트':'Fan Club Kit','위버스앨범':'Weverse Album',
+  '포토세트':'Photo Set','포토팩':'Photo Pack','포토엽서':'Photo Postcard',
+  // ── 이벤트 ──
+  '팬사인회':'Fan Sign','사인회':'Fan Sign Event','팬미팅':'Fan Meeting',
+  '콘서트':'Concert','쇼케이스':'Showcase','데뷔무대':'Debut Stage',
+  '데뷔':'Debut','컴백':'Comeback','뮤직뱅크':'Music Bank',
+  '음악중심':'Show! Music Core','인기가요':'Inkigayo',
+  '엠카운트다운':'M Countdown','쇼챔피언':'Show Champion',
+  // ── 판매 관련 ──
+  '일괄판매':'Bulk Sale','일괄':'Bulk','판매':'For Sale',
+  '양도':'Transfer','나눔':'Giveaway','교환':'Trade','교환가능':'Trade OK',
+  '급처':'Urgent Sale','즉시판매':'Instant Sale',
+  '포함':'Included','미포함':'Not Included','포장':'Packaged',
+  '단품':'Single','세트':'Set','풀세트':'Full Set',
+  // ── 상태 ──
+  '새상품':'Brand New','새제품':'Brand New','중고':'Used',
+  '상급':'Excellent','최상급':'Near Mint','보관용':'Storage Only',
+  '사용감없음':'No Signs of Use','흠없음':'No Defects',
+  // ── 멤버/기타 ──
+  '직캠':'Fancam','영상':'Video','사진':'Photo','싸인':'Signed','사인':'Signed',
+  '포토카드세트':'Photocard Set','멤버별':'By Member','전멤버':'All Members',
+  '랜덤':'Random','보증':'Guaranteed',
 };
 function translateName(name){
   let result = name;
-  for(const [kr, en] of Object.entries(KR_TO_EN)){
+  // 긴 키워드를 먼저 처리해야 부분 치환 방지 (예: '공식굿즈' → '공식'+'굿즈' 분리 방지)
+  const entries = Object.entries(KR_TO_EN).sort((a,b) => b[0].length - a[0].length);
+  for(const [kr, en] of entries){
     result = result.split(kr).join(en);
   }
   return result;
