@@ -733,7 +733,7 @@ function buildWeek(area){
       cell.appendChild(dc);
     }
 
-    cell.onclick=()=>{ selectDate(ds); scrollToBottom(); };
+    cell.onclick=()=>{ selectDate(ds); };
     grid.appendChild(cell);
   }
   area.appendChild(grid);
@@ -807,7 +807,7 @@ function buildMonth(area){
       cell.appendChild(pillsEl);
     }
 
-    cell.onclick=()=>{ selectDate(ds); scrollToBottom(); };
+    cell.onclick=()=>{ selectDate(ds); };
     grid.appendChild(cell);
   });
   area.appendChild(grid);
@@ -820,13 +820,11 @@ function selectDate(ds){
   selectedDate = ds;
   selectedArtistName = null;
   const lineup = LINEUP_BY_DATE[ds];
-  if(lineup && (lineup.rawTitle || lineup.groups.length > 0)){
-    allGroupsSelected = true;
-  } else {
-    allGroupsSelected = false;
-  }
+  allGroupsSelected = !!(lineup && (lineup.rawTitle || lineup.groups.length > 0));
   buildCal();
   renderBottom();
+  // sel-hdr가 sticky 헤더 바로 아래 오도록 한 번만 스크롤
+  requestAnimationFrame(() => scrollToBottom());
 }
 
 function triggerAllGoods(ds){
@@ -925,9 +923,6 @@ function scrollToBottom(){
 // ─────────────────────────────────────────
 function renderBottom(){
   const bot=document.getElementById('bottom');
-  // 페이지 전체 높이를 미리 고정해서 innerHTML 초기화 시 스크롤 튀는 것 방지
-  const prevPageHeight = document.body.scrollHeight;
-  document.body.style.minHeight = prevPageHeight + 'px';
   bot.innerHTML='';
 
   const [y,mo,d]=selectedDate.split('-').map(Number);
@@ -983,14 +978,9 @@ function renderBottom(){
     allChip.textContent = 'All';
     if(allActive) allChip.dataset.active = 'true';
     allChip.onclick = () => {
-      const sy = window.scrollY;
       selectedArtistName = null;
       allGroupsSelected = true;
       renderBottom();
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        document.body.style.minHeight = '';
-        window.scrollTo(0, sy);
-      }));
     };
     strip.appendChild(allChip);
 
@@ -1003,15 +993,10 @@ function renderBottom(){
       chip.textContent = artistDisplayName(artistName);
       if(isActive) chip.dataset.active = 'true';
       chip.onclick = () => {
-        const sy = window.scrollY;
         const toggling = !allGroupsSelected && selectedArtistName === artistName;
         selectedArtistName = toggling ? null : artistName;
         allGroupsSelected = false;
         renderBottom();
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          document.body.style.minHeight = '';
-          window.scrollTo(0, sy);
-        }));
       };
       strip.appendChild(chip);
     });
@@ -1067,7 +1052,6 @@ function renderBottom(){
 async function fetchAllGroupGoods(artists) {
   const area = document.getElementById('live-goods-area');
   if(!area) return;
-  const savedScroll = window.scrollY;
 
   try {
     const results = await Promise.all(
@@ -1094,7 +1078,6 @@ async function fetchAllGroupGoods(artists) {
     }
     items.sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
 
-    freshArea.style.minHeight = freshArea.offsetHeight + 'px';
     freshArea.innerHTML = '';
 
     const hdr = document.createElement('div');
@@ -1141,8 +1124,6 @@ async function fetchAllGroupGoods(artists) {
       grid.appendChild(card);
     });
     freshArea.appendChild(grid);
-    freshArea.style.minHeight = '';
-    window.scrollTo(0, savedScroll);
 
   } catch(err) {
     const a = document.getElementById('live-goods-area');
@@ -1153,7 +1134,6 @@ async function fetchAllGroupGoods(artists) {
 async function fetchAndShowLiveGoods(artistName) {
   const area = document.getElementById('live-goods-area');
   if(!area) return;
-  const savedScroll = window.scrollY;
 
   try {
     const res = await fetch(`/api/goods?artist=${encodeURIComponent(artistName)}&n=60`);
@@ -1164,7 +1144,6 @@ async function fetchAndShowLiveGoods(artistName) {
     const freshArea = document.getElementById('live-goods-area');
     if(!freshArea) return;
 
-    freshArea.style.minHeight = freshArea.offsetHeight + 'px';
     freshArea.innerHTML = '';
 
     const displayName = allGroupsSelected ? "Today's Artists" : artistDisplayName(artistName);
@@ -1217,8 +1196,6 @@ async function fetchAndShowLiveGoods(artistName) {
       grid.appendChild(card);
     });
     freshArea.appendChild(grid);
-    freshArea.style.minHeight = '';
-    window.scrollTo(0, savedScroll);
 
   } catch(err) {
     const area2 = document.getElementById('live-goods-area');
