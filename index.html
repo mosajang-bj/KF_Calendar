@@ -1007,6 +1007,7 @@ function renderBottom(){
 async function fetchAllGroupGoods(artists) {
   const area = document.getElementById('live-goods-area');
   if(!area) return;
+  const savedScroll = window.scrollY;
 
   try {
     const results = await Promise.all(
@@ -1033,6 +1034,7 @@ async function fetchAllGroupGoods(artists) {
     }
     items.sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
 
+    freshArea.style.minHeight = freshArea.offsetHeight + 'px';
     freshArea.innerHTML = '';
 
     const hdr = document.createElement('div');
@@ -1079,6 +1081,8 @@ async function fetchAllGroupGoods(artists) {
       grid.appendChild(card);
     });
     freshArea.appendChild(grid);
+    freshArea.style.minHeight = '';
+    window.scrollTo(0, savedScroll);
 
   } catch(err) {
     const a = document.getElementById('live-goods-area');
@@ -1089,6 +1093,7 @@ async function fetchAllGroupGoods(artists) {
 async function fetchAndShowLiveGoods(artistName) {
   const area = document.getElementById('live-goods-area');
   if(!area) return;
+  const savedScroll = window.scrollY;
 
   try {
     const res = await fetch(`/api/goods?artist=${encodeURIComponent(artistName)}&n=60`);
@@ -1099,6 +1104,7 @@ async function fetchAndShowLiveGoods(artistName) {
     const freshArea = document.getElementById('live-goods-area');
     if(!freshArea) return;
 
+    freshArea.style.minHeight = freshArea.offsetHeight + 'px';
     freshArea.innerHTML = '';
 
     const displayName = allGroupsSelected ? "Today's Artists" : artistName;
@@ -1151,6 +1157,8 @@ async function fetchAndShowLiveGoods(artistName) {
       grid.appendChild(card);
     });
     freshArea.appendChild(grid);
+    freshArea.style.minHeight = '';
+    window.scrollTo(0, savedScroll);
 
   } catch(err) {
     const area2 = document.getElementById('live-goods-area');
