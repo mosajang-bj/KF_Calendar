@@ -875,8 +875,14 @@ function artistDisplayName(name) {
 //  SCROLL TO BOTTOM
 // ─────────────────────────────────────────
 function scrollToBottom(){
-  const bot=document.getElementById('bottom');
-  if(bot) bot.scrollIntoView({behavior:'smooth',block:'start'});
+  const target=document.getElementById('bottom')?.querySelector('.sel-hdr')
+               ||document.getElementById('bottom');
+  if(!target) return;
+  // .hdr(56px) + .view-bar(52px) sticky 높이 제외, 8px 여백
+  const stickyH = (document.querySelector('.hdr')?.offsetHeight||56)
+                + (document.querySelector('.view-bar')?.offsetHeight||52);
+  const top = target.getBoundingClientRect().top + window.scrollY - stickyH - 8;
+  window.scrollTo({top, behavior:'smooth'});
 }
 
 // ─────────────────────────────────────────
