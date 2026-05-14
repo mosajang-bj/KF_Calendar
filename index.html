@@ -46,7 +46,7 @@ body{
   letter-spacing:0;
   color:var(--txt1);
   display:flex;flex-direction:column;
-  width:100%;max-width:480px;
+  width:100%;max-width:600px;
   min-height:100%;
   background:#F6F6F6;
   position:relative;
@@ -418,7 +418,7 @@ body{
 }
 .myg-sheet{
   position:relative;z-index:1;
-  width:100%;max-width:480px;
+  width:100%;max-width:600px;
   background:#fff;
   border-radius:20px 20px 0 0;
   padding:0 0 env(safe-area-inset-bottom,0);
@@ -488,8 +488,8 @@ body{
 .fb-btn{
   position:fixed;
   bottom:20px;
-  /* max-width:480px 앱 우측 모서리에서 16px */
-  right:max(16px, calc((100vw - 480px) / 2 + 16px));
+  /* max-width:600px 앱 우측 모서리에서 16px */
+  right:max(16px, calc((100vw - 600px) / 2 + 16px));
   z-index:8000;
   background:#FFFFFF;border:1px solid var(--border);
   border-radius:8px;padding:8px 14px;
@@ -1878,7 +1878,7 @@ function openFeedbackModal() {
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9998;display:flex;align-items:flex-end;justify-content:center;padding:0';
   overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
   overlay.innerHTML = `
-    <div style="background:#FFFFFF;border-radius:var(--r) var(--r) 0 0;padding:24px;width:100%;max-width:480px;
+    <div style="background:#FFFFFF;border-radius:var(--r) var(--r) 0 0;padding:24px;width:100%;max-width:600px;
                 box-shadow:0 -4px 24px rgba(0,0,0,0.12);color:var(--txt1);">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <div style="font-size:15px;font-weight:700;letter-spacing:0">Share your feedback</div>
