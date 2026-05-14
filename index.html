@@ -180,12 +180,8 @@ body{
   font-size:14px;font-weight:600;color:var(--txt1);letter-spacing:0;
 }
 .wday.today .wday-num{
-  background:transparent;color:var(--txt1);font-weight:700;
-}
-.wday.today::after{
-  content:'';position:absolute;bottom:5px;
-  width:4px;height:4px;border-radius:50%;
-  background:var(--accent);
+  background:#191919;color:#fff;font-weight:700;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
 }
 .wday.sun .wday-num{color:#E57373}
 .wday.sat .wday-num{color:#5C9EE8}
@@ -226,17 +222,12 @@ body{
   margin-bottom:3px;color:var(--txt1);
 }
 .mday.today .mday-num{
-  background:transparent;color:var(--txt1);font-weight:700;
-}
-.mday.today .mday-num::after{
-  content:'';display:block;
-  width:3px;height:3px;border-radius:50%;
-  background:var(--accent);
-  position:absolute;bottom:1px;left:50%;transform:translateX(-50%);
+  background:#191919;color:#fff;font-weight:700;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
 }
 .mday.sun .mday-num{color:#E57373}
 .mday.sat .mday-num{color:#5C9EE8}
-.mday.today.sun .mday-num,.mday.today.sat .mday-num{color:var(--txt1)}
+.mday.today.sun .mday-num,.mday.today.sat .mday-num{color:#fff}
 .mday-dots{display:flex;flex-wrap:wrap;gap:2px;padding:0 1px}
 .mdot{width:4px;height:4px;border-radius:50%}
 .mday-evts{display:flex;flex-direction:column;gap:2px;margin-top:2px;overflow:hidden}
@@ -346,7 +337,7 @@ body{
 
 /* goods intro section */
 .goods-intro{
-  padding:12px 20px 16px;
+  padding:0 20px 16px;
 }
 .goods-intro-eyebrow{display:none}
 .goods-intro-title-row{
@@ -1245,7 +1236,7 @@ function renderBottom(){
   if(selectedArtistName || allGroupsSelected){
     const liveGoodsArea = document.createElement('div');
     liveGoodsArea.id = 'live-goods-area';
-    liveGoodsArea.style.cssText = 'padding:20px 0;text-align:center;color:var(--txt2);font-size:13px;background:#FFFFFF';
+    liveGoodsArea.style.cssText = 'padding:12px 0 0;text-align:center;color:var(--txt2);font-size:13px;background:#FFFFFF';
     const label = selectedArtistName || 'All';
     liveGoodsArea.innerHTML = `<div style="display:inline-block;width:20px;height:20px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px"></div>Searching ${escHtml(label)} listings…`;
     bot.appendChild(liveGoodsArea);
