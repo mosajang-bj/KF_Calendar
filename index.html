@@ -225,23 +225,25 @@ body{
 }
 .bottom::-webkit-scrollbar{display:none}
 
-/* chip-only sticky strip */
-.chip-sticky{
-  position:fixed;
+/* chip bar — .app 직속 자식이므로 sticky 안정 동작 */
+#chipBar{
+  position:sticky;
   top:108px;
-  left:0;right:0;
-  margin:0 auto;
-  width:100%;
-  max-width:600px;
   z-index:20;
   background:#FFFFFF;
+}
+#chipBar:not(:empty){
   border-bottom:1px solid var(--border);
 }
-.chip-placeholder{
-  /* matches chip-sticky height so content doesn't jump under it */
-  height:44px;
-  flex-shrink:0;
+/* inner scroll strip */
+.chip-strip{
+  padding:8px 16px;
+  display:flex;gap:8px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
 }
+.chip-strip::-webkit-scrollbar{display:none}
 
 /* selected date header */
 .sel-hdr{
@@ -538,6 +540,9 @@ body{
 
 <!-- CALENDAR AREA -->
 <div class="cal-area" id="calArea"></div>
+
+<!-- CHIP BAR: .app 직속 → sticky 안정 동작 -->
+<div id="chipBar"></div>
 
 <!-- BOTTOM: Events + Goods -->
 <div class="bottom" id="bottom">
@@ -1121,13 +1126,12 @@ function renderBottom(){
   // date header는 일반 flow
   bot.appendChild(hdr);
 
-  // ── Group chips (sticky, .bottom 안) ──
+  // ── Group chips (#chipBar에 렌더 → .app 직속 sticky) ──
+  const chipBar = document.getElementById('chipBar');
+  chipBar.innerHTML = '';
   if(lineup && chipCount > 0){
-    const stickyWrap = document.createElement('div');
-    stickyWrap.className = 'chip-sticky';
-
     const strip = document.createElement('div');
-    strip.style.cssText = 'padding:8px 16px 8px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;';
+    strip.className = 'chip-strip';
 
     const pillBase = 'display:inline-flex;align-items:center;flex-shrink:0;height:32px;padding:0 16px;border-radius:9999px;font-size:13px;font-weight:700;letter-spacing:0;cursor:pointer;user-select:none;transition:all .15s;-webkit-tap-highlight-color:transparent;border:none;outline:none;';
 
@@ -1189,13 +1193,7 @@ function renderBottom(){
       }
     });
 
-    stickyWrap.appendChild(strip);
-    bot.appendChild(stickyWrap);
-
-    // fixed 포지셔닝으로 flow에서 빠지므로 동일 높이 spacer 삽입
-    const chipPlaceholder = document.createElement('div');
-    chipPlaceholder.className = 'chip-placeholder';
-    bot.appendChild(chipPlaceholder);
+    chipBar.appendChild(strip);
 
     requestAnimationFrame(() => {
       const activeChip = strip.querySelector('[data-active="true"]');
