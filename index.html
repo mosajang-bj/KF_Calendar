@@ -34,10 +34,9 @@
   --r-xs:      8px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
+html,body{height:auto;min-height:100%}
 body{
   background:#E8E8E8;
-  display:flex;justify-content:center;
   -webkit-font-smoothing:antialiased;
 }
 .app{
@@ -47,7 +46,8 @@ body{
   color:var(--txt1);
   display:flex;flex-direction:column;
   width:100%;max-width:600px;
-  min-height:100%;
+  min-height:100vh;
+  margin:0 auto;
   background:#F6F6F6;
   position:relative;
   overflow-x:clip;
