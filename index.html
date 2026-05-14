@@ -325,6 +325,31 @@ body{
   margin-bottom:2px;
 }
 
+/* Skeleton loading */
+.skel-base{
+  background:linear-gradient(90deg,#F2F2F2 25%,#E8E8E8 50%,#F2F2F2 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.4s ease-in-out infinite;
+  border-radius:4px;
+}
+.skel-card{ cursor:default; }
+.skel-img{
+  aspect-ratio:1;border-radius:8px;overflow:hidden;
+  background:linear-gradient(90deg,#F2F2F2 25%,#E8E8E8 50%,#F2F2F2 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.4s ease-in-out infinite;
+}
+.skel-body{ padding:8px 0 0; }
+.skel-price{
+  height:14px;width:52%;margin-bottom:6px;
+}
+.skel-name1{
+  height:13px;width:100%;margin-bottom:4px;
+}
+.skel-name2{
+  height:13px;width:68%;
+}
+
 .goods-empty{
   padding:24px 20px;font-size:13px;color:var(--txt2);text-align:center;letter-spacing:0;
 }
@@ -380,6 +405,10 @@ body{
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{
+  0%{background-position:200% 0}
+  100%{background-position:-200% 0}
+}
 
 /* ════════════════════════════════════════
    MY GROUPS
@@ -1228,7 +1257,15 @@ function renderBottom(){
     liveGoodsArea.id = 'live-goods-area';
     liveGoodsArea.style.cssText = 'padding:20px 0 0;text-align:center;color:var(--txt2);font-size:13px;background:#FFFFFF';
     const label = selectedArtistName || 'All';
-    liveGoodsArea.innerHTML = `<div style="padding:40px 0;display:flex;justify-content:center;"><div style="width:20px;height:20px;border:2px solid #E0E0E0;border-top-color:#191919;border-radius:50%;animation:spin .7s linear infinite;"></div></div>`;
+    liveGoodsArea.innerHTML = `<div class="goods-grid">${Array.from({length:6}).map(()=>`
+      <div class="skel-card">
+        <div class="skel-img"></div>
+        <div class="skel-body">
+          <div class="skel-base skel-price"></div>
+          <div class="skel-base skel-name1"></div>
+          <div class="skel-base skel-name2"></div>
+        </div>
+      </div>`).join('')}</div>`;
     bot.appendChild(liveGoodsArea);
 
     // DOM에 붙인 직후 즉시 fetch
