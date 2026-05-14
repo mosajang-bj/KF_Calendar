@@ -1214,7 +1214,8 @@ function renderBottom(){
     } else if(allGroupsSelected && lineup){
       const ra = parseRawTitleStatic(lineup.rawTitle);
       const artists = ra.length > 0 ? ra : lineup.groups;
-      fetchAllGroupGoods(artists);
+      const showLabel = show ? show.short : null;
+      fetchAllGroupGoods(artists, showLabel);
     }
   } else if(lineup){
     const prompt = document.createElement('div');
@@ -1233,7 +1234,7 @@ function renderBottom(){
 //  LIVE GOODS: 번장 실시간 검색
 // ─────────────────────────────────────────
 // 전체 탭: 여러 그룹을 각각 검색해서 합치기
-async function fetchAllGroupGoods(artists) {
+async function fetchAllGroupGoods(artists, showName) {
   const area = document.getElementById('live-goods-area');
   if(!area) return;
 
@@ -1268,7 +1269,7 @@ async function fetchAllGroupGoods(artists) {
     hdr.className = 'goods-intro';
     hdr.innerHTML = `
       <div class="goods-intro-title-row">
-        <div class="goods-intro-title">Fan goods from<br>K-pop music shows</div>
+        <div class="goods-intro-title">Fan goods from<br>${showName ? escHtml(showName) : 'K-pop music shows'}</div>
       </div>
       <div class="goods-intro-footer">
         <div class="goods-intro-sub">${items.length > 0 ? `${items.length} listings · Latest` : 'No listings found'}</div>
