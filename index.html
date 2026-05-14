@@ -1793,42 +1793,85 @@ updateMyGroupsBtn();
 // ─────────────────────────────────────────
 function openFeedbackModal() {
   if(document.getElementById('fb-modal')) return;
+  _fbRating = 0;
+
   const overlay = document.createElement('div');
   overlay.id = 'fb-modal';
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9998;display:flex;align-items:flex-end;justify-content:center;padding:0';
-  overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
-  overlay.innerHTML = `
-    <div style="background:#FFFFFF;border-radius:var(--r) var(--r) 0 0;padding:24px;width:100%;max-width:600px;
-                box-shadow:0 -4px 24px rgba(0,0,0,0.12);color:var(--txt1);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <div style="font-size:15px;font-weight:700;letter-spacing:0">Share your feedback</div>
-        <div onclick="document.getElementById('fb-modal').remove()" style="cursor:pointer;font-size:20px;color:var(--txt2);line-height:1">×</div>
+  overlay.className = 'myg-overlay';
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'myg-backdrop';
+  backdrop.onclick = () => closeFeedbackModal();
+  overlay.appendChild(backdrop);
+
+  const sheet = document.createElement('div');
+  sheet.className = 'myg-sheet';
+  sheet.style.cssText = 'padding-bottom:env(safe-area-inset-bottom,24px);';
+  sheet.innerHTML = `
+    <div style="display:flex;justify-content:center;padding:12px 0 4px">
+      <div style="width:36px;height:4px;border-radius:2px;background:#E0E0E0"></div>
+    </div>
+    <div style="padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:17px;font-weight:700;letter-spacing:0;color:var(--txt1)">Share Feedback</div>
+      <button onclick="closeFeedbackModal()" style="width:32px;height:32px;border-radius:50%;border:none;background:#F2F2F2;color:var(--txt2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">×</button>
+    </div>
+
+    <div style="padding:20px 20px 0">
+      <div style="font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:10px;letter-spacing:0">How would you rate this?</div>
+      <div id="fb-stars" style="display:flex;gap:4px">
+        ${[1,2,3,4,5].map(n=>`
+          <button data-s="${n}" onclick="setRating(${n})" style="
+            flex:1;height:44px;border-radius:10px;border:1.5px solid #E8E8E8;
+            background:#FAFAFA;font-size:22px;cursor:pointer;
+            transition:all .15s;display:flex;align-items:center;justify-content:center;
+          ">★</button>
+        `).join('')}
       </div>
-      <div style="margin-bottom:14px">
-        <div style="font-size:12px;color:var(--txt2);margin-bottom:8px">How would you rate this app?</div>
-        <div id="fb-stars" style="display:flex;gap:8px;font-size:28px;cursor:pointer">
-          ${[1,2,3,4,5].map(n=>`<span data-s="${n}" onclick="setRating(${n})" style="opacity:0.3;transition:opacity .15s">★</span>`).join('')}
-        </div>
-      </div>
-      <textarea id="fb-text" placeholder="Any thoughts? Feature requests, bugs, anything…"
-        style="width:100%;min-height:100px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border2);
-               border-radius:var(--r-sm);color:var(--txt1);font-size:14px;resize:vertical;outline:none;
-               font-family:inherit;box-sizing:border-box"></textarea>
-      <button onclick="submitFeedback()" style="margin-top:12px;width:100%;background:var(--accent);color:#fff;
-              border:none;border-radius:var(--r-sm);padding:12px;font-size:14px;font-weight:700;cursor:pointer">
-        Submit Feedback
+    </div>
+
+    <div style="padding:16px 20px 0">
+      <div style="font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:8px;letter-spacing:0">Any thoughts?</div>
+      <textarea id="fb-text" placeholder="Feature requests, bugs, anything…"
+        style="width:100%;min-height:96px;padding:12px;
+               background:#F6F6F6;border:1.5px solid transparent;border-radius:10px;
+               color:var(--txt1);font-size:14px;letter-spacing:0;line-height:1.5;
+               resize:none;outline:none;font-family:inherit;box-sizing:border-box;
+               transition:border-color .15s;"
+        onfocus="this.style.borderColor='var(--txt1)'"
+        onblur="this.style.borderColor='transparent'"></textarea>
+    </div>
+
+    <div style="padding:16px 20px 8px">
+      <button onclick="submitFeedback()" style="
+        width:100%;height:48px;background:var(--accent);color:#fff;
+        border:none;border-radius:10px;font-size:15px;font-weight:700;
+        letter-spacing:0;cursor:pointer;transition:background .15s;
+      " onmouseover="this.style.background='var(--accent-l)'" onmouseout="this.style.background='var(--accent)'">
+        Submit
       </button>
-      <div id="fb-msg" style="margin-top:8px;font-size:12px;text-align:center;color:var(--txt2);min-height:16px"></div>
+      <div id="fb-msg" style="margin-top:10px;font-size:12px;text-align:center;color:var(--txt2);min-height:16px;letter-spacing:0"></div>
     </div>
   `;
+  overlay.appendChild(sheet);
   document.body.appendChild(overlay);
+}
+
+function closeFeedbackModal() {
+  const overlay = document.getElementById('fb-modal');
+  if(!overlay) return;
+  const sheet = overlay.querySelector('.myg-sheet');
+  if(sheet){ sheet.style.animation='sheetDown .24s cubic-bezier(.32,1,.36,1) forwards'; }
+  setTimeout(()=>overlay.remove(), 240);
 }
 
 let _fbRating = 0;
 function setRating(n) {
   _fbRating = n;
-  document.querySelectorAll('#fb-stars span').forEach(s => {
-    s.style.opacity = Number(s.dataset.s) <= n ? '1' : '0.3';
+  document.querySelectorAll('#fb-stars button').forEach(s => {
+    const active = Number(s.dataset.s) <= n;
+    s.style.background   = active ? '#191919' : '#FAFAFA';
+    s.style.color        = active ? '#FFFFFF' : 'var(--txt1)';
+    s.style.borderColor  = active ? '#191919' : '#E8E8E8';
   });
 }
 
