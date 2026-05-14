@@ -1337,8 +1337,8 @@ async function fetchAllGroupGoods(artists, showName) {
           ${imgHtml}
         </div>
         <div class="gcard-body">
-          <div class="gcard-name">${escHtml(itemName)}</div>
           <div class="gcard-price">₩${item.price.toLocaleString()}</div>
+          <div class="gcard-name">${escHtml(itemName)}</div>
         </div>
       `;
       card.onclick = () => window.open(productUrl, '_blank');
@@ -1409,8 +1409,8 @@ async function fetchAndShowLiveGoods(artistName) {
           ${imgHtml}
         </div>
         <div class="gcard-body">
-          <div class="gcard-name">${escHtml(itemName)}</div>
           <div class="gcard-price">₩${item.price.toLocaleString()}</div>
+          <div class="gcard-name">${escHtml(itemName)}</div>
         </div>
       `;
       card.onclick = () => window.open(productUrl, '_blank');
