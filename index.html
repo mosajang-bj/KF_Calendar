@@ -1775,7 +1775,13 @@ function openSubmitModal() {
       </div>
       <div style="display:flex;flex-direction:column;gap:12px;">
         <input id="sf-name" placeholder="Event name" style="${inputStyle()}">
-        <input id="sf-date" type="date" style="${inputStyle()}">
+        <div style="position:relative;">
+          <input id="sf-date" type="date" lang="en" style="${inputStyle()}padding-left:12px;">
+          <span id="sf-date-placeholder" style="
+            position:absolute;left:12px;top:50%;transform:translateY(-50%);
+            font-size:14px;color:var(--txt3);pointer-events:none;font-family:inherit;
+          ">📅 Date (YYYY-MM-DD)</span>
+        </div>
         <input id="sf-nick" placeholder="Your nickname (optional)" style="${inputStyle()}">
         <input id="sf-url" placeholder="Source URL (official notice, article…)" style="${inputStyle()}">
         <button onclick="submitEvent()" style="
@@ -1787,6 +1793,13 @@ function openSubmitModal() {
     </div>
   `;
   document.body.appendChild(overlay);
+
+  // date placeholder 토글
+  const sfDate = document.getElementById('sf-date');
+  const sfPh = document.getElementById('sf-date-placeholder');
+  const togglePh = () => { sfPh.style.display = sfDate.value ? 'none' : ''; };
+  sfDate.addEventListener('change', togglePh);
+  sfDate.addEventListener('input', togglePh);
 }
 
 function inputStyle() {
