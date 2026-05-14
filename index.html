@@ -225,6 +225,11 @@ body{
 }
 .bottom::-webkit-scrollbar{display:none}
 
+/* date header — .app 직속, 스크롤과 함께 올라감 */
+#dateHeader{
+  background:#FFFFFF;
+}
+
 /* chip bar — .app 직속 자식이므로 sticky 안정 동작 */
 #chipBar{
   position:sticky;
@@ -541,10 +546,13 @@ body{
 <!-- CALENDAR AREA -->
 <div class="cal-area" id="calArea"></div>
 
-<!-- CHIP BAR: .app 직속 → sticky 안정 동작 -->
+<!-- DATE HEADER: .app 직속 (스크롤과 함께 올라감) -->
+<div id="dateHeader"></div>
+
+<!-- CHIP BAR: .app 직속 → sticky top:108px 안정 동작 -->
 <div id="chipBar"></div>
 
-<!-- BOTTOM: Events + Goods -->
+<!-- BOTTOM: goods content only -->
 <div class="bottom" id="bottom">
   <!-- rendered by JS -->
 </div>
@@ -1074,12 +1082,10 @@ async function sortedArtists(artists) {
 //  SCROLL TO BOTTOM
 // ─────────────────────────────────────────
 function scrollToBottom(){
-  const target=document.getElementById('bottom')?.querySelector('.sel-hdr')
-               ||document.getElementById('bottom');
+  const target=document.getElementById('dateHeader')||document.getElementById('bottom');
   if(!target) return;
-  // .hdr-wrap sticky 높이 제외, 8px 여백
-  const stickyH = document.querySelector('.hdr-wrap')?.offsetHeight || 100;
-  const top = target.getBoundingClientRect().top + window.scrollY - stickyH - 8;
+  const stickyH = 108 + 8; // GNB 56 + view-bar 52 + 8px margin
+  const top = target.getBoundingClientRect().top + window.scrollY - stickyH;
   window.scrollTo({top, behavior:'smooth'});
 }
 
@@ -1090,6 +1096,12 @@ function renderBottom(){
   const bot=document.getElementById('bottom');
   bot.innerHTML='';
 
+  // dateHeader, chipBar도 초기화
+  const dateHeader = document.getElementById('dateHeader');
+  dateHeader.innerHTML='';
+  const chipBar = document.getElementById('chipBar');
+  chipBar.innerHTML='';
+
   const [y,mo,d]=selectedDate.split('-').map(Number);
   const dateObj=new Date(y,mo-1,d);
   const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -1098,10 +1110,9 @@ function renderBottom(){
   const show   = lineup ? (SHOW_LABELS[lineup.showName] || { name: lineup.showName, color:'#9B6FD8', short: lineup.showName }) : null;
 
   const rawArtists = lineup ? parseRawTitleStatic(lineup.rawTitle) : [];
-  // 실제 칩으로 표시되는 수: rawArtists가 있으면 그 수, 없으면 groups 수
   const chipCount = rawArtists.length > 0 ? rawArtists.length : (lineup ? lineup.groups.length : 0);
 
-  // ── Date header ──
+  // ── Date header → #dateHeader (.app 직속, 스크롤과 함께 올라감) ──
   const hdr = document.createElement('div');
   hdr.className = 'sel-hdr';
   if(lineup && show){
@@ -1123,12 +1134,9 @@ function renderBottom(){
       </div>
     `;
   }
-  // date header는 일반 flow
-  bot.appendChild(hdr);
+  dateHeader.appendChild(hdr);
 
-  // ── Group chips (#chipBar에 렌더 → .app 직속 sticky) ──
-  const chipBar = document.getElementById('chipBar');
-  chipBar.innerHTML = '';
+  // ── Group chips → #chipBar (.app 직속 sticky) ──
   if(lineup && chipCount > 0){
     const strip = document.createElement('div');
     strip.className = 'chip-strip';
