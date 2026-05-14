@@ -48,3 +48,25 @@ create policy "public read"
 create policy "service write"
   on public.music_show_lineups for all
   using (auth.role() = 'service_role');
+
+-- ─────────────────────────────────────────
+--  artist_name_map 테이블
+--  한국어 아티스트명 → 공식 영문명 캐시
+-- ─────────────────────────────────────────
+create table if not exists public.artist_name_map (
+  kr_name   text primary key,   -- 한국어 원본명 (예: '가비엔제이')
+  en_name   text not null,      -- 공식 영문명 (예: 'Gavy NJ')
+  verified  boolean default false, -- 수동 검증 여부
+  created_at timestamptz default now()
+);
+
+-- service_role 쓰기 허용
+alter table public.artist_name_map enable row level security;
+
+create policy "public read artist_name_map"
+  on public.artist_name_map for select
+  using (true);
+
+create policy "service write artist_name_map"
+  on public.artist_name_map for all
+  using (auth.role() = 'service_role');

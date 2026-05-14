@@ -11,7 +11,7 @@
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Bunjang Global — K-pop 공방 캘린더</title>
+<title>Bunjang Global — K-pop Music Show Calendar</title>
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
 /* ════════════════════════════════════════
@@ -51,6 +51,7 @@ body{
   background:#F6F6F6;
   position:relative;
   overflow-x:clip;
+  overscroll-behavior:contain;
 }
 
 /* ════════════════════════════════════════
@@ -236,12 +237,16 @@ body{
   position:sticky;top:108px;z-index:20;
   background:#FFFFFF;
   border-bottom:1px solid var(--border);
+  -webkit-transform:translateZ(0);
+  transform:translateZ(0);
 }
 
 /* selected date header */
 .sel-hdr{
   display:flex;align-items:center;justify-content:space-between;
   padding:16px 16px 12px;
+  background:#FFFFFF;
+  position:relative;z-index:10;
 }
 .sel-date{font-size:16px;font-weight:700;color:var(--txt1);letter-spacing:0}
 .sel-sub{font-size:12px;color:var(--txt2);margin-top:3px;letter-spacing:0;display:flex;align-items:center;gap:6px}
@@ -366,9 +371,110 @@ body{
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* feedback btn */
+/* ════════════════════════════════════════
+   MY GROUPS
+════════════════════════════════════════ */
+.myg-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:9999px;border:none;
+  background:#F6F6F6;color:var(--txt1);cursor:pointer;
+  transition:background .15s;position:relative;flex-shrink:0;
+}
+.myg-btn:hover{background:#EBEBEB}
+.myg-btn.active{background:var(--accent);color:#fff}
+.myg-dot{
+  position:absolute;top:5px;right:5px;
+  width:6px;height:6px;border-radius:50%;
+  background:var(--accent);border:1.5px solid #fff;
+  pointer-events:none;
+}
+/* 팝업 오버레이 */
+.myg-overlay{
+  position:fixed;inset:0;z-index:9990;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding:0;
+}
+.myg-backdrop{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,0.45);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+}
+.myg-sheet{
+  position:relative;z-index:1;
+  width:100%;max-width:480px;
+  background:#fff;
+  border-radius:20px 20px 0 0;
+  padding:0 0 env(safe-area-inset-bottom,0);
+  box-shadow:0 -4px 40px rgba(0,0,0,0.18);
+  transform:translateY(100%);
+  animation:sheetUp .32s cubic-bezier(.32,1,.36,1) forwards;
+}
+@keyframes sheetUp{to{transform:translateY(0)}}
+@keyframes sheetDown{from{transform:translateY(0)}to{transform:translateY(100%)}}
+.myg-handle{
+  width:36px;height:4px;border-radius:2px;
+  background:rgba(25,25,25,0.12);
+  margin:12px auto 0;
+}
+.myg-head{
+  padding:16px 20px 0;
+  display:flex;align-items:flex-start;justify-content:space-between;
+}
+.myg-title{font-size:18px;font-weight:800;letter-spacing:-0.2px;line-height:1.25}
+.myg-sub{font-size:13px;color:var(--txt2);margin-top:4px}
+.myg-close{
+  width:30px;height:30px;border-radius:50%;border:none;
+  background:#F6F6F6;color:var(--txt2);font-size:18px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:2px;
+}
+.myg-list{
+  display:flex;flex-wrap:wrap;gap:8px;
+  padding:16px 20px 20px;max-height:52vh;overflow-y:auto;
+}
+.myg-chip{
+  display:inline-flex;align-items:center;height:34px;
+  padding:0 14px;border-radius:9999px;font-size:13px;font-weight:700;
+  border:1.5px solid var(--border2);background:#fff;color:var(--txt2);
+  cursor:pointer;transition:all .15s;user-select:none;white-space:nowrap;
+}
+.myg-chip.sel{
+  background:#191919;color:#fff;border-color:#191919;
+}
+.myg-chip.disabled{opacity:0.35;pointer-events:none}
+.myg-footer{
+  padding:12px 20px 20px;display:flex;gap:10px;
+  border-top:1px solid var(--border);
+}
+.myg-skip{
+  flex:1;height:46px;border-radius:10px;border:1.5px solid var(--border2);
+  background:#fff;color:var(--txt2);font-size:14px;font-weight:700;cursor:pointer;
+  transition:background .15s;
+}
+.myg-skip:hover{background:#F6F6F6}
+.myg-save{
+  flex:2;height:46px;border-radius:10px;border:none;
+  background:var(--accent);color:#fff;font-size:14px;font-weight:700;cursor:pointer;
+  transition:opacity .15s;
+}
+.myg-save:hover{opacity:.88}
+.myg-save:disabled{opacity:.4;cursor:default}
+/* 빨려드는 애니메이션 */
+@keyframes suckedIn{
+  0%{opacity:1;transform:scale(1)}
+  60%{opacity:0.7;transform:scale(0.4)}
+  100%{opacity:0;transform:scale(0.05)}
+}
+.myg-sucking{animation:suckedIn .38s cubic-bezier(.4,0,1,1) forwards}
+
+/* feedback btn — app 컨테이너 안에 위치 */
 .fb-btn{
-  position:fixed;bottom:20px;right:16px;z-index:8000;
+  position:fixed;
+  bottom:20px;
+  /* max-width:480px 앱 우측 모서리에서 16px */
+  right:max(16px, calc((100vw - 480px) / 2 + 16px));
+  z-index:8000;
   background:#FFFFFF;border:1px solid var(--border);
   border-radius:8px;padding:8px 14px;
   font-size:12px;font-weight:600;color:var(--txt2);letter-spacing:0;
@@ -398,6 +504,11 @@ body{
     </svg>
   </div>
   <div class="hdr-r">
+    <button id="myGroupsBtn" class="myg-btn" onclick="openMyGroups(true)" title="My Groups">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+    </button>
     <button onclick="openSubmitModal()" style="
       background:#F6F6F6;color:#191919;border:1px solid rgba(25,25,25,0.12);border-radius:8px;
       padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;letter-spacing:0;
@@ -482,6 +593,60 @@ let selectedDate = dKey(TODAY);
 let weekStart = getWeekStart(TODAY);
 let monthPivot = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
 
+// ── Product name KR→EN keyword map ──
+const KR_TO_EN = {
+  // ── 공방 관련 ──
+  '공방포카':'Fan Postcard','공방 포카':'Fan Postcard','공방굿즈':'Fan Goods',
+  '공방 굿즈':'Fan Goods','공방':'Music Show Broadcast',
+  '역조공 굿즈':'Fan Gift Goods','역조공':'Fan Gift',
+  '조공':'Fan Gift','사녹':'Pre-recorded',
+  // ── 포토카드 ──
+  '포토카드':'Photocard','포카':'Photocard','트레이딩카드':'Trading Card',
+  '트레카':'Trading Card','미니포토':'Mini Photo','폴라로이드':'Polaroid',
+  // ── 앨범/음반 ──
+  '앨범':'Album','미개봉':'Unsealed','개봉':'Opened','음반':'Album',
+  '정규앨범':'Full Album','미니앨범':'Mini Album','싱글앨범':'Single Album',
+  '리패키지':'Repackage','스페셜앨범':'Special Album',
+  // ── 굿즈 종류 ──
+  '굿즈':'Goods','공식굿즈':'Official Goods','공식 굿즈':'Official Goods',
+  '공식':'Official','한정판':'Limited Edition','한정':'Limited',
+  '포토북':'Photobook','브로마이드':'Bromide','포스터':'Poster',
+  '스티커':'Sticker','키링':'Keyring','엽서':'Postcard','피규어':'Figure',
+  '뱃지':'Badge','마스코트':'Mascot','담요':'Blanket','에코백':'Eco Bag',
+  '슬로건':'Slogan','응원봉':'Light Stick','라이트스틱':'Light Stick',
+  '팬클럽키트':'Fan Club Kit','위버스앨범':'Weverse Album',
+  '포토세트':'Photo Set','포토팩':'Photo Pack','포토엽서':'Photo Postcard',
+  // ── 이벤트 ──
+  '팬사인회':'Fan Sign','사인회':'Fan Sign Event','팬미팅':'Fan Meeting',
+  '콘서트':'Concert','쇼케이스':'Showcase','데뷔무대':'Debut Stage',
+  '데뷔':'Debut','컴백':'Comeback','뮤직뱅크':'Music Bank',
+  '음악중심':'Show! Music Core','인기가요':'Inkigayo',
+  '엠카운트다운':'M Countdown','쇼챔피언':'Show Champion',
+  // ── 판매 관련 ──
+  '일괄판매':'Bulk Sale','일괄':'Bulk','판매':'For Sale',
+  '양도':'Transfer','나눔':'Giveaway','교환':'Trade','교환가능':'Trade OK',
+  '급처':'Urgent Sale','즉시판매':'Instant Sale',
+  '포함':'Included','미포함':'Not Included','포장':'Packaged',
+  '단품':'Single','세트':'Set','풀세트':'Full Set',
+  // ── 상태 ──
+  '새상품':'Brand New','새제품':'Brand New','중고':'Used',
+  '상급':'Excellent','최상급':'Near Mint','보관용':'Storage Only',
+  '사용감없음':'No Signs of Use','흠없음':'No Defects',
+  // ── 멤버/기타 ──
+  '직캠':'Fancam','영상':'Video','사진':'Photo','싸인':'Signed','사인':'Signed',
+  '포토카드세트':'Photocard Set','멤버별':'By Member','전멤버':'All Members',
+  '랜덤':'Random','보증':'Guaranteed',
+};
+function translateName(name){
+  let result = name;
+  // 긴 키워드를 먼저 처리해야 부분 치환 방지 (예: '공식굿즈' → '공식'+'굿즈' 분리 방지)
+  const entries = Object.entries(KR_TO_EN).sort((a,b) => b[0].length - a[0].length);
+  for(const [kr, en] of entries){
+    result = result.split(kr).join(en);
+  }
+  return result;
+}
+
 // 공방 일정 데이터: { 'YYYY-MM-DD': { showName, episode, groups:[], rawTitle } }
 let LINEUP_BY_DATE = {};
 // 공방 화면에서 선택된 아티스트 원본 이름 (칩 클릭), '전체'면 null
@@ -496,11 +661,11 @@ let EVENTS = [];
 //  SHOW LABELS
 // ─────────────────────────────────────────
 const SHOW_LABELS = {
-  music_core:    { name:'쇼! 음악중심', short:'음악중심', day:'SAT', color:'#E8823A' },
-  inkigayo:      { name:'SBS 인기가요', short:'인기가요', day:'SUN', color:'#A855C8' },
-  music_bank:    { name:'뮤직뱅크',     short:'뮤직뱅크', day:'FRI', color:'#4CAF50' },
-  mcountdown:    { name:'엠카운트다운', short:'엠카',     day:'THU', color:'#FF4757' },
-  show_champion: { name:'쇼챔피언',     short:'쇼챔',     day:'WED', color:'#00C4B4' },
+  music_core:    { name:'Show! Music Core', short:'Music Core',    day:'SAT', color:'#E8823A' },
+  inkigayo:      { name:'SBS Inkigayo',     short:'Inkigayo',      day:'SUN', color:'#A855C8' },
+  music_bank:    { name:'Music Bank',       short:'Music Bank',    day:'FRI', color:'#4CAF50' },
+  mcountdown:    { name:'M Countdown',      short:'M Countdown',   day:'THU', color:'#FF4757' },
+  show_champion: { name:'Show Champion',    short:'Show Champion', day:'WED', color:'#00C4B4' },
 };
 
 // 프론트용 아티스트→그룹ID 매핑
@@ -677,7 +842,7 @@ function buildWeek(area){
     cell.appendChild(num);
 
     const lineup = LINEUP_BY_DATE[ds];
-    if(lineup){
+    if(lineup && dateHasMyGroup(ds)){
       const dc=document.createElement('div');
       dc.className='dots-col';
       const show = SHOW_LABELS[lineup.showName];
@@ -685,7 +850,7 @@ function buildWeek(area){
       const dot=document.createElement('div');
       dot.className='evt-dot';
       dot.style.background=showColor;
-      dot.title=(show?show.short:lineup.showName)+' 공방';
+      dot.title=(show?show.short:lineup.showName)+' Lineup';
       dc.appendChild(dot);
       const wRaw = parseRawTitleStatic(lineup.rawTitle);
       const wCount = wRaw.length > 0 ? wRaw.length : lineup.groups.length;
@@ -699,7 +864,7 @@ function buildWeek(area){
       cell.appendChild(dc);
     }
 
-    cell.onclick=()=>{ selectDate(ds); scrollToBottom(); };
+    cell.onclick=()=>{ selectDate(ds); };
     grid.appendChild(cell);
   }
   area.appendChild(grid);
@@ -749,7 +914,7 @@ function buildMonth(area){
     cell.appendChild(num);
 
     const mLineup = LINEUP_BY_DATE[ds];
-    if(mLineup){
+    if(mLineup && dateHasMyGroup(ds)){
       const show = SHOW_LABELS[mLineup.showName];
       const showColor = show ? show.color : '#9B6FD8';
       const dotsEl=document.createElement('div');
@@ -768,12 +933,12 @@ function buildMonth(area){
       pill.style.color=showColor;
       const mRaw = parseRawTitleStatic(mLineup.rawTitle);
       const mCount = mRaw.length > 0 ? mRaw.length : mLineup.groups.length;
-      pill.textContent=(show?show.short:mLineup.showName)+(mCount?` · ${mCount}팀`:'');
+      pill.textContent=(show?show.short:mLineup.showName)+(mCount?` · ${mCount}`:'');
       pillsEl.appendChild(pill);
       cell.appendChild(pillsEl);
     }
 
-    cell.onclick=()=>{ selectDate(ds); scrollToBottom(); };
+    cell.onclick=()=>{ selectDate(ds); };
     grid.appendChild(cell);
   });
   area.appendChild(grid);
@@ -786,13 +951,11 @@ function selectDate(ds){
   selectedDate = ds;
   selectedArtistName = null;
   const lineup = LINEUP_BY_DATE[ds];
-  if(lineup && (lineup.rawTitle || lineup.groups.length > 0)){
-    allGroupsSelected = true;
-  } else {
-    allGroupsSelected = false;
-  }
+  allGroupsSelected = !!(lineup && (lineup.rawTitle || lineup.groups.length > 0));
   buildCal();
   renderBottom();
+  // sel-hdr가 sticky 헤더 바로 아래 오도록 한 번만 스크롤
+  requestAnimationFrame(() => scrollToBottom());
 }
 
 function triggerAllGoods(ds){
@@ -807,6 +970,7 @@ function triggerAllGoods(ds){
 const SEGMENT_BLACKLIST = new Set([
   '영 크리에이터 크루', '온 세상을 다정함으로 물들일 큐피드',
   '뮤직뱅크 1위 앵콜직캠', '앵콜직캠', '직캠', '공연', '특집',
+  'Encore Fancam', 'Special',
 ]);
 
 // 세그먼트에서 실제 그룹명만 추출: "CRAVITY COMEBACK" → "CRAVITY"
@@ -831,7 +995,7 @@ function parseRawTitleStatic(raw) {
   let segments;
   if (dashIdx !== -1) {
     segments = decoded.slice(dashIdx + 3)
-      .replace(/\s+등\s*$/, '')
+      .replace(/\s+등\s*$/, '').replace(/\s+etc\.?\s*$/i, '')
       .split(',')
       .map(s => s.replace(/\s*\([^)]*\)/g, '').trim());
   } else {
@@ -850,11 +1014,80 @@ function parseRawTitleStatic(raw) {
 }
 
 // ─────────────────────────────────────────
+//  ARTIST DISPLAY NAME (KR → Official EN)
+// ─────────────────────────────────────────
+const ARTIST_DISPLAY_NAME = {
+  // BTS & solos
+  '방탄소년단':'BTS','진':'Jin','슈가':'SUGA','지민':'Jimin','뷔':'V','정국':'Jung Kook',
+  // groups
+  '세븐틴':'SEVENTEEN','엔하이픈':'ENHYPEN','트와이스':'TWICE','블랙핑크':'BLACKPINK',
+  '슈퍼주니어':'SUPER JUNIOR','샤이니':'SHINee','에이티즈':'ATEEZ',
+  '투모로우바이투게더':'TOMORROW X TOGETHER','있지':'ITZY','플레이브':'PLAVE',
+  '아일릿':'ILLIT','이븐':'EVNNE','원어스':'ONEUS','넥스지':'NEXZ',
+  '82메이저':'82MAJOR','엔시티 위시':'NCT WISH','엔시티 드림':'NCT DREAM',
+  '엔시티 127':'NCT 127','엔시티':'NCT','츄':'CHUU','원호':'WONHO',
+  '화사':'HWASA','선미':'SUNMI','수진':'SOOJIN','청하':'CHUNG HA',
+  '이채연':'LEE CHAEYEON','휘인':'WHEEIN','박지훈':'PARK JIHOON',
+  '키노':'KINO','펜타곤':'PENTAGON','여자아이들':'(G)I-DLE','마마무':'MAMAMOO',
+  '레드벨벳':'Red Velvet','자이커스':'XIKERS',
+};
+function artistDisplayName(name) {
+  return ARTIST_DISPLAY_NAME[name] || name;
+}
+
+// ─────────────────────────────────────────
+//  GROUP POPULARITY RANK (CSV Top100 기준)
+//  key: ARTIST_TO_GROUP_FRONT 값(group ID), value: 순위(낮을수록 인기)
+// ─────────────────────────────────────────
+const GROUP_RANK = {
+  'nct':1,'seventeen':2,'bts':3,'ive':4,'txt':5,
+  'straykids':6,'plave':7,'boynextdoor':8,'zerobaseone':10,
+  'day6':11,'theboyz':12,'aespa':13,'enhypen':14,'monstax':15,
+  'newjeans':16,'exo':17,'tws':18,'ateez':19,'btob':20,
+  'shinee':21,'lesserafim':22,'triples':24,'twice':28,'nmixx':29,
+  'andteam':30,'blackpink':32,'redvelvet':33,'treasure':34,
+  'cravity':36,'gidle':37,'astro':38,'superjunior':40,
+  'illit':42,'itzy':44,'mamamoo':45,'kissoflife':53,
+  'kep1er':57,'babymonster':58,'oneus':64,'nflying':68,
+  'got7':76,'billlie':77,'pentagon':80,'xikers':80,
+  'xdinaryheroes':49,'qwer':52,'evnne':75,'nexz':83,
+  'alphadriveone':27,'82major':87,
+};
+
+// artist 이름(raw) → group ID 반환
+function getGroupId(name) {
+  return ARTIST_TO_GROUP_FRONT[name] || null;
+}
+
+// 칩 순서 정렬: CSV 순위 있으면 그 순위, 없으면 매물 수 조회 후 재정렬
+async function sortedArtists(artists) {
+  const ranked = [];
+  const unranked = [];
+
+  for (const a of artists) {
+    const gid = getGroupId(a);
+    const rank = gid ? (GROUP_RANK[gid] ?? null) : null;
+    if (rank !== null) ranked.push({ name: a, rank });
+    else unranked.push(a);
+  }
+  ranked.sort((a, b) => a.rank - b.rank);
+
+  // 순위 있는 것 먼저, 없는 것은 뒤에 임시 배치
+  return { initial: [...ranked.map(r => r.name), ...unranked], unranked };
+}
+
+// ─────────────────────────────────────────
 //  SCROLL TO BOTTOM
 // ─────────────────────────────────────────
 function scrollToBottom(){
-  const bot=document.getElementById('bottom');
-  if(bot) bot.scrollIntoView({behavior:'smooth',block:'start'});
+  const target=document.getElementById('bottom')?.querySelector('.sel-hdr')
+               ||document.getElementById('bottom');
+  if(!target) return;
+  // .hdr(56px) + .view-bar(52px) sticky 높이 제외, 8px 여백
+  const stickyH = (document.querySelector('.hdr')?.offsetHeight||56)
+                + (document.querySelector('.view-bar')?.offsetHeight||52);
+  const top = target.getBoundingClientRect().top + window.scrollY - stickyH - 8;
+  window.scrollTo({top, behavior:'smooth'});
 }
 
 // ─────────────────────────────────────────
@@ -884,7 +1117,7 @@ function renderBottom(){
         <div class="sel-date">${dayNames[dateObj.getDay()]}, ${MONTH_NAMES[mo-1]} ${d}</div>
         <div class="sel-sub" style="display:flex;align-items:center;gap:6px;margin-top:3px">
           <span class="show-badge" style="background:${show.color}">${show.short}</span>
-          <span style="color:var(--txt2);font-size:12px">${lineup.episode ? lineup.episode+'회 · ' : ''}${chipCount}팀 출연</span>
+          <span style="color:var(--txt2);font-size:12px">${lineup.episode ? 'EP '+lineup.episode+' · ' : ''}${chipCount} Artists</span>
         </div>
       </div>
       <div class="evt-badge" style="background:${show.color}">${chipCount}</div>
@@ -893,7 +1126,7 @@ function renderBottom(){
     hdr.innerHTML=`
       <div>
         <div class="sel-date">${dayNames[dateObj.getDay()]}, ${MONTH_NAMES[mo-1]} ${d}</div>
-        <div class="sel-sub">공방 일정 없음</div>
+        <div class="sel-sub">No show scheduled</div>
       </div>
     `;
   }
@@ -914,7 +1147,8 @@ function renderBottom(){
     const allChip = document.createElement('button');
     const allActive = allGroupsSelected;
     allChip.style.cssText = pillBase + `background:${allActive ? '#191919' : '#F6F6F6'};color:${allActive ? '#FFFFFF' : '#8C8C8C'};`;
-    allChip.textContent = '전체';
+    allChip.textContent = 'All';
+    if(allActive) allChip.dataset.active = 'true';
     allChip.onclick = () => {
       selectedArtistName = null;
       allGroupsSelected = true;
@@ -923,24 +1157,57 @@ function renderBottom(){
     strip.appendChild(allChip);
 
     // ── 개별 그룹 칩 ──
-    const artists = rawArtists.length > 0 ? rawArtists : lineup.groups;
-    artists.forEach(artistName => {
+    const allRawList = rawArtists.length > 0 ? rawArtists : lineup.groups;
+    // My Groups 설정 시 해당 그룹만 표시, 아니면 전체
+    const rawList = (myGroups && myGroups.length > 0)
+      ? allRawList.filter(a => myGroups.includes(a))
+      : allRawList;
+
+    function makeChip(artistName) {
       const chip = document.createElement('button');
       const isActive = !allGroupsSelected && selectedArtistName === artistName;
       chip.style.cssText = pillBase + `background:${isActive ? '#191919' : '#F6F6F6'};color:${isActive ? '#FFFFFF' : '#8C8C8C'};`;
-      chip.textContent = artistName;
+      chip.textContent = artistDisplayName(artistName);
+      chip.dataset.artist = artistName;
+      if(isActive) chip.dataset.active = 'true';
       chip.onclick = () => {
         const toggling = !allGroupsSelected && selectedArtistName === artistName;
         selectedArtistName = toggling ? null : artistName;
         allGroupsSelected = false;
         renderBottom();
-        if(selectedArtistName) fetchAndShowLiveGoods(selectedArtistName);
       };
-      strip.appendChild(chip);
+      return chip;
+    }
+
+    // 1. CSV 순위 기준 즉시 정렬 후 칩 렌더
+    sortedArtists(rawList).then(({ initial, unranked }) => {
+      initial.forEach(name => strip.appendChild(makeChip(name)));
+
+      // 2. 순위 없는 그룹만 백그라운드에서 매물 수 조회 후 재정렬
+      if (unranked.length > 1) {
+        Promise.all(unranked.map(a =>
+          fetch(`/api/goods?artist=${encodeURIComponent(a)}&n=1`)
+            .then(r => r.ok ? r.json() : { items: [] })
+            .then(d => ({ name: a, count: (d.items || []).length }))
+            .catch(() => ({ name: a, count: 0 }))
+        )).then(results => {
+          results.sort((a, b) => b.count - a.count);
+          // strip에서 unranked 칩들만 꺼내서 순서 재배치
+          results.forEach(({ name }) => {
+            const chip = strip.querySelector(`[data-artist="${CSS.escape(name)}"]`);
+            if (chip) strip.appendChild(chip); // 맨 뒤로 이동 후 순서대로
+          });
+        });
+      }
     });
 
     stickyWrap.appendChild(strip);
     bot.appendChild(stickyWrap);
+
+    requestAnimationFrame(() => {
+      const activeChip = strip.querySelector('[data-active="true"]');
+      if(activeChip) strip.scrollLeft = activeChip.offsetLeft - (strip.offsetWidth - activeChip.offsetWidth) / 2;
+    });
   }
 
   // ── Divider ──
@@ -953,8 +1220,8 @@ function renderBottom(){
     const liveGoodsArea = document.createElement('div');
     liveGoodsArea.id = 'live-goods-area';
     liveGoodsArea.style.cssText = 'padding:20px 0;text-align:center;color:var(--txt2);font-size:13px;background:#FFFFFF';
-    const label = selectedArtistName || '전체';
-    liveGoodsArea.innerHTML = `<div style="display:inline-block;width:20px;height:20px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px"></div>${escHtml(label)} 매물 검색 중…`;
+    const label = selectedArtistName || 'All';
+    liveGoodsArea.innerHTML = `<div style="display:inline-block;width:20px;height:20px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px"></div>Searching ${escHtml(label)} listings…`;
     bot.appendChild(liveGoodsArea);
 
     // DOM에 붙인 직후 즉시 fetch
@@ -968,7 +1235,7 @@ function renderBottom(){
   } else if(lineup){
     const prompt = document.createElement('div');
     prompt.style.cssText = 'padding:16px 16px 20px;text-align:center;color:var(--txt2);font-size:12.5px';
-    prompt.textContent = '위에서 그룹을 선택하면 번장 한정판 매물을 바로 볼 수 있어요';
+    prompt.textContent = 'Select a group above to browse Bunjang listings';
     bot.appendChild(prompt);
   } else {
     const empty = document.createElement('div');
@@ -1017,10 +1284,10 @@ async function fetchAllGroupGoods(artists) {
     hdr.className = 'goods-intro';
     hdr.innerHTML = `
       <div class="goods-intro-title-row">
-        <div class="goods-intro-title">오늘 올라온 공방 포카 · 역조공 굿즈<br>지금 바로 확인하세요</div>
+        <div class="goods-intro-title">Today's Fan Goods &amp; Postcards<br>Check them out now</div>
       </div>
       <div class="goods-intro-footer">
-        <div class="goods-intro-sub">${items.length > 0 ? `${items.length}개 매물 · 최신순` : '등록된 매물 없음'}</div>
+        <div class="goods-intro-sub">${items.length > 0 ? `${items.length} listings · Latest` : 'No listings found'}</div>
       </div>
     `;
     freshArea.appendChild(hdr);
@@ -1028,7 +1295,7 @@ async function fetchAllGroupGoods(artists) {
     if(items.length === 0){
       const empty = document.createElement('div');
       empty.className = 'goods-empty';
-      empty.textContent = '이날 출연 그룹 관련 공방 굿즈 매물이 없습니다.';
+      empty.textContent = 'No fan goods listings found for today\'s artists.';
       freshArea.appendChild(empty);
       return;
     }
@@ -1038,7 +1305,8 @@ async function fetchAllGroupGoods(artists) {
     items.slice(0, 60).forEach((item, i) => {
       const productUrl = `https://globalbunjang.com/product/${item.id}`;
       const imgSrc = item.imageUrl ? `/api/image?url=${encodeURIComponent(item.imageUrl)}` : '';
-      const imgHtml = imgSrc ? `<img src="${imgSrc}" alt="${escHtml(item.name)}" loading="lazy" onerror="this.classList.add('err')">` : '';
+      const itemName = translateName(item.name);
+      const imgHtml = imgSrc ? `<img src="${imgSrc}" alt="${escHtml(itemName)}" loading="lazy" onerror="this.classList.add('err')">` : '';
       const card = document.createElement('div');
       card.className = 'gcard';
       card.style.cssText = `animation:fadeUp .22s ease both;animation-delay:${i*15}ms`;
@@ -1048,7 +1316,7 @@ async function fetchAllGroupGoods(artists) {
           ${imgHtml}
         </div>
         <div class="gcard-body">
-          <div class="gcard-name">${escHtml(item.name)}</div>
+          <div class="gcard-name">${escHtml(itemName)}</div>
           <div class="gcard-price">₩${item.price.toLocaleString()}</div>
         </div>
       `;
@@ -1059,7 +1327,7 @@ async function fetchAllGroupGoods(artists) {
 
   } catch(err) {
     const a = document.getElementById('live-goods-area');
-    if(a) a.innerHTML = `<div style="padding:16px 14px;color:var(--txt2);font-size:12px">매물 로드 실패: ${escHtml(err.message)}</div>`;
+    if(a) a.innerHTML = `<div style="padding:16px 14px;color:var(--txt2);font-size:12px">Failed to load listings: ${escHtml(err.message)}</div>`;
   }
 }
 
@@ -1078,18 +1346,18 @@ async function fetchAndShowLiveGoods(artistName) {
 
     freshArea.innerHTML = '';
 
-    const displayName = allGroupsSelected ? '이날 출연 그룹' : artistName;
+    const displayName = allGroupsSelected ? "Today's Artists" : artistDisplayName(artistName);
     const hdr = document.createElement('div');
     hdr.className = 'goods-intro';
     hdr.innerHTML = `
       <div class="goods-intro-title-row">
-        <div class="goods-intro-title">${escHtml(displayName)} 공방 포카 · 역조공 굿즈</div>
-        <a href="https://bunjang.co.kr/search/products?q=${encodeURIComponent(artistName+' 공방')}&order=date" target="_blank" rel="noopener" class="goods-intro-chevron">
+        <div class="goods-intro-title">${escHtml(displayName)} Fan Goods &amp; Postcards</div>
+        <a href="https://globalbunjang.com/search?q=${encodeURIComponent(artistName+' 공방')}&order=date" target="_blank" rel="noopener" class="goods-intro-chevron">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
         </a>
       </div>
       <div class="goods-intro-footer">
-        <div class="goods-intro-sub">${items.length > 0 ? `${items.length}개 매물 · 최신순` : '등록된 매물 없음'}</div>
+        <div class="goods-intro-sub">${items.length > 0 ? `${items.length} listings · Latest` : 'No listings found'}</div>
       </div>
     `;
     freshArea.appendChild(hdr);
@@ -1097,7 +1365,7 @@ async function fetchAndShowLiveGoods(artistName) {
     if(items.length === 0){
       const empty = document.createElement('div');
       empty.className = 'goods-empty';
-      empty.textContent = `${displayName} 관련 공방 굿즈 매물이 없습니다.`;
+      empty.textContent = `No fan goods listings found for ${displayName}.`;
       freshArea.appendChild(empty);
       return;
     }
@@ -1107,8 +1375,9 @@ async function fetchAndShowLiveGoods(artistName) {
     items.slice(0, 40).forEach((item, i) => {
       const productUrl = `https://globalbunjang.com/product/${item.id}`;
       const imgSrc = item.imageUrl ? `/api/image?url=${encodeURIComponent(item.imageUrl)}` : '';
+      const itemName = translateName(item.name);
       const imgHtml = imgSrc
-        ? `<img src="${imgSrc}" alt="${escHtml(item.name)}" loading="lazy" onerror="this.classList.add('err')">`
+        ? `<img src="${imgSrc}" alt="${escHtml(itemName)}" loading="lazy" onerror="this.classList.add('err')">`
         : '';
       const card = document.createElement('div');
       card.className = 'gcard';
@@ -1119,7 +1388,7 @@ async function fetchAndShowLiveGoods(artistName) {
           ${imgHtml}
         </div>
         <div class="gcard-body">
-          <div class="gcard-name">${escHtml(item.name)}</div>
+          <div class="gcard-name">${escHtml(itemName)}</div>
           <div class="gcard-price">₩${item.price.toLocaleString()}</div>
         </div>
       `;
@@ -1130,7 +1399,7 @@ async function fetchAndShowLiveGoods(artistName) {
 
   } catch(err) {
     const area2 = document.getElementById('live-goods-area');
-    if(area2) area2.innerHTML = `<div style="padding:16px 14px;color:var(--txt2);font-size:12px">매물 로드 실패: ${escHtml(err.message)}</div>`;
+    if(area2) area2.innerHTML = `<div style="padding:16px 14px;color:var(--txt2);font-size:12px">Failed to load listings: ${escHtml(err.message)}</div>`;
   }
 }
 
@@ -1180,7 +1449,7 @@ async function fetchMusicShowLineups() {
         date:  (r.broad_date || '').slice(0, 10),
         name:  show.name,
         type:  'gonbang',
-        venue: r.episode_number ? `${r.episode_number}회` : '',
+        venue: r.episode_number ? `EP ${r.episode_number}` : '',
         color: show.color,
       };
     });
@@ -1200,9 +1469,292 @@ async function fetchMusicShowLineups() {
       buildCal();
       renderBottom();
     }
+    // 데이터 로드 완료 후 첫 방문 팝업
+    if (!localStorage.getItem(MY_GROUPS_SEEN_KEY)) {
+      setTimeout(() => openMyGroups(), 600);
+    }
   } catch(e) {
     console.warn('[KF_Calendar] fetchLineups 실패:', e.message);
   }
+}
+
+// ─────────────────────────────────────────
+//  MY GROUPS
+// ─────────────────────────────────────────
+const MY_GROUPS_KEY = 'kf_my_groups'; // localStorage key
+const MY_GROUPS_SEEN_KEY = 'kf_my_groups_seen';
+const MAX_SELECTION = 3;
+
+// 저장된 내 그룹 (artist 원본명 배열), null이면 전체 모드
+function loadMyGroups() {
+  try {
+    const v = localStorage.getItem(MY_GROUPS_KEY);
+    return v ? JSON.parse(v) : null;
+  } catch { return null; }
+}
+function saveMyGroups(groups) {
+  localStorage.setItem(MY_GROUPS_KEY, JSON.stringify(groups));
+  localStorage.setItem(MY_GROUPS_SEEN_KEY, '1');
+}
+function clearMyGroups() {
+  localStorage.removeItem(MY_GROUPS_KEY);
+  localStorage.setItem(MY_GROUPS_SEEN_KEY, '1');
+}
+
+let myGroups = loadMyGroups(); // null = 전체, [] or [...] = 필터
+
+// 버튼 상태 업데이트
+function updateMyGroupsBtn() {
+  const btn = document.getElementById('myGroupsBtn');
+  if (!btn) return;
+  const dot = btn.querySelector('.myg-dot');
+  if (myGroups && myGroups.length > 0) {
+    btn.classList.add('active');
+    if (!dot) {
+      const d = document.createElement('span');
+      d.className = 'myg-dot';
+      btn.appendChild(d);
+    }
+  } else {
+    btn.classList.remove('active');
+    if (dot) dot.remove();
+  }
+}
+
+// 팝업 닫기 — 버튼으로 빨려드는 애니메이션
+function closeMyGroups(sheetEl) {
+  if (!sheetEl) return;
+  const overlay = sheetEl.closest('.myg-overlay');
+  if (!overlay) return;
+
+  const btn = document.getElementById('myGroupsBtn');
+  const btnRect = btn ? btn.getBoundingClientRect() : null;
+  const sheetRect = sheetEl.getBoundingClientRect();
+
+  // 시트를 버튼 위치로 이동시키는 transform 목적지 계산
+  if (btnRect) {
+    const tx = btnRect.left + btnRect.width / 2 - (sheetRect.left + sheetRect.width / 2);
+    const ty = btnRect.top + btnRect.height / 2 - (sheetRect.top + sheetRect.height / 2);
+    sheetEl.style.transformOrigin = `calc(50% - ${tx}px) calc(50% - ${ty}px)`;
+  }
+  sheetEl.classList.add('myg-sucking');
+
+  // 백드롭 페이드
+  const backdrop = overlay.querySelector('.myg-backdrop');
+  if (backdrop) backdrop.style.transition = 'opacity .35s';
+  if (backdrop) backdrop.style.opacity = '0';
+
+  setTimeout(() => {
+    overlay.remove();
+    updateMyGroupsBtn();
+  }, 380);
+}
+
+// 전체 그룹 목록 수집 (현재 LINEUP_BY_DATE 기준)
+function getAllArtistsFromLineups() {
+  const set = new Set();
+  for (const lineup of Object.values(LINEUP_BY_DATE)) {
+    const artists = parseRawTitleStatic(lineup.rawTitle);
+    const list = artists.length > 0 ? artists : lineup.groups;
+    list.forEach(a => set.add(a));
+  }
+  return [...set].sort((a, b) => {
+    // GROUP_RANK 기준 정렬, 없으면 뒤
+    const ga = ARTIST_TO_GROUP_FRONT[a], gb = ARTIST_TO_GROUP_FRONT[b];
+    const ra = ga ? (GROUP_RANK[ga] ?? 999) : 999;
+    const rb = gb ? (GROUP_RANK[gb] ?? 999) : 999;
+    return ra - rb;
+  });
+}
+
+function openMyGroups(fromBtn) {
+  if (document.querySelector('.myg-overlay')) return;
+
+  const allArtists = getAllArtistsFromLineups();
+  let selected = new Set(myGroups || []);
+
+  const overlay = document.createElement('div');
+  overlay.className = 'myg-overlay';
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'myg-backdrop';
+  backdrop.onclick = () => {
+    // 백드롭 클릭 = skip
+    myGroups = null;
+    clearMyGroups();
+    applyMyGroups();
+    closeMyGroups(sheet);
+  };
+
+  const sheet = document.createElement('div');
+  sheet.className = 'myg-sheet';
+
+  let searchQuery = '';
+  const selArr = [...selected]; // 순서 유지 배열
+
+  function syncSelected() {
+    selected = new Set(selArr);
+  }
+
+  function renderSheet() {
+    syncSelected();
+    const slots = [0,1,2].map(i => selArr[i] || null);
+    const canSave = selArr.length > 0;
+
+    sheet.innerHTML = `
+      <div class="myg-handle"></div>
+      <div class="myg-head">
+        <div>
+          <div class="myg-title">My Groups</div>
+          <div class="myg-sub">Search and pick up to 3 groups — your personal K-pop lineup.</div>
+        </div>
+        <button class="myg-close" id="myg-close-btn">✕</button>
+      </div>
+
+      <!-- 선택 슬롯 3개 -->
+      <div style="display:flex;gap:8px;padding:12px 20px 4px;">
+        ${slots.map((name, i) => `
+          <div style="flex:1;border-radius:10px;border:1.5px ${name ? 'solid #191919' : 'dashed rgba(25,25,25,0.18)'};
+               background:${name ? '#191919' : '#F6F6F6'};
+               min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+               gap:2px;cursor:${name ? 'pointer' : 'default'};transition:all .15s;position:relative;"
+               ${name ? `data-remove="${escHtml(name)}"` : ''}>
+            ${name
+              ? `<span style="position:absolute;top:4px;right:6px;font-size:11px;color:rgba(255,255,255,0.5);line-height:1;">✕</span>
+                 <span style="font-size:12px;font-weight:800;color:#fff;text-align:center;padding:0 16px;line-height:1.2;width:100%;box-sizing:border-box;">${escHtml(artistDisplayName(name))}</span>`
+              : `<span style="font-size:10px;font-weight:700;color:var(--txt3);letter-spacing:.5px;">${i+1}</span>
+                 <span style="font-size:11px;color:var(--txt3);">empty</span>`
+            }
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- 검색창 -->
+      <div style="padding:10px 20px 0;">
+        <div style="display:flex;align-items:center;gap:8px;background:#F6F6F6;border-radius:10px;padding:10px 14px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input id="myg-search" type="text" placeholder="Search groups…" value="${escHtml(searchQuery)}"
+            style="border:none;background:none;outline:none;font-size:14px;font-weight:600;
+                   color:var(--txt1);width:100%;font-family:inherit;letter-spacing:0;"
+            autocomplete="off" autocorrect="off" spellcheck="false"/>
+          ${searchQuery ? `<button id="myg-search-clear" style="border:none;background:none;padding:0;cursor:pointer;color:var(--txt2);font-size:16px;line-height:1;">✕</button>` : ''}
+        </div>
+      </div>
+
+      <!-- 검색 결과 -->
+      <div id="myg-list" style="overflow-y:auto;max-height:36vh;padding:8px 20px 12px;"></div>
+
+      <div class="myg-footer">
+        ${fromBtn
+          ? `<button class="myg-skip" id="myg-clear-btn">Clear All</button>`
+          : `<button class="myg-skip" id="myg-skip">Skip</button>`
+        }
+        <button class="myg-save" id="myg-save" ${!canSave ? 'disabled' : ''}>
+          ${canSave ? `Follow ${selArr.length} Group${selArr.length > 1 ? 's' : ''}` : 'Select a Group'}
+        </button>
+      </div>
+    `;
+
+    // Clear all 버튼 (fromBtn 진입 시 footer 좌측)
+    const clearAllBtn = sheet.querySelector('#myg-clear-btn');
+    if (clearAllBtn) clearAllBtn.onclick = () => { selArr.splice(0); renderSheet(); };
+
+    // Skip 버튼 (첫 방문 진입 시 footer 좌측)
+    const skipBtn = sheet.querySelector('#myg-skip');
+    if (skipBtn) skipBtn.onclick = () => { myGroups = null; clearMyGroups(); applyMyGroups(); closeMyGroups(sheet); };
+
+    // 슬롯 클릭 → 해당 그룹 제거
+    sheet.querySelectorAll('[data-remove]').forEach(el => {
+      el.onclick = () => {
+        const name = el.dataset.remove;
+        const idx = selArr.indexOf(name);
+        if (idx > -1) selArr.splice(idx, 1);
+        renderSheet();
+      };
+    });
+
+    // 검색 입력
+    const input = sheet.querySelector('#myg-search');
+    input.oninput = () => { searchQuery = input.value; renderSheet(); };
+    input.focus();
+
+    const clearBtn = sheet.querySelector('#myg-search-clear');
+    if (clearBtn) clearBtn.onclick = () => { searchQuery = ''; renderSheet(); };
+
+    // 검색 결과 목록
+    const q = searchQuery.trim().toLowerCase();
+    const filtered = allArtists.filter(a => {
+      const en = artistDisplayName(a).toLowerCase();
+      return !q || en.includes(q) || a.toLowerCase().includes(q);
+    });
+
+    const list = sheet.querySelector('#myg-list');
+    if (filtered.length === 0) {
+      list.innerHTML = `<div style="text-align:center;color:var(--txt2);font-size:13px;padding:20px 0;">No results</div>`;
+    } else {
+      filtered.forEach(artistName => {
+        const isSel = selArr.includes(artistName);
+        const rank = selArr.indexOf(artistName); // 0,1,2 or -1
+        const isDisabled = !isSel && selArr.length >= MAX_SELECTION;
+        const row = document.createElement('div');
+        row.style.cssText = `display:flex;align-items:center;justify-content:space-between;
+          padding:11px 0;border-bottom:1px solid var(--border);cursor:${isDisabled?'default':'pointer'};
+          opacity:${isDisabled?'0.35':'1'};`;
+        row.innerHTML = `
+          <span style="font-size:14px;font-weight:700;color:var(--txt1);">${escHtml(artistDisplayName(artistName))}</span>
+          <div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;
+            border:${isSel?'none':'1.5px solid rgba(25,25,25,0.2)'};
+            background:${isSel?'#191919':'transparent'};
+            display:flex;align-items:center;justify-content:center;
+            font-size:11px;font-weight:800;color:${isSel?'#fff':'var(--txt3)'};">
+            ${isSel ? rank+1 : ''}
+          </div>
+        `;
+        if (!isDisabled) {
+          row.onclick = () => {
+            if (isSel) selArr.splice(selArr.indexOf(artistName), 1);
+            else selArr.push(artistName);
+            renderSheet();
+          };
+        }
+        list.appendChild(row);
+      });
+    }
+
+    sheet.querySelector('#myg-close-btn').onclick = () => {
+      closeMyGroups(sheet);
+    };
+    sheet.querySelector('#myg-save').onclick = () => {
+      if (selArr.length === 0) return;
+      myGroups = [...selArr];
+      saveMyGroups(myGroups);
+      applyMyGroups();
+      closeMyGroups(sheet);
+    };
+  }
+
+  renderSheet();
+  overlay.appendChild(backdrop);
+  overlay.appendChild(sheet);
+  document.body.appendChild(overlay);
+}
+
+// 내 그룹 필터 적용 — 캘린더 + 하단 섹션 재렌더
+function applyMyGroups() {
+  buildCal();
+  renderBottom();
+}
+
+// 캘린더 dot/날짜 필터: 내 그룹 설정 시 해당 그룹 포함 날짜만 강조
+function dateHasMyGroup(ds) {
+  if (!myGroups || myGroups.length === 0) return true; // 전체 모드
+  const lineup = LINEUP_BY_DATE[ds];
+  if (!lineup) return false;
+  const artists = parseRawTitleStatic(lineup.rawTitle);
+  const list = artists.length > 0 ? artists : lineup.groups;
+  return myGroups.some(g => list.includes(g));
 }
 
 // ─────────────────────────────────────────
@@ -1211,6 +1763,8 @@ async function fetchMusicShowLineups() {
 buildCal();
 renderBottom();
 fetchMusicShowLineups();
+
+updateMyGroupsBtn();
 
 // ─────────────────────────────────────────
 //  FAN SUBMISSION MODAL

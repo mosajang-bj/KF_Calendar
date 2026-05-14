@@ -9,6 +9,8 @@ const SUPA_SERVICE_KEY = process.env.SUPA_SERVICE_KEY;
 const SYNC_SECRET      = process.env.SYNC_SECRET || '';
 
 const IMBC = 'https://playvod.imbc.com/api/PreviewList';
+// dayOfWeek: 방송일 기준 (iMBC BroadDate = 실제 방송일)
+// 음악중심 토(6), 쇼챔피언 수(3)
 const SHOWS_IMBC = [
   { show_name: 'music_core',    programId: '1000788100000100000', dayOfWeek: 6 }, // 토
   { show_name: 'show_champion', programId: '1003864100000100000', dayOfWeek: 3 }, // 수
@@ -89,16 +91,15 @@ function dKey(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-// 오늘부터 다음달 말일까지 특정 요일의 날짜 목록
-function futureDatesForDay(dayOfWeek) {
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  // 다음달 말일
+// since 날짜부터 다음달 말일까지 특정 요일의 날짜 목록 (기본: 30일 전부터)
+function datesForDay(dayOfWeek, sinceDate) {
+  const start = sinceDate ? new Date(sinceDate) : new Date(Date.now() - 30 * 86400000);
+  start.setHours(0,0,0,0);
+  const today = new Date(); today.setHours(0,0,0,0);
   const end = new Date(today.getFullYear(), today.getMonth()+2, 0);
 
   const dates = [];
-  const cur = new Date(today);
-  // 오늘부터 순회
+  const cur = new Date(start);
   while (cur <= end) {
     if (cur.getDay() === dayOfWeek) dates.push(dKey(new Date(cur)));
     cur.setDate(cur.getDate()+1);
@@ -135,11 +136,12 @@ function parseMusicCore(ep) {
 }
 
 // 쇼챔피언 파싱: "Show Champion (쇼 챔피언) - CRAVITY, TWS (투어스), ..."
+// 또는 " -CRAVITY" (대시 뒤 공백 없는 경우도 처리)
 function parseShowChampion(ep) {
   const raw = ep.ContentTitle || ep.contentTitle || '';
-  const dashIdx = raw.indexOf(' - ');
-  if (dashIdx === -1) return { raw, artists: [] };
-  const artists = raw.slice(dashIdx+3)
+  const m = raw.match(/ -\s*/);
+  if (!m) return { raw, artists: [] };
+  const artists = raw.slice(m.index + m[0].length)
     .replace(/\s+등\s*$/, '')
     .split(',')
     .map(s => s.replace(/\s*\([^)]*\)/g,'').trim())
@@ -154,6 +156,15 @@ function parseBroadDate(ep) {
   const m = raw.match(/(\d{4})[.\-/]?(\d{2})[.\-/]?(\d{2})/);
   if (m) return `${m[1]}-${m[2]}-${m[3]}`;
   return null;
+}
+
+// naver source로 저장된 날짜 조회 (iMBC가 덮어쓰지 않도록)
+async function getNaverProtectedDates(showName) {
+  const res = await fetch(
+    `${SUPA_URL}/rest/v1/music_show_lineups?show_name=eq.${showName}&source=eq.naver&select=broad_date`,
+    { headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` } }
+  ).then(r => r.json()).catch(() => []);
+  return new Set((res || []).map(r => r.broad_date));
 }
 
 // Supabase helpers
@@ -180,14 +191,14 @@ async function upsertRows(rows) {
     if (res.ok) { ok += chunk.length; continue; }
     // fallback: 개별 upsert
     for (const row of chunk) {
-      // 기존 행 확인
       const existing = await fetch(
-        `${SUPA_URL}/rest/v1/music_show_lineups?show_name=eq.${row.show_name}&broad_date=eq.${row.broad_date}&select=id,groups,raw_title`,
+        `${SUPA_URL}/rest/v1/music_show_lineups?show_name=eq.${row.show_name}&broad_date=eq.${row.broad_date}&select=id,groups,source`,
         { headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` } }
       ).then(r=>r.json()).catch(()=>[]);
 
       if (existing.length > 0) {
-        // 그룹/raw_title이 있는 행은 덮어쓰지 않음 (뼈대만 채우는 경우)
+        // naver source 우선 — imbc/date_rule이 덮어쓰지 않음
+        if (existing[0].source === 'naver' && row.source !== 'naver') { ok++; continue; }
         if (row.source === 'date_rule' && existing[0].groups?.length > 0) { ok++; continue; }
         await fetch(`${SUPA_URL}/rest/v1/music_show_lineups?id=eq.${existing[0].id}`, {
           method: 'PATCH',
@@ -216,12 +227,14 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: 'unauthorized' });
   }
 
+  const since = req.query.since || null; // 백필용: ?since=2026-05-08
+
   const log = [];
   let totalUpserted = 0;
 
   for (const show of SHOWS_IMBC) {
-    // ① 미래 날짜 뼈대 채우기
-    const futureDates = futureDatesForDay(show.dayOfWeek);
+    // ① since~다음달말 범위의 날짜 뼈대 채우기 (기본: 30일 전부터)
+    const futureDates = datesForDay(show.dayOfWeek, since);
     const skeletonRows = futureDates.map(d => ({
       show_name: show.show_name,
       broad_date: d,
@@ -233,15 +246,18 @@ module.exports = async function handler(req, res) {
     const skelOk = await upsertRows(skeletonRows);
     log.push(`[${show.show_name}] 뼈대 ${skelOk}/${futureDates.length}개`);
 
-    // ② iMBC에서 최근 에피소드 가져와서 groups 업데이트
+    // ② iMBC에서 최근 에피소드 가져와서 groups 업데이트 (naver 데이터 보호)
+    const naverDates = await getNaverProtectedDates(show.show_name);
     const episodes = await fetchImbcEpisodes(show.programId);
     const dataRows = [];
     for (const ep of episodes) {
       const date = parseBroadDate(ep);
       if (!date) continue;
+      if (naverDates.has(date)) continue; // naver 우선: iMBC가 덮어쓰지 않음
       const { raw, artists } = show.show_name === 'music_core'
         ? parseMusicCore(ep)
         : parseShowChampion(ep);
+      if (artists.length === 0) continue; // 출연진 없으면 저장 안 함
       const groups = mapArtists(artists);
       dataRows.push({
         show_name: show.show_name,

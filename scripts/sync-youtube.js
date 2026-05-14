@@ -130,10 +130,13 @@ const SHOWS = [
 ];
 
 // ─── 날짜 유틸 ────────────────────────────────────────
+// 업로드일 기준 가장 가까운 방송일 (앞뒤 모두 고려)
 function nearestWeekday(isoStr, targetDay) {
   const d = new Date(isoStr);
-  const diff = (targetDay - d.getDay() + 7) % 7;
-  d.setDate(d.getDate() + (diff === 0 ? 0 : diff));
+  const dow = d.getDay();
+  const fwd = (targetDay - dow + 7) % 7;
+  const bwd = (dow - targetDay + 7) % 7;
+  d.setDate(d.getDate() + (fwd <= bwd ? fwd : -bwd));
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 

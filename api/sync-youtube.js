@@ -8,6 +8,8 @@ const SUPA_SERVICE_KEY = process.env.SUPA_SERVICE_KEY;
 const SYNC_SECRET     = process.env.SYNC_SECRET || '';
 const YT              = 'https://www.googleapis.com/youtube/v3';
 
+// dayOfWeek: 방송일 기준
+// music_bank 금(5), inkigayo 일(0), mcountdown 목(4)
 const SHOWS = [
   {
     show_name:   'music_bank',
@@ -20,11 +22,7 @@ const SHOWS = [
       if (!m) return [];
       return m[1].split(/[,&]/).map(s => s.replace(/and\s*/i, '').trim()).filter(s => s.length > 1);
     },
-    parseDate: (title, publishedAt) => {
-      const m = title.match(/(\d{2})(\d{2})(\d{2})\s*$/);
-      if (m) return `20${m[1]}-${m[2]}-${m[3]}`;
-      return nearestWeekday(publishedAt, 5);
-    },
+    parseDate: (_title, publishedAt) => nearestWeekday(publishedAt, 5),
   },
   {
     show_name:   'inkigayo',
@@ -93,7 +91,10 @@ const SHOWS = [
         const ep = parseInt(epMatch[1], 10);
         const base = new Date('2008-08-07');
         base.setDate(base.getDate() + (ep - 1) * 7);
-        return `${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,'0')}-${String(base.getDate()).padStart(2,'0')}`;
+        // ep 번호가 터무니없이 크면 (예: 해상도 1080p 오매치) 무시
+        if (Math.abs(base - new Date()) < 5 * 365 * 86400000) {
+          return `${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,'0')}-${String(base.getDate()).padStart(2,'0')}`;
+        }
       }
       return nearestWeekday(publishedAt, 4);
     },
@@ -179,10 +180,13 @@ function mapToGroupIds(artists) {
   return Array.from(ids);
 }
 
+// 업로드일 기준 가장 가까운 방송일 (앞뒤 모두 고려)
 function nearestWeekday(isoStr, targetDay) {
   const d = new Date(isoStr);
-  const diff = (targetDay - d.getDay() + 7) % 7;
-  d.setDate(d.getDate() + diff);
+  const dow = d.getDay();
+  const fwd = (targetDay - dow + 7) % 7;
+  const bwd = (dow - targetDay + 7) % 7;
+  d.setDate(d.getDate() + (fwd <= bwd ? fwd : -bwd));
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
@@ -190,12 +194,13 @@ function dKey(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-function futureDatesForDay(dayOfWeek) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+function datesForDay(dayOfWeek, sinceDate) {
+  const start = sinceDate ? new Date(sinceDate) : new Date(Date.now() - 30 * 86400000);
+  start.setHours(0, 0, 0, 0);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
   const end = new Date(today.getFullYear(), today.getMonth() + 2, 0);
   const dates = [];
-  const cur = new Date(today);
+  const cur = new Date(start);
   while (cur <= end) {
     if (cur.getDay() === dayOfWeek) dates.push(dKey(new Date(cur)));
     cur.setDate(cur.getDate() + 1);
@@ -285,16 +290,19 @@ module.exports = async function handler(req, res) {
   if (!SUPA_SERVICE_KEY) return res.status(500).json({ error: 'SUPA_SERVICE_KEY 없음' });
   if (!YOUTUBE_API_KEY)  return res.status(500).json({ error: 'YOUTUBE_API_KEY 없음' });
 
-  // 60일 전부터 검색 (최근 데이터 + 약간의 여유)
-  const publishedAfter = new Date(Date.now() - 60 * 86400 * 1000).toISOString();
+  const since = req.query.since || null; // 백필용: ?since=2026-05-08
+  // since가 있으면 그 날짜부터, 없으면 60일 전부터 YouTube 검색
+  const publishedAfter = since
+    ? new Date(since).toISOString()
+    : new Date(Date.now() - 60 * 86400 * 1000).toISOString();
 
   const log = [];
   let totalUpserted = 0;
 
   for (const show of SHOWS) {
     try {
-      // ① 미래 날짜 뼈대 생성
-      const futureDates = futureDatesForDay(show.dayOfWeek);
+      // ① since~다음달말 범위의 날짜 뼈대 생성 (기본: 30일 전부터)
+      const futureDates = datesForDay(show.dayOfWeek, since);
       const skeletonRows = futureDates.map(d => ({
         show_name: show.show_name,
         broad_date: d,
