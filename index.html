@@ -57,11 +57,13 @@ body{
 /* ════════════════════════════════════════
    HEADER
 ════════════════════════════════════════ */
-.hdr{
+.hdr-wrap{
   position:sticky;top:0;z-index:50;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;height:56px;
   background:#FFFFFF;
+}
+.hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;height:52px;
   border-bottom:1px solid var(--border);
 }
 .logo{
@@ -73,10 +75,8 @@ body{
    VIEW TOGGLE (week / month)
 ════════════════════════════════════════ */
 .view-bar{
-  position:sticky;top:56px;z-index:39;
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;height:52px;
-  background:#FFFFFF;
+  padding:0 16px;height:48px;
   border-bottom:1px solid var(--border);
 }
 .view-l{display:flex;align-items:center;gap:2px}
@@ -482,7 +482,8 @@ body{
 <body>
 <div class="app">
 
-<!-- HEADER -->
+<!-- HEADER + VIEW BAR sticky wrapper -->
+<div class="hdr-wrap">
 <header class="hdr">
   <div class="logo">
     <svg height="20" viewBox="0 0 828 161" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -511,7 +512,7 @@ body{
 </header>
 
 <!-- VIEW BAR -->
-<div class="view-bar">
+<div class="view-bar" id="viewBar">
   <div class="view-l">
     <button class="nav-btn" onclick="navPrev()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
@@ -529,6 +530,7 @@ body{
     </div>
   </div>
 </div>
+</div><!-- /hdr-wrap -->
 
 <!-- CALENDAR AREA -->
 <div class="cal-area" id="calArea"></div>
@@ -1066,9 +1068,8 @@ function scrollToBottom(){
   const target=document.getElementById('bottom')?.querySelector('.sel-hdr')
                ||document.getElementById('bottom');
   if(!target) return;
-  // .hdr(56px) + .view-bar(52px) sticky 높이 제외, 8px 여백
-  const stickyH = (document.querySelector('.hdr')?.offsetHeight||56)
-                + (document.querySelector('.view-bar')?.offsetHeight||52);
+  // .hdr-wrap sticky 높이 제외, 8px 여백
+  const stickyH = document.querySelector('.hdr-wrap')?.offsetHeight || 100;
   const top = target.getBoundingClientRect().top + window.scrollY - stickyH - 8;
   window.scrollTo({top, behavior:'smooth'});
 }
