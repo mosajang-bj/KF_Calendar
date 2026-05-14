@@ -1791,7 +1791,9 @@ function openSubmitModal() {
 
 function inputStyle() {
   return `width:100%;padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border2);
-          background:var(--bg3);color:var(--txt1);font-size:14px;outline:none;box-sizing:border-box;`;
+          background:var(--bg3);color:var(--txt1);font-size:14px;font-family:inherit;
+          outline:none;box-sizing:border-box;appearance:none;-webkit-appearance:none;
+          height:42px;display:block;`;
 }
 
 async function submitEvent() {
