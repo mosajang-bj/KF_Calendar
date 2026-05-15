@@ -417,10 +417,11 @@ body{
 .myg-btn{
   display:flex;align-items:center;justify-content:center;
   width:34px;height:34px;border-radius:9999px;border:none;
-  background:#F6F6F6;color:var(--txt1);cursor:pointer;
-  transition:background .15s;position:relative;flex-shrink:0;
+  background:transparent;color:var(--txt1);cursor:pointer;
+  position:relative;flex-shrink:0;
+  -webkit-tap-highlight-color:transparent;outline:none;
 }
-.myg-btn:hover{background:#EBEBEB}
+.myg-btn:active{background:#F6F6F6;}
 .myg-btn.active{background:var(--accent);color:#fff}
 .myg-dot{
   position:absolute;top:5px;right:5px;
