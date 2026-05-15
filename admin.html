@@ -457,7 +457,7 @@ const supaFetch = (path, opts={}) => api(path, opts);
 
 async function loadAllEvents() {
   try {
-    const res = await supaFetch('music_show_lineups?select=*&order=broad_date.asc', {prefer:''});
+    const res = await supaFetch('music_show_lineups?select=*&order=broad_date.asc');
     const data = await res.json();
     allEvents = Array.isArray(data) ? data : [];
   } catch(e) {
@@ -494,7 +494,9 @@ function toggleFilter(type, val) {
 function visibleEvents() {
   const q = filterGroup.toLowerCase();
   return allEvents.filter(e => {
-    const srcMatch = filterSrc.has(e.source || 'manual');
+    // 'manual' = 어드민 입력, 그 외('naver','date_rule','imbc_api' 등) = Crawled 버킷
+    const isCrawled = (e.source || 'manual') !== 'manual';
+    const srcMatch = isCrawled ? filterSrc.has('naver') : filterSrc.has('manual');
     if (!srcMatch) return false;
     if (!q) return true;
     const inGroups = (e.groups||[]).some(g => g.toLowerCase().includes(q));
@@ -547,15 +549,19 @@ function renderCal() {
     const MAX_PILLS = 3;
     dayEvts.slice(0, MAX_PILLS).forEach(e => {
       const pill = document.createElement('div');
-      pill.className = `cal-pill ${PC[e.source]||'src-manual'}`;
+      const isCrawled = (e.source||'manual') !== 'manual';
+      pill.className = `cal-pill ${isCrawled ? 'src-crawl' : 'src-manual'}`;
       const showColor = SHOW_COLORS_ADMIN[e.show_name];
-      if(showColor) pill.style.borderLeft = `2px solid ${showColor}`;
-      const showShort = (SHOW_LABELS_ADMIN[e.show_name]||e.show_name).replace('🎵 ','').replace(/^[A-Z]+ /,'');
-      const artists = e.raw_title
-        ? e.raw_title.split(/[·,]/).slice(0,2).map(s=>s.trim()).join(', ')
-        : (e.groups||[]).slice(0,2).join(', ');
-      pill.textContent = `${showShort}`;
-      pill.title = `${SHOW_LABELS_ADMIN[e.show_name]||e.show_name}\n${e.raw_title||e.groups.join(', ')}`;
+      if(showColor) pill.style.cssText += `;border-left:3px solid ${showColor}`;
+      // 방송명 축약: 'MBC 음악중심' → '음악중심'
+      const fullLabel = SHOW_LABELS_ADMIN[e.show_name] || e.show_name;
+      const shortName = fullLabel.replace(/🎵 /,'').replace(/^[A-Za-z]+ M? /,'').replace(/^[A-Za-z]+ /,'');
+      const artistCount = (e.groups||[]).length;
+      pill.textContent = artistCount ? `${shortName} (${artistCount})` : shortName;
+      const titleArtists = e.raw_title
+        ? e.raw_title.replace(/^[^-]+-\s*/,'').slice(0,80)
+        : (e.groups||[]).join(', ').slice(0,80);
+      pill.title = `${fullLabel}\n${titleArtists}`;
       pill.onclick = () => openDetail(e);
       cell.appendChild(pill);
     });
@@ -571,6 +577,17 @@ function renderCal() {
 }
 
 // ── DETAIL PANEL ──
+const GROUP_COLORS = {
+  bts:'#9040d0',enhypen:'#d07030',seventeen:'#6050c0',aespa:'#40a0c0',ive:'#c04080',
+  lesserafim:'#d08030',newjeans:'#4080c0',twice:'#e06090',blackpink:'#d040a0',
+  exo:'#6080c0',nct127:'#30a060',nctdream:'#e04050',nctwish:'#50c0a0',
+  ateez:'#e05030',straykids:'#808030',txt:'#70a040',itzy:'#d06080',
+  nmixx:'#60c060',plave:'#5070d0',zerobaseone:'#a06040',boynextdoor:'#4090d0',
+  tws:'#c05050',illit:'#c060c0',babymonster:'#d04040',andteam:'#6040a0',
+  billlie:'#a04080',cravity:'#4060b0',evnne:'#d07050',nexz:'#50b080',
+  qwer:'#90a030',treasure:'#c07030',kissoflife:'#e06060',
+};
+
 function openDetail(e) {
   detailEvent = e;
   const panel = document.getElementById('detail-panel');
@@ -578,24 +595,40 @@ function openDetail(e) {
   document.getElementById('dp-edit').style.display='none';
 
   const showLabel = SHOW_LABELS_ADMIN[e.show_name] || e.show_name;
-  const srcBadge  = SC[e.source] || 'badge-type';
-  const artists   = e.raw_title || (e.groups||[]).join(' · ');
+  const showColor = SHOW_COLORS_ADMIN[e.show_name] || '#9B6FD8';
+  const isCrawled = (e.source||'manual') !== 'manual';
+  const srcText   = isCrawled ? '자동수집' : '수동입력';
+  const srcClass  = isCrawled ? 'badge-crawl' : 'badge-manual';
 
-  document.getElementById('dp-name').textContent = showLabel;
+  // 아티스트: raw_title이 있으면 파싱, 없으면 groups[]
+  const rawParts = e.raw_title
+    ? e.raw_title.replace(/^[^-]+-\s*/, '').split(/[,·]/).map(s=>s.trim()).filter(Boolean)
+    : [];
+  const artistList = rawParts.length ? rawParts : (e.groups||[]);
+
+  // 그룹 뱃지 HTML
+  const groupBadges = (e.groups||[]).map(g => {
+    const c = GROUP_COLORS[g] || '#555';
+    return `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:${c}22;color:${c};border:1px solid ${c}55;margin:2px">${g.toUpperCase()}</span>`;
+  }).join('');
+
+  document.getElementById('dp-name').innerHTML =
+    `<span style="color:${showColor}">${showLabel}</span>`;
   document.getElementById('dp-meta').innerHTML = `
-    <span class="badge ${srcBadge}">${e.source}</span><br>
-    📅 ${e.broad_date}${e.episode_number ? ` &nbsp;·&nbsp; EP ${e.episode_number}회` : ''}
-    <br>🎤 ${artists}
+    <span class="badge ${srcClass}">${srcText}</span>
+    &nbsp;📅 ${e.broad_date}${e.episode_number ? ` &nbsp;·&nbsp; EP ${e.episode_number}회` : ''}<br><br>
+    ${groupBadges || '<span style="color:#555;font-size:12px">그룹 매핑 없음</span>'}
+    ${artistList.length ? `<div style="margin-top:8px;font-size:11px;color:#777;line-height:1.8">${artistList.join(' · ')}</div>` : ''}
   `;
 
   const actions = document.getElementById('dp-actions');
   actions.innerHTML='';
   const btnGoLineups = document.createElement('button');
-  btnGoLineups.className='btn-edit'; btnGoLineups.textContent='공방 일정 탭에서 편집';
+  btnGoLineups.className='btn-edit btn-sm'; btnGoLineups.textContent='공방 일정 탭 편집';
   btnGoLineups.onclick = () => { panel.classList.remove('open'); showTab('lineups'); };
   const btnClose = document.createElement('button');
   btnClose.className='btn-sm'; btnClose.style.cssText='background:#222;color:#888';
-  btnClose.textContent='Close'; btnClose.onclick = () => panel.classList.remove('open');
+  btnClose.textContent='닫기'; btnClose.onclick = () => panel.classList.remove('open');
   actions.append(btnGoLineups, btnClose);
 }
 
