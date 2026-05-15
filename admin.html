@@ -456,21 +456,34 @@ const supaFetch = (path, opts={}) => api(path, opts);
 })();
 
 async function loadAllEvents() {
+  const statsEl = document.getElementById('topbar-stats');
   try {
-    const res = await supaFetch('music_show_lineups?select=*&order=broad_date.asc');
-    const data = await res.json();
+    statsEl.textContent = '불러오는 중…';
+    const res = await fetch(
+      `${SUPA_URL}/rest/v1/music_show_lineups?select=*&order=broad_date.asc`,
+      { headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Accept': 'application/json' } }
+    );
+    const text = await res.text();
+    if (!res.ok) {
+      statsEl.textContent = `API 오류 ${res.status}: ${text.slice(0,100)}`;
+      allEvents = []; return;
+    }
+    const data = JSON.parse(text);
     allEvents = Array.isArray(data) ? data : [];
+    console.log('[admin] loaded', allEvents.length, 'lineups, sample:', allEvents[0]);
   } catch(e) {
-    console.error('loadAllEvents:', e);
+    document.getElementById('topbar-stats').textContent = `Fetch 오류: ${e.message}`;
+    console.error('[admin] loadAllEvents:', e);
     allEvents = [];
   }
 }
 
 function updateTopbar() {
-  const naver  = allEvents.filter(e=>e.source==='naver').length;
-  const manual = allEvents.filter(e=>e.source==='manual').length;
+  const crawled = allEvents.filter(e=>(e.source||'manual')!=='manual').length;
+  const manual  = allEvents.filter(e=>e.source==='manual').length;
+  const visible = visibleEvents().length;
   document.getElementById('topbar-stats').textContent =
-    `${allEvents.length} lineups · ${naver} crawled · ${manual} manual`;
+    `총 ${allEvents.length}개 (크롤 ${crawled} · 수동 ${manual}) · 표시 ${visible}개`;
 }
 
 // ── CALENDAR ──
