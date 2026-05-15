@@ -1888,9 +1888,8 @@ function openFeedbackModal() {
   sheet.className = 'myg-sheet';
   sheet.style.cssText = 'padding-bottom:env(safe-area-inset-bottom,16px);display:flex;flex-direction:column;overflow:hidden;';
   sheet.innerHTML = `
-    <!-- GDS TopNavigation: 48px, title left + close right -->
-    <div style="height:56px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-      <div style="font-size:20px;font-weight:700;letter-spacing:0;color:#191919;line-height:1.2;">Share Feedback</div>
+    <!-- GDS TopNavigation: 48px, close button 오른쪽 정렬 -->
+    <div style="height:48px;padding:12px 20px;display:flex;align-items:center;justify-content:flex-end;flex-shrink:0;">
       <button onclick="closeFeedbackModal()" style="width:24px;height:24px;border:none;background:none;padding:0;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;outline:none;">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="12" cy="12" r="12" fill="#7F7F7F"/>
@@ -1902,8 +1901,11 @@ function openFeedbackModal() {
     <!-- GDS Body -->
     <div style="padding:0 20px 24px;display:flex;flex-direction:column;overflow-y:auto;flex:1;">
 
-      <!-- Subtitle: P2_Regular_15, margin-bottom 20px -->
-      <div style="font-size:15px;font-weight:400;letter-spacing:0;color:#4C4C4C;line-height:1.4;margin-bottom:20px;">How was your experience with Bunjang Global?</div>
+      <!-- Title: H4_Bold_20 + Subtitle: P2_Regular_15, gap 6px, margin-bottom 20px -->
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:20px;">
+        <div style="font-size:20px;font-weight:700;letter-spacing:0;color:#191919;line-height:1.2;">Share Feedback</div>
+        <div style="font-size:15px;font-weight:400;letter-spacing:0;color:#4C4C4C;line-height:1.4;">How was your experience with Bunjang Global?</div>
+      </div>
 
       <!-- Star rating: 박스 밖, 메인 액션 -->
       <div style="margin-bottom:24px;">
