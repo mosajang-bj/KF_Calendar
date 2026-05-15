@@ -1909,16 +1909,18 @@ function openFeedbackModal() {
 
       <!-- Star rating: 박스 밖, 메인 액션 -->
       <div style="margin-bottom:24px;">
-        <div style="font-size:15px;font-weight:500;letter-spacing:0;color:#666666;line-height:1.4;margin-bottom:12px;">Overall satisfaction</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-size:15px;font-weight:700;letter-spacing:0;color:#666666;line-height:1.4;">Overall satisfaction</div>
+          <div id="fb-rating-label" style="font-size:13px;font-weight:500;letter-spacing:0;color:#FFC200;line-height:1.4;"></div>
+        </div>
         <div id="fb-stars" style="display:flex;gap:6px;">
           ${[1,2,3,4,5].map(n=>`<button data-s="${n}" onclick="setRating(${n})" style="flex:1;height:48px;border-radius:8px;border:1.5px solid #E0E0E0;background:#FFFFFF;font-size:22px;color:#E0E0E0;cursor:pointer;transition:all .15s ease;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;outline:none;">★</button>`).join('')}
         </div>
-        <div id="fb-rating-label" style="font-size:13px;font-weight:500;letter-spacing:0;color:#FFC200;line-height:1.4;margin-top:8px;min-height:18px;text-align:center;"></div>
       </div>
 
-      <!-- Textarea: gray-50 박스 안, 선택적 2차 입력 -->
+      <!-- Textarea -->
       <div>
-        <div style="font-size:15px;font-weight:500;letter-spacing:0;color:#666666;line-height:1.4;margin-bottom:8px;">What can we improve? <span style="font-weight:400;color:#B2B2B2;">(optional)</span></div>
+        <div style="font-size:15px;font-weight:700;letter-spacing:0;color:#666666;line-height:1.4;margin-bottom:8px;">What can we improve? <span style="font-weight:400;color:#B2B2B2;">(optional)</span></div>
         <textarea id="fb-text" placeholder="Share your thoughts on features, bugs, or anything else…" style="width:100%;min-height:88px;padding:12px 16px;background:#FFFFFF;border:1.5px solid rgba(25,25,25,0.14);border-radius:8px;color:#191919;font-size:15px;font-weight:400;letter-spacing:0;line-height:1.4;resize:none;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color .15s;-webkit-appearance:none;" onfocus="this.style.borderColor='#D80C18'" onblur="this.style.borderColor='rgba(25,25,25,0.14)'"></textarea>
       </div>
     </div>
