@@ -265,18 +265,29 @@ async function upsertRows(rows) {
     });
     if (res.ok) { ok += chunk.length; continue; }
     for (const row of chunk) {
-      const ins = await fetch(`${SUPA_URL}/rest/v1/music_show_lineups`, {
-        method: 'POST',
-        headers: {
-          apikey: SUPA_SERVICE_KEY,
-          Authorization: `Bearer ${SUPA_SERVICE_KEY}`,
-          'Content-Type': 'application/json',
-          Prefer: 'resolution=merge-duplicates,return=minimal',
-        },
-        body: JSON.stringify([row]),
-        signal: AbortSignal.timeout(10000),
-      });
-      if (ins.ok) ok++;
+      const ex = await fetch(
+        `${SUPA_URL}/rest/v1/music_show_lineups?show_name=eq.${row.show_name}&broad_date=eq.${row.broad_date}&select=id,source`,
+        { headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` } }
+      ).then(r => r.json()).catch(() => []);
+      if (ex.length > 0) {
+        // naver source 보호 — youtube_api가 덮어쓰지 않음
+        if (ex[0].source === 'naver') { ok++; continue; }
+        if (row.source === 'date_rule' && ex[0].source !== 'date_rule') { ok++; continue; }
+        await fetch(`${SUPA_URL}/rest/v1/music_show_lineups?id=eq.${ex[0].id}`, {
+          method: 'PATCH',
+          headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+          body: JSON.stringify({ groups: row.groups, raw_title: row.raw_title, source: row.source }),
+        });
+        ok++;
+      } else {
+        const ins = await fetch(`${SUPA_URL}/rest/v1/music_show_lineups`, {
+          method: 'POST',
+          headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}`, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' },
+          body: JSON.stringify([row]),
+          signal: AbortSignal.timeout(10000),
+        });
+        if (ins.ok) ok++;
+      }
     }
   }
   return ok;

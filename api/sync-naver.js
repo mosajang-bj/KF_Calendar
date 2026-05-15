@@ -1,5 +1,5 @@
 // api/sync-naver.js
-// 뮤직뱅크(금) + 쇼챔피언(수) — Naver 회차정보 탭 크롤링 → Supabase upsert
+// 전체 5개 음악방송 — Naver 회차정보 탭 크롤링 → Supabase upsert (최우선 소스)
 // Vercel Cron: 0 0 * * * (매일 09:00 KST)
 
 const { resolveEnNames } = require('./artist-en-name');
@@ -9,9 +9,13 @@ const SUPA_SERVICE_KEY = process.env.SUPA_SERVICE_KEY;
 const SYNC_SECRET      = process.env.SYNC_SECRET || '';
 
 // os: Naver 내부 프로그램 ID (회차정보 탭 URL에서 확인)
+// descFormat: 'dt_dd' = <dt>출연</dt><dd>..., 'span_desc' = <span class="desc _text">...
 const SHOWS_NAVER = [
-  { show_name: 'music_bank',    dayOfWeek: 5, label: '뮤직뱅크',  navOs: '659774', navQuery: '뮤직뱅크' },
-  { show_name: 'show_champion', dayOfWeek: 3, label: '쇼챔피언',  navOs: '669613', navQuery: '쇼 챔피언' },
+  { show_name: 'music_bank',    dayOfWeek: 5, label: '뮤직뱅크',    navOs: '659774', navQuery: '뮤직뱅크' },
+  { show_name: 'show_champion', dayOfWeek: 3, label: '쇼챔피언',    navOs: '669613', navQuery: '쇼 챔피언' },
+  { show_name: 'music_core',    dayOfWeek: 6, label: '음악중심',    navOs: '658837', navQuery: '음악중심' },
+  { show_name: 'mcountdown',    dayOfWeek: 4, label: '엠카운트다운', navOs: '659252', navQuery: '엠카운트다운' },
+  { show_name: 'inkigayo',      dayOfWeek: 0, label: '인기가요',    navOs: '658960', navQuery: '인기가요', descFormat: 'span_desc' },
 ];
 
 const ARTIST_TO_GROUP = {
@@ -133,9 +137,9 @@ async function fetchNaverEpisodeTab(show) {
 }
 
 // HTML에서 회차 데이터 파싱
-// 구조: <span class="num_txt">N</span>회 ... <span class="date_info">YYYY.MM.DD.</span>
-//       ... <dt>출연</dt> <dd>[performers]</dd>
-function parseNaverEpisodes(html) {
+// descFormat 'dt_dd':   <dt>출연</dt> <dd>[performers]</dd>  (뮤직뱅크·음악중심·엠카·쇼챔)
+// descFormat 'span_desc': <span class="desc _text">aespa, NMIXX ... 등</span>  (인기가요)
+function parseNaverEpisodes(html, descFormat = 'dt_dd') {
   const episodes = [];
   const seen = new Set();
 
@@ -153,20 +157,33 @@ function parseNaverEpisodes(html) {
 
     if (seen.has(date)) continue;
 
-    const subM = s.match(/<dt>출연<\/dt>\s*<dd>([\s\S]*?)<\/dd>/);
-    if (!subM) continue;
+    let performers = [];
 
-    // <a>NAME</a> 추출 후 나머지 태그 제거
-    let ddText = subM[1]
-      .replace(/<a[^>]*>([^<]*)<\/a>/g, '$1')
-      .replace(/<[^>]+>/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
+    if (descFormat === 'span_desc') {
+      // 인기가요 포맷: <span class="desc _text">aespa, NMIXX, BOYNEXTDOOR 등</span>
+      const descM = s.match(/class="desc _text">([^<]+)/);
+      if (!descM) continue;
+      performers = descM[1]
+        .replace(/\s*등\s*$/, '')
+        .split(',')
+        .map(p => p.trim())
+        .filter(p => p.length > 1 && p.length < 40);
+    } else {
+      // 기본 포맷: <dt>출연</dt> <dd>...</dd>
+      const subM = s.match(/<dt>출연<\/dt>\s*<dd>([\s\S]*?)<\/dd>/);
+      if (!subM) continue;
 
-    const performers = ddText
-      .split(',')
-      .map(s => s.trim())
-      .filter(s => s.length > 1 && s.length < 40);
+      let ddText = subM[1]
+        .replace(/<a[^>]*>([^<]*)<\/a>/g, '$1')
+        .replace(/<[^>]+>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      performers = ddText
+        .split(',')
+        .map(p => p.trim())
+        .filter(p => p.length > 1 && p.length < 40);
+    }
 
     if (performers.length > 0) {
       seen.add(date);
@@ -245,7 +262,7 @@ module.exports = async function handler(req, res) {
 
       // ② Naver 회차정보 크롤링
       const html = await fetchNaverEpisodeTab(show);
-      const episodes = parseNaverEpisodes(html);
+      const episodes = parseNaverEpisodes(html, show.descFormat || 'dt_dd');
 
       if (episodes.length === 0) {
         log.push(`[${show.show_name}] Naver 에피소드 없음 (HTML ${html.length}자)`);
