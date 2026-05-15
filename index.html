@@ -304,14 +304,15 @@ body{
 .gcard-img-bg{display:none}
 .gcard-img-fallback{
   position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
+  display:none;align-items:center;justify-content:center;
   font-size:36px;opacity:.3;
 }
+.gcard-img.img-err .gcard-img-fallback{display:flex;}
 .gcard-img img{
   position:absolute;inset:0;width:100%;height:100%;
   object-fit:cover;
 }
-.gcard-img img.err{display:none}
+.gcard-img.img-err img{display:none;}
 
 .gcard-body{padding:8px 0 0;text-align:left}
 .gcard-name{
@@ -1439,7 +1440,7 @@ async function fetchAllGroupGoods(artists, showName) {
       const productUrl = `https://globalbunjang.com/product/${item.id}`;
       const imgSrc = item.imageUrl ? `/api/image?url=${encodeURIComponent(item.imageUrl)}` : '';
       const itemName = translateName(item.name);
-      const imgHtml = imgSrc ? `<img src="${imgSrc}" alt="${escHtml(itemName)}" loading="lazy" onerror="this.classList.add('err')">` : '';
+      const imgHtml = imgSrc ? `<img src="${imgSrc}" alt="${escHtml(itemName)}" loading="lazy" onerror="this.closest('.gcard-img').classList.add('img-err')">` : '';
       const card = document.createElement('div');
       card.className = 'gcard';
       card.style.cssText = `animation:fadeUp .22s ease both;animation-delay:${i*15}ms`;
@@ -1510,7 +1511,7 @@ async function fetchAndShowLiveGoods(artistName) {
       const imgSrc = item.imageUrl ? `/api/image?url=${encodeURIComponent(item.imageUrl)}` : '';
       const itemName = translateName(item.name);
       const imgHtml = imgSrc
-        ? `<img src="${imgSrc}" alt="${escHtml(itemName)}" loading="lazy" onerror="this.classList.add('err')">`
+        ? `<img src="${imgSrc}" alt="${escHtml(itemName)}" loading="lazy" onerror="this.closest('.gcard-img').classList.add('img-err')">`
         : '';
       const card = document.createElement('div');
       card.className = 'gcard';
