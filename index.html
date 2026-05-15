@@ -1925,8 +1925,8 @@ function openFeedbackModal() {
       </div>
     </div>
 
-    <!-- Status message: 스크롤 영역 밖, 푸터 바로 위 고정 -->
-    <div id="fb-msg" style="min-height:36px;padding:0 20px;display:flex;align-items:center;justify-content:center;font-size:13px;letter-spacing:0;color:#8C8C8C;flex-shrink:0;"></div>
+    <!-- Status message: 텍스트 있을 때만 공간 차지 -->
+    <div id="fb-msg" style="padding:0 20px;display:none;align-items:center;justify-content:center;font-size:13px;letter-spacing:0;color:#8C8C8C;flex-shrink:0;min-height:32px;"></div>
 
     <!-- GDS Sticky Action Button -->
     <div style="border-top:1.5px solid #F6F6F6;padding:12px 20px;display:flex;gap:6px;flex-shrink:0;">
@@ -1978,16 +1978,22 @@ async function submitFeedback() {
   const submitBtn = document.getElementById('fb-submit-btn');
   const text      = document.getElementById('fb-text').value.trim();
 
+  const showMsg = (text, color) => {
+    msg.style.color = color;
+    msg.textContent = text;
+    msg.style.display = 'flex';
+  };
+
   // 별점 미선택 — 에러 표시 (GDS fg-negative)
   if (!_fbRating) {
-    msg.style.color = '#F32C15';
-    msg.textContent = 'Please select a rating.';
+    showMsg('Please select a rating.', '#F32C15');
     return;
   }
 
   // 로딩 상태 — 버튼 비활성화
   submitBtn.disabled = true;
   submitBtn.textContent = 'Submitting…';
+  msg.style.display = 'none';
   msg.textContent = '';
 
   try {
@@ -1997,22 +2003,18 @@ async function submitFeedback() {
       body: JSON.stringify({ rating: _fbRating, message: text }),
     });
     if (res.ok || res.status === 201) {
-      // 성공 — GDS fg-positive
-      msg.style.color = '#00A587';
-      msg.textContent = '✓ Thank you for your feedback!';
+      showMsg('✓ Thank you for your feedback!', '#00A587');
       submitBtn.textContent = 'Done ✓';
       setTimeout(() => closeFeedbackModal(), 1800);
     } else {
-      // 서버 에러 — GDS fg-negative
-      msg.style.color = '#F32C15';
-      msg.textContent = 'Error. Please try again.';
+      showMsg('Error. Please try again.', '#F32C15');
       submitBtn.disabled = false;
       submitBtn.textContent = 'Submit';
     }
   } catch (e) {
     // 네트워크 에러 — GDS fg-negative
     msg.style.color = '#F32C15';
-    msg.textContent = 'Network error. Check your connection.';
+    showMsg('Network error. Check your connection.', '#F32C15');
     submitBtn.disabled = false;
     submitBtn.textContent = 'Submit';
   }
