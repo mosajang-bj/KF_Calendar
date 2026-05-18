@@ -7,6 +7,8 @@ const { resolveEnNames } = require('./artist-en-name');
 const SUPA_URL         = 'https://kzffotlfdtubkbxsjqiv.supabase.co';
 const SUPA_SERVICE_KEY = process.env.SUPA_SERVICE_KEY;
 const SYNC_SECRET      = process.env.SYNC_SECRET || '';
+const TG_BOT_TOKEN     = process.env.TG_BOT_TOKEN || '';
+const TG_CHAT_ID       = process.env.TG_CHAT_ID || '';
 
 // os: Naver 내부 프로그램 ID (회차정보 탭 URL에서 확인)
 // descFormat: 'dt_dd' = <dt>출연</dt><dd>..., 'span_desc' = <span class="desc _text">...
@@ -84,6 +86,18 @@ const ARTIST_TO_GROUP = {
   'H1-KEY':'h1key','하이키':'h1key',
   'KiiiKiii':'kiikikii',
   'Billlie':'billlie','빌리':'billlie',
+  '82MAJOR':'82major',
+  'YOUNITE':'younite','유나이트':'younite',
+  'NAZE':'naze','네이즈':'naze',
+  'UNCHILD':'unchild',
+  'CORTIS':'cortis',
+  'CrazAngel':'crazangel','크레이즈엔젤':'crazangel',
+  'KIIRAS':'kiiras',
+  'FLARE U':'flareu','플레어 유':'flareu',
+  'H//PE Princess':'hpeprincess',
+  'XngHan&Xoul':'xnghananxoul',
+  '자두':'jadu',
+  '차동협':'chadonghyup',
 };
 
 function mapArtists(names) {
@@ -237,6 +251,47 @@ async function upsertRows(rows) {
   return ok;
 }
 
+// ── 텔레그램 노티 ──
+async function sendTelegram(text) {
+  if (!TG_BOT_TOKEN || !TG_CHAT_ID) return;
+  try {
+    await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: TG_CHAT_ID, text, parse_mode: 'HTML' }),
+      signal: AbortSignal.timeout(10000),
+    });
+  } catch (e) {
+    console.error('[sync-naver] TG 전송 실패:', e.message);
+  }
+}
+
+// 이번 주 + 다음 주 방송일(월~일) 범위 반환
+function thisAndNextWeekRange() {
+  const now = new Date();
+  // 이번 주 월요일
+  const mon = new Date(now);
+  mon.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+  mon.setHours(0, 0, 0, 0);
+  // 다음 주 일요일
+  const sun = new Date(mon);
+  sun.setDate(mon.getDate() + 13);
+  return { from: dKey(mon), to: dKey(sun) };
+}
+
+// 이번 주/다음 주 방송별 lineup 건수를 Supabase에서 조회
+async function fetchWeekCounts(from, to) {
+  const url = `${SUPA_URL}/rest/v1/music_show_lineups` +
+    `?broad_date=gte.${from}&broad_date=lte.${to}` +
+    `&select=show_name,broad_date,groups,source`;
+  const res = await fetch(url, {
+    headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` },
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) throw new Error(`Supabase fetch HTTP ${res.status}`);
+  return res.json();
+}
+
 module.exports = async function handler(req, res) {
   const authHeader = req.headers.authorization || '';
   const secret = req.query.secret || '';
@@ -292,6 +347,64 @@ module.exports = async function handler(req, res) {
 
     } catch (err) {
       log.push(`[${show.show_name}] 오류: ${err.message}`);
+    }
+  }
+
+  // ── 텔레그램 노티 ──
+  // Cron 실행(Authorization 헤더 없음)이거나 ?notify=1 일 때만 전송
+  const isCron = !req.headers.authorization && !req.query.secret;
+  const forceNotify = req.query.notify === '1';
+  if ((isCron || forceNotify) && TG_BOT_TOKEN && TG_CHAT_ID) {
+    try {
+      const { from, to } = thisAndNextWeekRange();
+      const rows = await fetchWeekCounts(from, to);
+
+      // 방송별 집계
+      const counts = {};
+      const warns = [];
+      for (const show of SHOWS_NAVER) counts[show.show_name] = { total: 0, withLineup: 0 };
+      for (const r of rows) {
+        if (!counts[r.show_name]) continue;
+        counts[r.show_name].total++;
+        if (r.groups && r.groups.length > 0) counts[r.show_name].withLineup++;
+      }
+
+      // 로그에서 오류 줄 추출
+      const errLines = log.filter(l => l.includes('오류') || l.includes('없음'));
+
+      // 5개 이하 경고 (뼈대만 있고 출연진 없는 방송)
+      for (const [show_name, c] of Object.entries(counts)) {
+        if (c.withLineup <= 5) warns.push(`⚠️ <b>${show_name}</b>: 출연진 있는 일정 ${c.withLineup}개`);
+      }
+
+      const hasIssue = errLines.length > 0 || warns.length > 0;
+      const icon = hasIssue ? '🚨' : '✅';
+      const lines = [
+        `${icon} <b>sync-naver 실행 완료</b> (${new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })})`,
+        `📊 총 upsert: ${totalUpserted}건 | 대상기간: ${from} ~ ${to}`,
+        '',
+      ];
+
+      if (errLines.length > 0) {
+        lines.push('❌ <b>크롤링 실패/없음:</b>');
+        errLines.forEach(l => lines.push(`  ${l}`));
+        lines.push('');
+      }
+      if (warns.length > 0) {
+        lines.push('📉 <b>출연진 적은 방송 (≤5개):</b>');
+        warns.forEach(w => lines.push(`  ${w}`));
+        lines.push('');
+      }
+
+      lines.push('<b>방송별 현황:</b>');
+      for (const [sn, c] of Object.entries(counts)) {
+        const label = SHOWS_NAVER.find(s => s.show_name === sn)?.label || sn;
+        lines.push(`  ${label}: 전체 ${c.total}회 / 출연진 ${c.withLineup}회`);
+      }
+
+      await sendTelegram(lines.join('\n'));
+    } catch (notifyErr) {
+      log.push(`[notify] 텔레그램 전송 오류: ${notifyErr.message}`);
     }
   }
 

@@ -178,9 +178,14 @@ select option{background:#0d0d14}
   <div id="tab-lineups" style="display:none">
     <div class="sec-hdr" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <h2 style="font-size:16px;font-weight:700;color:#c4a0f0">공방 일정 관리</h2>
-      <button onclick="syncImbc()" style="background:#306090;border:none;color:#fff;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
-        🔄 음악중심 자동 수집
-      </button>
+      <div style="display:flex;gap:8px">
+        <button onclick="syncNaver()" style="background:#1a6b3a;border:none;color:#fff;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
+          🔄 전체 방송 자동 수집 (Naver)
+        </button>
+        <button onclick="syncImbc()" style="background:#306090;border:none;color:#fff;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
+          🔄 음악중심 자동 수집
+        </button>
+      </div>
     </div>
 
     <!-- 수동 입력 폼 -->
@@ -399,6 +404,17 @@ async function submitLineup() {
     'THE BOYZ':'theboyz','ONEUS':'oneus','GOT7':'got7','DAY6':'day6',
     'tripleS':'triples','NEXZ':'nexz','KATSEYE':'katseye',
     'Xdinary Heroes':'xdinaryheroes','ALPHA DRIVE ONE':'alphadriveone',
+    'Billlie':'billlie','빌리':'billlie',
+    '82MAJOR':'82major',
+    'YOUNITE':'younite','유나이트':'younite',
+    'NAZE':'naze','네이즈':'naze',
+    'UNCHILD':'unchild',
+    'CORTIS':'cortis',
+    'CrazAngel':'crazangel','크레이즈엔젤':'crazangel',
+    'KIIRAS':'kiiras',
+    'FLARE U':'flareu','플레어 유':'flareu',
+    'H//PE Princess':'hpeprincess',
+    'XngHan&Xoul':'xnghananxoul',
   };
   const groups = [...new Set(artists.map(a=>ARTIST_MAP[a]).filter(Boolean))];
 
@@ -423,6 +439,23 @@ async function submitLineup() {
     loadLineups();
   } catch(e) {
     msg.style.color='#f08080'; msg.textContent='오류: ' + e.message;
+  }
+}
+
+async function syncNaver() {
+  const btn = event.target;
+  btn.textContent = '수집 중...'; btn.disabled = true;
+  try {
+    const secret = prompt('SYNC_SECRET을 입력하세요 (없으면 Enter)') || '';
+    const res = await fetch(`/api/sync-naver?secret=${encodeURIComponent(secret)}`);
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+    alert(`✓ 수집 완료\n${(json.log||[]).join('\n')}`);
+    loadLineups();
+  } catch(e) {
+    alert('수집 실패: ' + e.message);
+  } finally {
+    btn.textContent = '🔄 전체 방송 자동 수집 (Naver)'; btn.disabled = false;
   }
 }
 
