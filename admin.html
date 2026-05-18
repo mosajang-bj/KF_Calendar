@@ -313,7 +313,7 @@ function showTab(name) {
     document.querySelectorAll('.tab')[TABS.indexOf(t)].classList.toggle('on', t===name);
   });
   if(name==='calendar')    renderCal();
-  if(name==='lineups')     loadLineups();
+  if(name==='lineups')     loadLineups(null);
   if(name==='feedback')    loadFeedback();
 }
 
@@ -331,7 +331,7 @@ const SHOW_COLORS_ADMIN = {
   mcountdown:'#FF4757', show_champion:'#00C4B4', the_show:'#6B94D6',
 };
 
-async function loadLineups() {
+async function loadLineups(onDone) {
   const el = document.getElementById('lineup-list');
   el.innerHTML = '<div style="color:#555;font-size:13px">불러오는 중...</div>';
   try {
@@ -362,6 +362,7 @@ async function loadLineups() {
       `;
       el.appendChild(row);
     });
+    if (typeof onDone === 'function') onDone();
   } catch(e) {
     el.innerHTML = `<div style="color:#f08080;font-size:13px">오류: ${e.message}</div>`;
   }
@@ -724,9 +725,15 @@ function openDetail(e) {
   btnGoLineups.className='btn-edit btn-sm'; btnGoLineups.textContent='공방 일정 편집';
   btnGoLineups.onclick = () => {
     panel.classList.remove('open');
-    showTab('lineups');
-    // 폼에 현재 이벤트 데이터 채우기
-    editLineup(e.id, e.show_name, e.broad_date, e.episode_number, e.raw_title || '');
+    // 탭 전환 (loadLineups 직접 호출하지 않음)
+    TABS.forEach(t => {
+      document.getElementById(`tab-${t}`).style.display = t==='lineups' ? 'block' : 'none';
+      document.querySelectorAll('.tab')[TABS.indexOf(t)].classList.toggle('on', t==='lineups');
+    });
+    // loadLineups 완료 후 폼에 데이터 채우기
+    loadLineups(() => {
+      editLineup(e.id, e.show_name, e.broad_date, e.episode_number, e.raw_title || '');
+    });
   };
   const btnClose = document.createElement('button');
   btnClose.className='btn-sm'; btnClose.style.cssText='background:#222;color:#888';
