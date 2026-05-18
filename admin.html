@@ -356,7 +356,7 @@ async function loadLineups() {
           <div style="color:#888;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.raw_title || r.groups.join(' · ')}</div>
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0">
-          <button onclick="editLineup(${r.id},'${r.show_name}','${r.broad_date}',${r.episode_number||'null'},'${(r.raw_title||'').replace(/'/g,"\\'")}')" style="background:#1e2a40;border:1px solid #2a4060;color:#80b0f0;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer">편집</button>
+          <button onclick="editLineupById(${r.id})" data-id="${r.id}" data-show="${r.show_name}" data-date="${r.broad_date}" data-ep="${r.episode_number||''}" data-title="${(r.raw_title||'').replace(/"/g,'&quot;')}" style="background:#1e2a40;border:1px solid #2a4060;color:#80b0f0;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer">편집</button>
           <button onclick="deleteLineup(${r.id}, this)" style="background:#3a1010;border:1px solid #6a2020;color:#f08080;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer">삭제</button>
         </div>
       `;
@@ -378,6 +378,16 @@ async function deleteLineup(id, btn) {
     alert('삭제 실패: ' + e.message);
     btn.textContent = '삭제';
   }
+}
+
+function editLineupById(id) {
+  const btn = document.querySelector(`button[data-id="${id}"]`);
+  if (!btn) return;
+  const showName  = btn.dataset.show;
+  const broadDate = btn.dataset.date;
+  const episodeNo = btn.dataset.ep;
+  const rawTitle  = btn.dataset.title;
+  editLineup(id, showName, broadDate, episodeNo, rawTitle);
 }
 
 function editLineup(id, showName, broadDate, episodeNo, rawTitle) {

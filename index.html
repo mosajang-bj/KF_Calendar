@@ -1570,11 +1570,15 @@ function toast(msg){
 // ─────────────────────────────────────────
 async function fetchMusicShowLineups() {
   try {
+    // 4주 전 ~ 8주 후만 로드, date_rule(출연진 없는 뼈대) 제외
     const since = new Date(TODAY);
-    since.setMonth(since.getMonth() - 6);
+    since.setDate(since.getDate() - 28);
+    const until = new Date(TODAY);
+    until.setDate(until.getDate() + 56);
     const sinceStr = dKey(since);
+    const untilStr = dKey(until);
     const res = await supaFetch(
-      `music_show_lineups?select=*&broad_date=gte.${sinceStr}&order=broad_date.asc`
+      `music_show_lineups?select=*&broad_date=gte.${sinceStr}&broad_date=lte.${untilStr}&source=neq.date_rule&order=broad_date.asc`
     );
     if (!res.ok) { console.warn('[KF_Calendar] fetchLineups HTTP', res.status); return; }
     const rows = await res.json();
@@ -1584,23 +1588,29 @@ async function fetchMusicShowLineups() {
     rows.forEach(r => {
       const dateKey = (r.broad_date || '').slice(0, 10);
       if (!dateKey) return;
-      LINEUP_BY_DATE[dateKey] = {
-        showName: r.show_name,
-        episode:  r.episode_number,
-        groups:   r.groups || [],
-        rawTitle: r.raw_title || '',
-      };
+      // 같은 날짜에 여러 row가 있으면 naver > manual 우선, date_rule 제외
+      const existing = LINEUP_BY_DATE[dateKey];
+      const priority = { naver: 2, manual: 1 };
+      if (!existing || (priority[r.source] || 0) >= (priority[existing.source] || 0)) {
+        LINEUP_BY_DATE[dateKey] = {
+          showName: r.show_name,
+          episode:  r.episode_number,
+          groups:   r.groups || [],
+          rawTitle: r.raw_title || '',
+          source:   r.source,
+        };
+      }
     });
 
-    EVENTS = rows.map(r => {
-      const show = SHOW_LABELS[r.show_name] || { name: r.show_name, color: '#9B6FD8' };
+    EVENTS = Object.entries(LINEUP_BY_DATE).map(([date, lineup]) => {
+      const show = SHOW_LABELS[lineup.showName] || { name: lineup.showName, color: '#9B6FD8' };
       return {
-        id:    `lineup-${r.id}`,
-        group: r.show_name,
-        date:  (r.broad_date || '').slice(0, 10),
+        id:    `lineup-${date}`,
+        group: lineup.showName,
+        date,
         name:  show.name,
         type:  'gonbang',
-        venue: r.episode_number ? `EP ${r.episode_number}` : '',
+        venue: lineup.episode ? `EP ${lineup.episode}` : '',
         color: show.color,
       };
     });
