@@ -190,7 +190,8 @@ select option{background:#0d0d14}
 
     <!-- 수동 입력 폼 -->
     <div style="background:#13131f;border:1px solid #22223a;border-radius:12px;padding:20px;margin-bottom:24px">
-      <h3 style="font-size:13px;font-weight:700;color:#aaa;margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em">수동 입력 (음악중심 외 방송사)</h3>
+      <input type="hidden" id="lf-edit-id" value="">
+      <h3 id="lf-form-title" style="font-size:13px;font-weight:700;color:#aaa;margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em">수동 입력 (음악중심 외 방송사)</h3>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px">
         <div>
           <label style="font-size:11px;color:#666;display:block;margin-bottom:4px">방송 프로그램</label>
@@ -218,7 +219,8 @@ select option{background:#0d0d14}
         <div style="font-size:11px;color:#555;margin-top:4px">네이버 검색에서 복사한 출연진 목록을 그대로 붙여넣어도 됩니다.</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
-        <button onclick="submitLineup()" style="background:#9040d0;border:none;color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">저장</button>
+        <button onclick="submitLineup()" id="lf-submit-btn" style="background:#9040d0;border:none;color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">저장</button>
+        <button onclick="cancelEditLineup()" id="lf-cancel-btn" style="display:none;background:#333;border:none;color:#aaa;padding:9px 16px;border-radius:8px;font-size:13px;cursor:pointer">취소</button>
         <span id="lf-msg" style="font-size:12px;color:#888"></span>
       </div>
     </div>
@@ -353,7 +355,10 @@ async function loadLineups() {
           </div>
           <div style="color:#888;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.raw_title || r.groups.join(' · ')}</div>
         </div>
-        <button onclick="deleteLineup(${r.id}, this)" style="background:#3a1010;border:1px solid #6a2020;color:#f08080;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0">삭제</button>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button onclick="editLineup(${r.id},'${r.show_name}','${r.broad_date}',${r.episode_number||'null'},'${(r.raw_title||'').replace(/'/g,"\\'")}')" style="background:#1e2a40;border:1px solid #2a4060;color:#80b0f0;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer">편집</button>
+          <button onclick="deleteLineup(${r.id}, this)" style="background:#3a1010;border:1px solid #6a2020;color:#f08080;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer">삭제</button>
+        </div>
       `;
       el.appendChild(row);
     });
@@ -375,7 +380,41 @@ async function deleteLineup(id, btn) {
   }
 }
 
+function editLineup(id, showName, broadDate, episodeNo, rawTitle) {
+  // raw_title에서 아티스트 목록 추출 ("show - art1, art2" → "art1\nart2")
+  const prefix = showName + ' - ';
+  const artistStr = rawTitle.startsWith(prefix) ? rawTitle.slice(prefix.length) : rawTitle;
+  const artists = artistStr.split(',').map(s => s.trim()).filter(Boolean).join('\n');
+
+  document.getElementById('lf-edit-id').value = id;
+  document.getElementById('lf-show').value = showName;
+  document.getElementById('lf-date').value = broadDate;
+  document.getElementById('lf-episode').value = episodeNo || '';
+  document.getElementById('lf-artists').value = artists;
+  document.getElementById('lf-form-title').textContent = '편집 중';
+  document.getElementById('lf-form-title').style.color = '#80b0f0';
+  document.getElementById('lf-submit-btn').textContent = '수정 저장';
+  document.getElementById('lf-cancel-btn').style.display = 'inline-block';
+  document.getElementById('lf-msg').textContent = '';
+  // 폼으로 스크롤
+  document.getElementById('lf-show').closest('div[style*="background:#13131f"]').scrollIntoView({ behavior:'smooth' });
+}
+
+function cancelEditLineup() {
+  document.getElementById('lf-edit-id').value = '';
+  document.getElementById('lf-show').value = 'inkigayo';
+  document.getElementById('lf-date').value = '';
+  document.getElementById('lf-episode').value = '';
+  document.getElementById('lf-artists').value = '';
+  document.getElementById('lf-form-title').textContent = '수동 입력 (음악중심 외 방송사)';
+  document.getElementById('lf-form-title').style.color = '#aaa';
+  document.getElementById('lf-submit-btn').textContent = '저장';
+  document.getElementById('lf-cancel-btn').style.display = 'none';
+  document.getElementById('lf-msg').textContent = '';
+}
+
 async function submitLineup() {
+  const editId  = document.getElementById('lf-edit-id').value;
   const show    = document.getElementById('lf-show').value;
   const date    = document.getElementById('lf-date').value;
   const episode = document.getElementById('lf-episode').value.trim();
@@ -420,8 +459,9 @@ async function submitLineup() {
 
   msg.style.color='#888'; msg.textContent='저장 중...';
   try {
-    const res = await fetch('/api/lineup-upsert', {
-      method: 'POST',
+    const url = editId ? `/api/lineup-upsert?id=${editId}` : '/api/lineup-upsert';
+    const res = await fetch(url, {
+      method: editId ? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         show_name: show,
@@ -432,9 +472,8 @@ async function submitLineup() {
       }),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-    msg.style.color='#60d090'; msg.textContent='✓ 저장됨';
-    document.getElementById('lf-artists').value = '';
-    document.getElementById('lf-episode').value = '';
+    msg.style.color='#60d090'; msg.textContent= editId ? '✓ 수정됨' : '✓ 저장됨';
+    cancelEditLineup();
     loadLineups();
   } catch(e) {
     msg.style.color='#f08080'; msg.textContent='오류: ' + e.message;

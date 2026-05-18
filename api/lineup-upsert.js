@@ -8,7 +8,7 @@ const SYNC_SECRET      = process.env.SYNC_SECRET || '';
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method === 'DELETE') {
@@ -26,7 +26,36 @@ module.exports = async function handler(req, res) {
     if (!delRes.ok) return res.status(delRes.status).json({ error: await delRes.text() });
     return res.status(200).json({ ok: true });
   }
-  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  if (req.method === 'PATCH') {
+    const id = req.query.id;
+    if (!id) return res.status(400).json({ error: 'id 필수' });
+    if (!SUPA_SERVICE_KEY) return res.status(500).json({ error: 'SUPA_SERVICE_KEY 없음' });
+    const body = req.body;
+    const raw_title = (body.raw_title && body.raw_title.includes(' - '))
+      ? body.raw_title
+      : `${body.show_name} - ${body.raw_title || ''}`;
+    const patchRes = await fetch(`${SUPA_URL}/rest/v1/music_show_lineups?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: {
+        apikey: SUPA_SERVICE_KEY,
+        Authorization: `Bearer ${SUPA_SERVICE_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({
+        show_name:      body.show_name,
+        broad_date:     body.broad_date,
+        episode_number: body.episode_number || null,
+        groups:         body.groups || [],
+        raw_title,
+        source: 'manual',
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!patchRes.ok) return res.status(patchRes.status).json({ error: await patchRes.text() });
+    return res.status(200).json({ ok: true, updated: true });
+  }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST/PATCH/DELETE only' });
 
   // 간단한 secret 체크 (SYNC_SECRET 미설정 시 열려있음)
   const auth = (req.headers.authorization || '').replace('Bearer ', '');
