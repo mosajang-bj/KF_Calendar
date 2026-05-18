@@ -1570,12 +1570,10 @@ function toast(msg){
 // ─────────────────────────────────────────
 async function fetchMusicShowLineups() {
   try {
-    // 4주 전 ~ 8주 후만 로드, date_rule(출연진 없는 뼈대) 제외
-    const since = new Date(TODAY);
-    since.setDate(since.getDate() - 28);
+    // 오늘부터 다음 3개월까지, date_rule(출연진 없는 뼈대) 제외
     const until = new Date(TODAY);
-    until.setDate(until.getDate() + 56);
-    const sinceStr = dKey(since);
+    until.setMonth(until.getMonth() + 3);
+    const sinceStr = dKey(TODAY);
     const untilStr = dKey(until);
     const res = await supaFetch(
       `music_show_lineups?select=*&broad_date=gte.${sinceStr}&broad_date=lte.${untilStr}&source=neq.date_rule&order=broad_date.asc`

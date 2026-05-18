@@ -118,10 +118,12 @@ function dKey(d) {
 }
 
 function datesForDay(dayOfWeek, sinceDate) {
-  const start = sinceDate ? new Date(sinceDate) : new Date(Date.now() - 30 * 86400000);
-  start.setHours(0,0,0,0);
+  // 오늘부터 다음 2주만 뼈대 생성 (불필요한 과거/먼 미래 row 방지)
   const today = new Date(); today.setHours(0,0,0,0);
-  const end = new Date(today.getFullYear(), today.getMonth()+2, 0);
+  const start = sinceDate ? new Date(sinceDate) : today;
+  start.setHours(0,0,0,0);
+  const end = new Date(today);
+  end.setDate(today.getDate() + 14);
   const dates = [];
   const cur = new Date(start);
   while (cur <= end) {
