@@ -366,8 +366,8 @@ async function deleteLineup(id, btn) {
   if (!confirm('삭제하시겠습니까?')) return;
   btn.textContent = '...';
   try {
-    const res = await supaFetch(`music_show_lineups?id=eq.${id}`, { method:'DELETE' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const res = await fetch(`/api/lineup-upsert?id=${id}`, { method:'DELETE' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
     btn.closest('div[style]').remove();
   } catch(e) {
     alert('삭제 실패: ' + e.message);

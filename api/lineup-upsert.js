@@ -11,6 +11,21 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(204).end();
+  if (req.method === 'DELETE') {
+    const id = req.query.id;
+    if (!id) return res.status(400).json({ error: 'id 필수' });
+    const delRes = await fetch(`${SUPA_URL}/rest/v1/music_show_lineups?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: {
+        apikey: SUPA_SERVICE_KEY,
+        Authorization: `Bearer ${SUPA_SERVICE_KEY}`,
+        Prefer: 'return=minimal',
+      },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!delRes.ok) return res.status(delRes.status).json({ error: await delRes.text() });
+    return res.status(200).json({ ok: true });
+  }
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
   // 간단한 secret 체크 (SYNC_SECRET 미설정 시 열려있음)
