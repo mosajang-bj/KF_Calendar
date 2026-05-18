@@ -1454,7 +1454,7 @@ async function fetchAllGroupGoods(artists, showName) {
     const grid = document.createElement('div');
     grid.className = 'goods-grid';
     items.slice(0, 60).forEach((item, i) => {
-      const productUrl = `https://globalbunjang.com/product/${item.id}`;
+      const productUrl = `https://globalbunjang.com/product/${item.id}?utm_source=kf-calendar&utm_medium=social&utm_campaign=pdp-direct`;
       const imgSrc = item.imageUrl ? `/api/image?url=${encodeURIComponent(item.imageUrl)}` : '';
       const itemName = translateName(item.name);
       const imgHtml = imgSrc ? `<img src="${imgSrc}" alt="${escHtml(itemName)}" loading="lazy" onerror="this.closest('.gcard-img').classList.add('img-err')">` : '';
@@ -1503,7 +1503,7 @@ async function fetchAndShowLiveGoods(artistName) {
     hdr.innerHTML = `
       <div class="goods-intro-title-row">
         <div class="goods-intro-title">${escHtml(displayName)} Fan Goods &amp; Postcards</div>
-        <a href="https://globalbunjang.com/search?q=${encodeURIComponent(artistName+' 공방')}&order=date" target="_blank" rel="noopener" class="goods-intro-chevron">
+        <a href="https://globalbunjang.com/search?q=${encodeURIComponent(artistName+' 공방')}&order=date&utm_source=kf-calendar&utm_medium=social&utm_campaign=fan-goods-postcards" target="_blank" rel="noopener" class="goods-intro-chevron">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
         </a>
       </div>
@@ -1524,7 +1524,7 @@ async function fetchAndShowLiveGoods(artistName) {
     const grid = document.createElement('div');
     grid.className = 'goods-grid';
     items.slice(0, 40).forEach((item, i) => {
-      const productUrl = `https://globalbunjang.com/product/${item.id}`;
+      const productUrl = `https://globalbunjang.com/product/${item.id}?utm_source=kf-calendar&utm_medium=social&utm_campaign=pdp-direct`;
       const imgSrc = item.imageUrl ? `/api/image?url=${encodeURIComponent(item.imageUrl)}` : '';
       const itemName = translateName(item.name);
       const imgHtml = imgSrc
@@ -1739,10 +1739,11 @@ const GROUP_BRAND_SLUG = {
   '빌리':'billlie','펜타곤':'pentagon','자이커스':'xikers','퀘이커':'qwer',
 };
 function groupBrandUrl(rawName) {
+  const utm = '?utm_source=kf-calendar&utm_medium=social&utm_campaign=kpop-groups';
   const slug = GROUP_BRAND_SLUG[rawName];
-  if (slug) return `https://globalbunjang.com/brand/${slug}`;
+  if (slug) return `https://globalbunjang.com/brand/${slug}${utm}`;
   const display = artistDisplayName(rawName);
-  return `https://globalbunjang.com/search?q=${encodeURIComponent(display)}`;
+  return `https://globalbunjang.com/search?q=${encodeURIComponent(display)}&utm_source=kf-calendar&utm_medium=social&utm_campaign=kpop-groups`;
 }
 
 function openSearchModal() {
