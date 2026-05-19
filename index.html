@@ -1236,10 +1236,10 @@ function renderBottom(){
         <div class="sel-date">${dayNames[dateObj.getDay()]}, ${MONTH_NAMES[mo-1]} ${d}</div>
         <div class="sel-sub" style="display:flex;align-items:center;gap:6px;margin-top:3px">
           <span class="show-badge" style="background:${show.color}">${show.short}</span>
-          <span style="color:var(--txt2);font-size:12px">${lineup.episode ? 'EP '+lineup.episode+' · ' : ''}${chipCount} Artists</span>
+          <span style="color:var(--txt2);font-size:12px">${chipCount > 0 ? (lineup.episode ? 'EP '+lineup.episode+' · ' : '')+chipCount+' Artists' : '출연진 업데이트 예정'}</span>
         </div>
       </div>
-      <div class="evt-badge" style="background:${show.color}">${chipCount}</div>
+      ${chipCount > 0 ? `<div class="evt-badge" style="background:${show.color}">${chipCount}</div>` : ''}
     `;
   } else {
     hdr.innerHTML=`
@@ -1367,10 +1367,10 @@ function renderBottom(){
         margin:0 auto 16px;
       ">📅</div>
       <div style="color:var(--txt1);font-size:14px;font-weight:600;letter-spacing:0;line-height:1.5;margin-bottom:6px">
-        Show lineup coming soon
+        아직 업데이트 안됐어요
       </div>
       <div style="color:var(--txt2);font-size:13px;letter-spacing:0;line-height:1.6">
-        Fan postcards &amp; goods will appear<br>once the show airs
+        출연진 정보가 확정되면<br>여기에 표시됩니다
       </div>
     `;
     bot.appendChild(empty);
@@ -1570,7 +1570,7 @@ function toast(msg){
 // ─────────────────────────────────────────
 async function fetchMusicShowLineups() {
   try {
-    // 4주 전 ~ 3개월 후, date_rule(출연진 없는 뼈대) 제외
+    // 4주 전 ~ 3개월 후 (date_rule 포함 — 출연진 없으면 "업데이트 예정" 표시)
     const since = new Date(TODAY);
     since.setDate(since.getDate() - 28);
     const until = new Date(TODAY);
@@ -1578,7 +1578,7 @@ async function fetchMusicShowLineups() {
     const sinceStr = dKey(since);
     const untilStr = dKey(until);
     const res = await supaFetch(
-      `music_show_lineups?select=*&broad_date=gte.${sinceStr}&broad_date=lte.${untilStr}&source=neq.date_rule&order=broad_date.asc`
+      `music_show_lineups?select=*&broad_date=gte.${sinceStr}&broad_date=lte.${untilStr}&order=broad_date.asc`
     );
     if (!res.ok) { console.warn('[KF_Calendar] fetchLineups HTTP', res.status); return; }
     const rows = await res.json();
@@ -1590,8 +1590,8 @@ async function fetchMusicShowLineups() {
       if (!dateKey) return;
       // 같은 날짜에 여러 row가 있으면 naver > manual 우선, date_rule 제외
       const existing = LINEUP_BY_DATE[dateKey];
-      const priority = { naver: 2, manual: 1 };
-      if (!existing || (priority[r.source] || 0) >= (priority[existing.source] || 0)) {
+      const priority = { naver: 3, manual: 2, imbc_api: 1, youtube_api: 1, date_rule: 0 };
+      if (!existing || (priority[r.source] ?? 0) >= (priority[existing.source] ?? 0)) {
         LINEUP_BY_DATE[dateKey] = {
           showName: r.show_name,
           episode:  r.episode_number,
